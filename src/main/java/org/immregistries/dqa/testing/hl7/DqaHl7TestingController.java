@@ -8,8 +8,6 @@ import org.apache.commons.logging.LogFactory;
 import org.immregistries.dqa.hl7util.Reportable;
 import org.immregistries.dqa.hl7util.builder.AckBuilder;
 import org.immregistries.dqa.hl7util.builder.AckData;
-import org.immregistries.dqa.testing.data.County;
-import org.immregistries.dqa.testing.data.CountyJpaRepository;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
@@ -27,8 +25,6 @@ public class DqaHl7TestingController {
     private static final Log logger = LogFactory.getLog(DqaHl7TestingController.class);
 
 
-    @Autowired
-    private CountyJpaRepository countyRepo;
     
 
 
@@ -82,31 +78,5 @@ public class DqaHl7TestingController {
 
     
 
-    //this is an example of how you would form a post.  
-    //this one takes the string, and makes a county with it. 
-    //and then returns the list of all the counties. 
-    //which is weird, and doesn't conform to any proper pattern. 
-    @RequestMapping(value = "demo", method = RequestMethod.POST)
-    public List<County> demo(
-            @RequestBody String message) throws Exception {
-
-    	addCountyWithName(message);
-        logger.info("demo!");
-        countyRepo.findAll();
-        return countyRepo.findAll();
-    }
-    
-    
-    
-    protected void addCountyWithName(String name) {
-    	County c = new County();
-    	c.setClassCode("HA!");
-    	c.setCountyCode("111");
-    	long id = Double.valueOf(Math.floor(Math.random() * 1000000)).longValue();
-    	c.setFipsNationalCountyId(id);
-    	c.setName(name + " " + id);
-    	c.setStateAbbreviation("MI");
-    	c.setStateCode("256");
-    	countyRepo.saveAndFlush(c);
-    }
+   
 }
