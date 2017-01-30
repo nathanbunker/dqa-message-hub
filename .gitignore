@@ -10,3 +10,4 @@
 .settings/.jsdtscope
 .classpath
 .project
+/.apt_generated/
