@@ -1,4 +1,4 @@
-package org.immregistries.dqa.testing.hl7;
+package org.immregistries.dqa.hub.rest;
 
 import java.util.ArrayList;
 import java.util.List;

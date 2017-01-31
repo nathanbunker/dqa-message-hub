@@ -1,0 +1,130 @@
+{
+	"variables": [],
+	"info": {
+		"name": "dqa-hub-testing",
+		"_postman_id": "ee5286e2-ffb3-c7ca-f907-7b79e5da0be5",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http urlencoded hl7 interface endpoing",
+			"request": {
+				"url": "localhost:8082/messages/form-standard",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "MESSAGEDATA",
+							"value": "this is a message",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "USERID",
+							"value": "me-the-user",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "PASSWORD",
+							"value": "123456",
+							"type": "text",
+							"enabled": true
+						},
+						{
+							"key": "FACILITYID",
+							"value": "12312-1412-12412",
+							"type": "text",
+							"enabled": true
+						}
+					]
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "hl7 ack tester",
+			"request": {
+				"url": "localhost:8082/tester/hl7",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "MSH|^~\\&|||||20161005163142-0400||VXU^V04^VXU_V04|1Zvx-F.71.8714.Gx|P|2.5.1|\nPID|||1Zvx-F.71.8714^^^AIRA-TEST^MR||Sharples^Lilyana^Duena^^^^L|Sheridan^Israt|20040501|F||2131-1^Other Race^CDCREC|18 Adson Ave^^Sault Sainte Marie^MI^49783^USA^P||^PRN^PH^^^906^4904239|||||||||2186-5^not Hispanic or Latino^CDCREC|\nNK1|1|Sheridan^Israt^^^^^L|MTH^Mother^HL70063|18 Adson Ave^^Sault Sainte Marie^MI^49783^USA^P|^PRN^PH^^^906^4904239|\nORC|RE||28222^TCH-FT|\nRXA|0|1|20050715||94^MMRV^CVX|999|||01^Historical^NIP001|\nORC|RE||28223^TCH-FT|\nRXA|0|1|20050812||94^MMRV^CVX|999|||01^Historical^NIP001|\n"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "demo - json",
+			"request": {
+				"url": "localhost:8082/messages/json",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"message\": \"This is a cool message\",\n  \"user\": \"regularUser\",\n  \"password\": \"password123\",\n  \"facilityCode\": \"DQATestFacility\"\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "demo - json example",
+			"request": {
+				"url": "localhost:8082/messages/json/example",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "URL Mappings",
+			"request": {
+				"url": "localhost:8082/mappings",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}

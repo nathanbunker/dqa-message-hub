@@ -2,7 +2,7 @@ package gov.mi.agcts.address.util;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.immregistries.dqa.testing.util.ObjectLoggingUtil;
+import org.immregistries.dqa.hub.util.ObjectLoggingUtil;
 import org.junit.Test;
 
 public class ObjectLoggingUtilTest {

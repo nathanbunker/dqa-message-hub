@@ -1,15 +1,14 @@
-package org.immregistries.dqa.testing;
+package org.immregistries.dqa.hub;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableConfigurationProperties
-@ComponentScan(basePackages={"org.immregistries.dqa.testing"})
+//@ComponentScan(basePackages={"org.immregistries.dqa.hub"})
 public class DqaMessageHubApplicationConfig extends SpringBootServletInitializer {
 	
 	@Override

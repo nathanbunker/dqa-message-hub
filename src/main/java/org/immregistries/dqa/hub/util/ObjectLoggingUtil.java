@@ -1,4 +1,4 @@
-package org.immregistries.dqa.testing.util;
+package org.immregistries.dqa.hub.util;
 
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.slf4j.Logger;
