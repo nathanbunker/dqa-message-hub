@@ -1,4 +1,4 @@
-package org.immregistries.dqa.testing.cfg;
+package org.immregistries.dqa.hub.cfg;
 
 import javax.annotation.PostConstruct;
 
