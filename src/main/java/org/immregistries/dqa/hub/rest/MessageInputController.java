@@ -1,5 +1,11 @@
 package org.immregistries.dqa.hub.rest;
 
+// Added imports
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+// -------------
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping(value = "/messages")
 @RestController
@@ -42,6 +49,59 @@ public class MessageInputController {
         messageSubmission.setFacilityCode(FACILITYID);
         
         return messageConsumer.makeAck(messageSubmission);
+    }
+    
+    @RequestMapping(value = "form-file", method = RequestMethod.POST)
+    public String urlEncodedHttpFormFilePost(
+    		MultipartFile file) throws Exception {
+    	
+        logger.info(file);
+        
+        String REGEX = "^MSH\\|.*";
+        String line;
+        String MESSAGEDATA = "";
+        String USERID = "user";
+        String PASSWORD = "pass";
+        String FACILITYID = "SF-000001";
+        String fileName = file.getOriginalFilename();
+        String messageResult;
+        String ackResult;
+        int count = 0;
+
+        InputStream inputStream = file.getInputStream();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        
+        DqaMessageInfo dqaInfo = new DqaMessageInfo(0);
+        			
+        while ((line = bufferedReader.readLine()) != null) {
+        	if (line.matches(REGEX)) {
+        		if (MESSAGEDATA.equals("")) {
+        			MESSAGEDATA = line;
+        			count++;
+        		}
+        		else {
+        	        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
+        	        dqaInfo.addHl7Messages(MESSAGEDATA);
+        	        dqaInfo.addHl7Messages(ackResult);
+        			MESSAGEDATA = line;
+        			count++;
+        		}
+        	}
+        	else {
+        		MESSAGEDATA = MESSAGEDATA.concat("\r\n");
+        		MESSAGEDATA = MESSAGEDATA.concat(line);
+        	}
+        }
+        
+        messageResult = "Filename: " + fileName + "\n" + "Number of messages: " + count + "\n" + "Reported under: " + FACILITYID;
+        
+        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
+        dqaInfo.addHl7Messages(MESSAGEDATA);
+        dqaInfo.addHl7Messages(ackResult);
+        
+        dqaInfo.printHL7Array();
+        
+        return messageResult;
     }
     
     @RequestMapping(value = "json", method = RequestMethod.POST)
