@@ -13,3 +13,5 @@
 /.apt_generated/
 
 \.factorypath
+
+\.settings/
