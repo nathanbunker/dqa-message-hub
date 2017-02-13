@@ -1,20 +1,12 @@
-package org.immregistries.dqa.hub.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.immregistries.dqa.hub.rest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.immregistries.dqa.hl7util.Reportable;
-import org.immregistries.dqa.hl7util.builder.AckBuilder;
-import org.immregistries.dqa.hl7util.builder.AckData;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
-import org.immregistries.dqa.validator.engine.ValidationRuleResult;
-import org.immregistries.dqa.validator.model.DqaMessageHeader;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
