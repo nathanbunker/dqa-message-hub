@@ -7,6 +7,8 @@ import org.immregistries.dqa.validator.report.Measureable;
 import org.immregistries.dqa.validator.report.ReportableCode;
 import org.joda.time.DateTime;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 public class MessageEvaluation {
 	
 	private List<Measureable> messageMeasures;
@@ -14,8 +16,11 @@ public class MessageEvaluation {
 	private int vaccineCount;
 	private AckResult messageResult;
 	private boolean messageProcessed;
+	private String messageAck;
+	private String messageVxu;
 	private int patientAge;
 	private DateTime messageReceivedTime;
+	
 	
 	public int getVaccineCount() {
 		return vaccineCount;
@@ -58,5 +63,18 @@ public class MessageEvaluation {
 	}
 	public void setMessageCodes(List<ReportableCode> messageCodes) {
 		this.messageCodes = messageCodes;
+	}
+
+	public String getMessageAck() {
+		return messageAck;
+	}
+	public void setMessageAck(String messageAck) {
+		this.messageAck = messageAck;
+	}
+	public String getMessageVxu() {
+		return messageVxu;
+	}
+	public void setMessageVxu(String messageVxu) {
+		this.messageVxu = messageVxu;
 	}
 }
