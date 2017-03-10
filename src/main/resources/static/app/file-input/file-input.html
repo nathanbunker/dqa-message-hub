@@ -1,0 +1,32 @@
+<div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="heading row">
+					<h4>FILE INPUT</h4>
+				</div>
+				<input type="file" file-model="myFile"/>
+
+				<button class="btn btn-primary" type="submit" ng-click="uploadFile()">Submit</button>
+			</div>
+		</div>
+		<br />
+		<div class="row" ng-show="stats != null">
+			<div class="col-md-12">
+				<pre>{{stats.responseMessage}}</pre>
+			</div>
+		</div>
+		<br />
+		<h2 ng-click="showAcks = !showAcks">
+		View HL7 Acks<span class="glyphicon" ng-class="showAcks ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up'"> </span></h2>
+		<div ng-show="showAcks">
+			<div ng-repeat="eval in response">
+				<div class="row">
+					<div>
+						<p class="hl7display" ng-bind-html="eval.messageAck | newline"></p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<button class="btn btn-primary" type="submit" ng-click="downloadFile()">Download</button>
+</div>

@@ -16,4 +16,17 @@ angular.module('messageHubDemoApp')
                 }
             })
         ;
+        
+        $stateProvider
+            .state('file-input', {
+                url: "/file-input",
+                templateUrl: 'app/file-input/file-input.html',
+                controller: "FileInputController",
+                resolve: {
+                    urlParams: ['$stateParams', function ($stateParams) {
+                        return {};
+                    }]
+                }
+            })
+        ;
     });

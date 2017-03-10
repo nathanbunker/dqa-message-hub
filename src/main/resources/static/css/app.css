@@ -49,3 +49,13 @@ body {
 pre {
     background-color: #f7f7f7;
 }
+
+.hl7display {
+    white-space: nowrap;
+    overflow-x: scroll;
+    font-family: monospace;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    padding: 10px;
+    background-color: #f7f7f7;
+}
