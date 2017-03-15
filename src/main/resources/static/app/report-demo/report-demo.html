@@ -1,0 +1,229 @@
+    <style>
+
+        .dottedbox {
+            width: 700px;
+            color: #749749;
+            background: #FFFFFF;
+            padding: 6px;
+            border-style: dashed;
+            border-width: 1px;
+            border-color: #CCDDDD
+        }
+
+        h1 {
+            color: #000000;
+            font-size: 2.0em;
+        }
+
+        h2 {
+            color: #000000;
+            font-size: 2.0em;
+            page-break-before: always;
+        }
+
+        h3 {
+            color: #000000;
+            font-size: 1.2em;
+        }
+
+        h4 {
+            color: #37595A;
+            font-size: 1.0em;
+        }
+
+        site {
+            color: #000000;
+            font-size: 1.2em;
+            padding-top: 5px;
+        }
+
+        table {
+            background: #CCDDDD;
+            border-style: solid;
+            border-width: 1;
+            border-color: #93AAAB;
+            border-collapse: collapse
+        }
+
+        th {
+            background: #93AAAB;
+            font-size: 0.8em;
+            color: #000000;
+            border-style: none;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        td {
+            border-style: solid;
+            border-width: 1;
+            border-color: #93AAAB;
+            margin: 0px;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+
+        pre {
+            border-style: solid;
+            border-width: 1;
+            border-color: #93AAAB;
+            background: #CCDDDD;
+            color: #749749;
+            font-size=-1
+        }
+
+        .score {
+            font-size: 1.5em;
+        }
+
+        .alert {}
+
+        .highlight {
+            background: #AAC4C4;
+            ;
+        }
+
+        .excellent {
+            color: #0031CE;
+            font-style: bold;
+        }
+
+        .good {
+            color: #0031CE;
+            font-style: bold;
+        }
+
+        .poor {
+            color: #CE3100;
+            font-style: bold;
+        }
+
+        .problem {
+            color: #CE3100;
+            font-style: bold;
+        }
+
+        a:link {
+            text-decoration: none;
+            color: #000000
+        }
+
+        a:visited {
+            text-decoration: none;
+            color: #000000
+        }
+
+        a:hover {
+            text-decoration: none;
+            color: #000000
+        }
+
+        a:active {
+            text-decoration: none;
+            color: #000000
+        }
+
+        a.tooltip span {
+            display: none;
+            padding: 2px 3px;
+            margin-left: 8px;
+            width: 130px;
+        }
+
+        a.tooltip:hover span {
+            display: inline;
+            position: absolute;
+            background: #CCDDDD;
+            border: 1px solid #749749;
+            color: #749749
+        }
+
+    </style>
+
+<div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="heading row">
+					<h4>Report Demo</h4>
+				</div>
+				
+				<div class="row">
+					<div class="form-group col-xs-12">
+						<textarea id="Message" class="form-control" ng-trim="false"
+							rows="10" ng-model="messageIn.message"></textarea>
+					</div>
+				</div>
+				<button class="btn btn-primary" type="submit" ng-click="getReport()">Get Report</button>
+				<button class="btn btn-primary" type="submit" ng-click="getExample()">Get Example Message</button>
+			</div>
+		</div>
+		<br /><br /><br />
+		
+		
+		<div class="row" ng-if="loaded">
+			<div class="col-md-12">
+				<div class="heading row">
+					<h4>Completeness</h4>
+				</div>
+<!-- 			<div class="text-primary text-center loading"
+					ng-if="messageEvaluation.messageAck == null">
+					<i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <br /> <span>Generating Report...</span>
+				</div> -->
+				<div id="completeness">
+					<div class="row">
+						<div class="col-md-12">
+							    <p class="dottedbox"> Completeness measures how many required, expected and recommended fields have been received and also indicates if expected vaccinations have been reported. </p>
+							    <h3>Score</h3>
+							    <table>
+							        <tr>
+							            <th align="center">Completeness Score</th>
+							            <th align="center">Description</th>
+							        </tr>
+							        <tr>
+							            <td align="center"><span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></th>
+							                <td align="center"><span class="score"><span class="good">Good</span></span>
+							                    </th>
+							        </tr>
+							   	</table> 
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div ng-repeat="section in report.scoreGroups">
+								<h3>{{section.label}}</h3>
+								 <table>
+									 <tr>
+							            <th align="left">Patient Fields</th>
+							            <th>Score</th>
+							            <th>Value Present</th>
+							            <!-- <th>Score Percent</th> -->
+							            <!-- <th>Evaluation</th> -->
+							        </tr>
+							        <tr>
+							       		<td class="highlight">Overall</td>
+							            <td class="highlight" align="center">{{section.sectionScore.scored}}/{{section.sectionScore.potential}}</td>
+							            <td class="highlight" align="center">&nbsp</td>
+							            <!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
+	<!-- 						            <td class="highlight" align="center"><span class="good">Excellent</span></td> -->
+							        </tr>
+	    							<tr ng-repeat-start="field in section.scores">
+								 		<td align="left">{{field.reportFieldDefinition.label}}</td>
+							            <!-- <td align="left">PID-3</td> -->
+							            <td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
+							            <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
+							            <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
+							            <!-- <td align="center"><span class="excellent">Excellent</span></td> -->
+								 	</tr>
+								 	<tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
+								        <td style="text-align:right;">{{issue.issueType}}</td>
+								        <td style="text-align:right;">-{{issue.issueDemerit}}</td>
+								        <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
+								    </tr>
+								 </table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</div>

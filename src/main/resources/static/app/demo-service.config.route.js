@@ -16,4 +16,17 @@ angular.module('messageHubDemoApp')
                 }
             })
         ;
+        $stateProvider
+        .state('reportDemo', {
+            url: "/report-demo",
+            templateUrl: 'app/report-demo/report-demo.html',
+            controller: "ReportDemoController",
+            resolve: {
+                urlParams: ['$stateParams', function ($stateParams) {
+                    return {};
+                }]
+            }
+        })
+        ;
+        
     });

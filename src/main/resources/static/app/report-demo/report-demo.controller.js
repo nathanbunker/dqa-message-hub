@@ -1,31 +1,26 @@
 angular.module('messageHubDemoApp')
 
-    .controller('DemoPageController', ['$scope', 'Hl7JsonPoster', 'Hl7JsonExample', 'ReportMessage', 
-        function ($scope, $poster, $example, $messageReporter) {
+    .controller('ReportDemoController', ['$scope', 'Hl7JsonPoster', 'ReportMessage', 'Hl7JsonExample',
+        function ($scope, $poster, $example, $exampleMessage) {
             
-    		$scope.messageIn = {
-//    				user:""
-//    				,profileCode:""
-//    				,message:""
-    		}
-    		
-    		$scope.messageEvaluation = {};
+    		$scope.report = {};
+    		$scope.messageIn = {};
 
             activate();
 
             function activate() {
-                console.log("LANDING PAGE CONTROLLER ACTIVATE");
+                console.log("ReportDemoController ACTIVATE");
             }
-
-            // submit an address to be cleansed (or find already-mapped address)
-            $scope.ok = function () {
-                console.log("Submitted");
-                $poster.save($scope.messageIn, function (data) {
+            
+            $scope.getReport = function () {
+                console.log("getting example");
+                $example.save($scope.messageIn, function (data) {
                     if (data != null) {
-                        $scope.messageEvaluation = data;
+                        $scope.report = data;
                         $scope.error = false;
+                        $scope.loaded = true;
                     } else {
-                        $scope.errorMessage = "An unknown error occurred.";
+                        $scope.errorMessage = "An unknown error occurred getting an example.";
                         $scope.error = true;
                     }
                 }, function (error) {
@@ -34,10 +29,9 @@ angular.module('messageHubDemoApp')
                 });
             };
             
-            // submit an address to be cleansed (or find already-mapped address)
             $scope.getExample = function () {
                 console.log("getting example");
-                $example.get(function (data) {
+                $exampleMessage.get(function (data) {
                     if (data != null) {
                         $scope.messageIn = data;
                         $scope.error = false;
