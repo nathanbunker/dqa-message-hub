@@ -194,6 +194,7 @@
 								 <table>
 									 <tr>
 							            <th align="left">Patient Fields</th>
+							            <th align="left">HL7 Field</th>
 							            <th>Score</th>
 							            <th>Value Present</th>
 							            <!-- <th>Score Percent</th> -->
@@ -201,6 +202,7 @@
 							        </tr>
 							        <tr>
 							       		<td class="highlight">Overall</td>
+							       		<td class="highlight"></td>
 							            <td class="highlight" align="center">{{section.sectionScore.scored}}/{{section.sectionScore.potential}}</td>
 							            <td class="highlight" align="center">&nbsp</td>
 							            <!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
@@ -208,7 +210,7 @@
 							        </tr>
 	    							<tr ng-repeat-start="field in section.scores">
 								 		<td align="left">{{field.reportFieldDefinition.label}}</td>
-							            <!-- <td align="left">PID-3</td> -->
+							            <td align="center">{{field.reportFieldDefinition.field.Hl7Field}}</td>
 							            <td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
 							            <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
 							            <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
