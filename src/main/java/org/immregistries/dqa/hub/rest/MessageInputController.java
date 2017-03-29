@@ -1,14 +1,15 @@
 package org.immregistries.dqa.hub.rest;
 
-// Added imports
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 // -------------
-
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.dqa.hub.persistence.MessageMetadata;
+import org.immregistries.dqa.hub.persistence.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.report.MessageEvaluation;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,14 +28,32 @@ public class MessageInputController {
 
     @Autowired 
     private Hl7MessageConsumer messageConsumer;
+    
+    @Autowired 
+    MessageMetadataJpaRepository metaRepo;
 
     @RequestMapping(value = "in", method = RequestMethod.POST)
-    public String hl7MessageEndpoint(
-            @RequestBody String message) throws Exception {
+    public String hl7MessageEndpoint(@RequestBody String message) throws Exception {
         logger.info("hl7 message interface endpoint!");
-        //This will take the message, parse, validate, and save the results so that it will show up 
-        //as part of the reporting UIX. 
-        return "message received";
+        
+        String provider = "DQA Default";
+        
+        Hl7MessageSubmission submission = new Hl7MessageSubmission();
+        submission.setFacilityCode(provider);
+        submission.setMessage(message);
+        submission.setPassword("none");
+        submission.setUser("dqa");
+        
+        String ack = messageConsumer.makeAck(submission);
+        
+        MessageMetadata mm = new MessageMetadata();
+        mm.setInputTime(new Date());
+        mm.setMessage(message);
+        mm.setResponse(ack);
+        mm.setProvider("DQA Default");
+        metaRepo.save(mm);
+
+        return ack;
     }
     
 
@@ -45,30 +65,38 @@ public class MessageInputController {
         logger.info(response);
         
         Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
+        
+        MessageMetadata mm = new MessageMetadata();
+        mm.setInputTime(new Date());
+        mm.setMessage(MESSAGEDATA);
+        mm.setProvider(FACILITYID);
+        metaRepo.save(mm);
+        
         messageSubmission.setMessage(MESSAGEDATA);
         messageSubmission.setUser(USERID);
         messageSubmission.setPassword(PASSWORD);
         messageSubmission.setFacilityCode(FACILITYID);
         
+        
         return messageConsumer.makeAck(messageSubmission);
     }
     
     @RequestMapping(value = "form-file", method = RequestMethod.POST)
-    public String urlEncodedHttpFormFilePost(
+    public String urlEncodedHttpFormFilePost(@RequestParam("file")
     		MultipartFile file) throws Exception {
     	
         logger.info(file);
         
-        String REGEX = "^MSH\\|.*";
+//        String REGEX = "^MSH\\|.*";
         String line;
-        String MESSAGEDATA = "";
-        String USERID = "user";
-        String PASSWORD = "pass";
-        String FACILITYID = "SF-000001";
-        String fileName = file.getOriginalFilename();
-        String messageResult;
-        String ackResult;
-        int count = 0;
+//        String MESSAGEDATA = "";
+//        String USERID = "user";
+//        String PASSWORD = "pass";
+//        String FACILITYID = "SF-000001";
+//        String fileName = file.getOriginalFilename();
+//        String messageResult;
+//        String ackResult;
+//        int count = 0;
 
         InputStream inputStream = file.getInputStream();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -76,40 +104,45 @@ public class MessageInputController {
         DqaMessageInfo dqaInfo = new DqaMessageInfo(0);
         			
         while ((line = bufferedReader.readLine()) != null) {
-        	if (line.matches(REGEX)) {
-        		if (MESSAGEDATA.equals("")) {
-        			MESSAGEDATA = line;
-        			count++;
-        		}
-        		else {
-        	        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
-        	        dqaInfo.addHl7Messages(MESSAGEDATA);
-        	        dqaInfo.addHl7Messages(ackResult);
-        			MESSAGEDATA = line;
-        			count++;
-        		}
-        	}
-        	else {
-        		MESSAGEDATA = MESSAGEDATA.concat("\r\n");
-        		MESSAGEDATA = MESSAGEDATA.concat(line);
-        	}
+//        	if (line.matches(REGEX)) {
+//        		if (MESSAGEDATA.equals("")) {
+//        			MESSAGEDATA = line;
+//        			count++;
+//        		}
+//        		else {
+//        	        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
+//        	        dqaInfo.addHl7Messages(MESSAGEDATA);
+//        	        dqaInfo.addHl7Messages(ackResult);
+//        			MESSAGEDATA = line;
+//        			count++;
+//        		}
+//        	}
+//        	else {
+//        		MESSAGEDATA = MESSAGEDATA.concat("\r\n");
+//        		MESSAGEDATA = MESSAGEDATA.concat(line);
+//        	}
+        	logger.info(line);
         }
         
-        messageResult = "Filename: " + fileName + "\n" + "Number of messages: " + count + "\n" + "Reported under: " + FACILITYID;
-        
-        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
-        dqaInfo.addHl7Messages(MESSAGEDATA);
-        dqaInfo.addHl7Messages(ackResult);
-        
-        dqaInfo.printHL7Array();
-        
-        return messageResult;
+//        messageResult = "Filename: " + fileName + "\n" + "Number of messages: " + count + "\n" + "Reported under: " + FACILITYID;
+//        
+//        ackResult = urlEncodedHttpFormPost(MESSAGEDATA, USERID, PASSWORD, FACILITYID);
+//        dqaInfo.addHl7Messages(MESSAGEDATA);
+//        dqaInfo.addHl7Messages(ackResult);
+//        
+//        dqaInfo.printHL7Array();
+        return "you did it!";
     }
+    
     
     @RequestMapping(value = "json", method = RequestMethod.POST)
     public MessageEvaluation jsonFormPost(@RequestBody Hl7MessageSubmission submission) {
     	logger.info("hl7 message interface endpoint! message: " + submission.getMessage() + " user: " + submission.getUser() + " password: " + submission.getPassword() + " facilityId: " + submission.getFacilityCode());
     	String vxu = submission.getMessage();
+    	
+      
+        
+        
     	logger.info("message: " + vxu);
     	String ack = "";
     	
@@ -127,11 +160,20 @@ public class MessageInputController {
     	MessageEvaluation me = new MessageEvaluation();
     	me.setMessageAck(ack);
     	me.setMessageVxu(vxu);
-    	
+    	this.saveMessage(vxu, ack, submission.getFacilityCode(), new Date());
     	logger.info("ACK: \n"+ack);
-    	
         return me;
     }
+    
+    protected void saveMessage(String message, String ack, String sender, Date inputTime) {
+    	 MessageMetadata mm = new MessageMetadata();
+         mm.setInputTime(new Date());
+         mm.setMessage(message);
+         mm.setProvider(sender);
+         mm.setResponse(ack);
+         metaRepo.save(mm);
+    }
+    
     String exampleMessageText = 
      "MSH|^~\\&|||||20170203184141-0700||VXU^V04^VXU_V04|25VK-K.01.03.pr|P|2.5.1|\n"
     +"PID|||25VK-K.01.03^^^AIRA-TEST^MR|||Brooks^Butterfly|20130206|M||2106-3^White^HL70005|233 Cherokee Ln^^Flint^MI^48501^USA^P||^PRN^PH^^^810^9573567|||||||||2186-5^not Hispanic or Latino^HL70005|\n"

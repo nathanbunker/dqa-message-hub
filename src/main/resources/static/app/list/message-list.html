@@ -1,0 +1,170 @@
+<style>
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+</style>
+<span class="glyphicon glyphicon-chevron-left text-primary"></span> <a ui-sref="landing-page" ng-click="console.clear()" >Select Provider</a>
+<div class="container">
+<!-- <div class="container"> -->
+<div class="row" style="padding-top:40px;">
+	  <div class="col-md-8">
+	  	<h2 class="messageList-header">{{::provider.key}} </h2>
+	  </div>
+	  <div class="col-md-4">
+	  	<div class="row vertical-align">
+	  		<div class="col-md-2">
+		  		<div><button type="button" class="btn btn-default btn-sm pull-right" ng-click="incrementDate(-1)"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+		  		</div>
+		  	</div>
+		  	<div class="col-md-8 text-center" style="font-size:2em;font-weight:bold;">
+				{{searchOptions.date | date : 'MM · dd · yyyy'}}
+			</div>
+			<div class="col-md-2 ">
+				<button type="button" class="btn btn-default btn-sm pull-left" ng-click="incrementDate(1)"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+			</div>
+	  	</div>
+  		<div class="col-md-6 col-md-offset-3">
+  			<p style="color:grey;">received date</p>
+  		</div>
+	  </div>
+</div>
+
+
+<div class="row">
+   <div class="col-md-4">
+		<button type="button" class="btn btn-primary btn-sm" ng-click="openModal()"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
+   </div>
+</div>
+
+<div class="row" ng-if="searchOptions.filters.messageSearchText">
+   <div class="col-md-12">
+   		<span class="col-md-2 h5" style="color:grey;">
+	    	<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('messageSearchText')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
+				Message Search:
+		</span>
+		<span class="col-md-8 h4">{{::searchOptions.filters.messageSearchText}}</span>
+   </div>
+</div>
+<div class="row" ng-if="searchOptions.filters.ackStatus">
+   <div class="col-md-12">
+   		<span class="col-md-2 h5" style="color:grey;">
+			<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('ackStatus')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
+			Ack Status:
+		</span>
+		<span class="col-md-8 h4">
+			{{searchOptions.filters.ackStatus}}
+		</span> 
+   </div>
+</div>
+<div class="row" ng-if="searchOptions.filters.statisticId" >
+   <div class="col-md-12">
+		<span class="col-md-2 h5" style="color:grey;">
+			<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('statisticId')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
+			ESSR Statistic:
+		</span>
+		<span class="col-md-8 h4" ng-show="statsFound">{{filterStatName}}</span>
+   </div>
+</div>
+
+<div class="row"  >
+	<div class="col-md-12"  >
+		
+			<span ng-if="!calendarPopulated" style="position:absolute;z-index:2;margin-top:114px;margin-left:541px;">
+				<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+				<span class="sr-only">Chart Populating...</span>
+			</span>
+		
+		<div >
+				<div style="height:240px;" 
+					agc-on-select="handleChartClick(selectedItem)"
+					google-chart	
+					chart="myChartObject"
+					agc-on-ready="readyHandler(chartWrapper)">
+				</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-1" style="margin-left: -75px;
+		    margin-top: -175px;">
+		<div style="height:73px">
+			<button ng-show="calendarDisplayYear < currentYear" 
+			style="
+		    font-size: 3em;
+		    border: none;
+		    color: #D3D3D3;"
+		    type="button" class="btn btn-default btn-sm" ng-click="nextYear();"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
+	    </div>
+	    <div style="height:73px"> 
+			<button  ng-show="calendarDisplayYear > 2010" 
+			style="
+		    font-size: 3em;
+		    border: none;
+		    color: #D3D3D3;" type="button" class="btn btn-default btn-sm" ng-click="prevYear();"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
+		</div>
+    </div>
+</div>
+
+
+<div class="row">
+	<div class="col-md-4">
+		<h4>Messages  
+		<span ng-if="resultsMetaData.totalElements">({{resultsMetaData.totalElements}})</h4></span>
+	</div>
+	
+</div>
+
+	
+  <div class="row">
+	<div class="col-md-12">
+ <!-- ng-if="!listloaded" -->
+		<span ng-if="!listloaded" class="col-md-12" style="position:absolute;z-index:2;margin-top:64px;text-align:center;">
+				<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+				<span class="sr-only">Chart Populating...</span>
+		</span>	
+		<div ng-class="{'text-muted':listloaded != true}">
+		<table class="table table-striped">
+			<thead>
+				<tr>
+				<th class="col-md-3">Message Control ID</th>
+				<th class="col-md-2">Patient Name</th>
+				<th class="col-md-4">CVX</th>
+				<th class="col-md-3">Message Received Date</th>
+				<th class="col-md-1">Ack Status</th>
+				</tr>
+			</thead>
+<!-- 			 ng-click="setSelected();" --> 
+<!--  -->
+		<tr ng-repeat="message in resultsMetaData.messages" >
+				<td>
+					<a ui-sref="message-detail({id: message.id})" ng-click="console.clear();">{{message.messageControlId}}</a> 
+					<!-- <a href="#/messages/{{message.id}}" >{{message.messageControlId}}</a> -->
+				</td>
+				<td>{{::message.patientName}}</td>
+				<td>{{::message.cvxList}}</td>
+				<td>{{::message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+				<td >
+				<button class="btn btn-xs btn-success" 
+					ng-class="{'btn-warning':message.ackStatus == 'AE', 'btn-danger':message.ackStatus == 'AR'} " 
+					style="cursor:default;"			
+				>{{::message.ackStatus}}</button>
+				</td>
+			</tr>
+		</table>
+		</div>
+		<uib-pagination total-items="resultsMetaData.totalElements" 
+						ng-model="resultsMetaData.page"
+						ng-change="pagingClicked()" 
+						boundary-link-numbers="true"
+						rotate="false"
+						items-per-page="resultsMetaData.elementsPerPage"
+						boundary-links="false"
+						force-ellipses="false"
+						max-size="resultsMetaData.maxSize"
+						previous-text="Prev"
+						>
+		</uib-pagination>
+		</div>
+	</div>
+</div>

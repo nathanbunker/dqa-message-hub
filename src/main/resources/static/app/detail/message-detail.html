@@ -1,0 +1,184 @@
+<div class="hl7container">
+    <span class="glyphicon glyphicon-chevron-left text-primary"></span> <a href="#" ng-click="goBack()">Return to list</a>
+    <div class="messageDetail.messageDataContainer" ng-if="messageDetail.messageData.vxuParts">
+        <div class="row">
+            <div class="col-md-6"><h3>Message Information</h3></div>
+            <div class="col-md-6"><h3>DQA Statistics</h3></div>
+        </div>
+        <div style="line-height:2em; padding-bottom:30px;" class="row">
+            <div class="col-md-6">
+                <table class="table">
+                    <tr>
+                        <td class="col-md-3">Sender</td>
+                        <td class="col-md-9">{{::messageDetail.messageData.providerKey}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Received Date</td>
+                        <td>{{::messageDetail.messageData.messageMetaData.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                    </tr>
+                    <tr>
+                        <td>Patient Name</td>
+                        <td>{{::messageDetail.messageData.messageMetaData.patientName}}</td>
+                    </tr>
+                    <tr>
+                        <td>Vaccine List</td>
+                        <td>{{::messageDetail.messageData.messageMetaData.cvxList}}</td>
+                    </tr>
+                    <tr>
+                        <td>Control Id</td>
+                        <td>{{::messageDetail.messageData.messageMetaData.messageControlId}}</td>
+                    </tr>
+                    <tr>
+                        <td>Ack Status</td>
+                        <td>
+                            <button class="btn btn-xs btn-success"
+                                    ng-class="{'btn-warning':messageDetail.messageData.messageMetaData.ackStatus == 'AE', 'btn-danger':messageDetail.messageData.messageMetaData.ackStatus == 'AR'} "
+                                    style="cursor:default;"
+                            >
+                                {{::messageDetail.messageData.messageMetaData.ackStatus}}
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- <h1>stats</h1>
+            <pre>{{messageDetail.messageStats.statList}}</pre>
+            <h1>errors</h1>
+            <pre>{{messageDetail.messageErrors.errorList}}</pre> -->
+            <div class="col-md-6">
+                <table class="table table-striped">
+                    <tr ng-repeat="statistic in messageDetail.messageStats.statList">
+                        <td>{{::statistic.statisticName}}</td>
+                        <td>{{::statistic.statisticValue}}</td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+        <div class="row" style="padding-bottom:30px;">
+            <div class="col-md-12">
+            	<div class="panel" ng-class="{'panel-default':messageDetail.messageErrors.errorList.length <= 0, 'panel-danger':messageDetail.messageErrors.errorList.length > 0}">
+            	<div class="panel-heading">
+                	<h4 class="panel-title">Errors</h4>
+                </div>
+                <div ng-if="messageDetail.messageErrors.errorList.length <= 0" class="panel-body">
+                    No Errors!
+                </div>
+                <div  ng-if="messageDetail.messageErrors.errorList.length > 0" class="panel-body">
+                	<table ng-hide="messageDetail.messageErrors.errorList.length <= 0" class="table table-striped">
+	                    <thead>
+	                    <th>Field</th>
+	                    <th>Value</th>
+	                    <th>Message</th>
+	                    <th>Reason</th>
+	                    </thead>
+	                    <tr ng-repeat="msgError in messageDetail.messageErrors.errorList">
+	                        <td>{{::msgError.fieldName}}</td>
+	                        <td>{{::msgError.originalFieldValue}}</td>
+	                        <td>{{::msgError.errorMessage}}</td>
+	                        <td>{{::msgError.errorReason}}</td>
+	                    </tr>
+	                </table>
+	               </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="row" style="padding-bottom:30px;">
+            <div class="col-md-12">
+                <h4>Response (Ack)</h4>
+                <div>
+                    <pre>{{::messageDetail.messageData.messageResponse}}</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" style="padding-bottom:25px;">
+            <div class="col-md-12">
+                <div>
+                <h4>Message Received</h4>
+                <div>
+                 	<pre style="font-family: Menlo,Monaco,Consolas,'Courier New',monospace;"
+                 	><span uib-popover="{{::part.locationDescription}}" popover-trigger='mouseenter' popover-title="{{::part.location}}" ng-click="messageClicked(part.location,part.valueIndex);" ng-repeat="part in messageRequestParts"  ng-class="{'h7h': part.valueIndex == hIdx, 'h7hActive':part.location}">{{::part.value}}</span></pre>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 ">
+                <div class="form-group has-feedback" >
+            		<label >Find in message: </label>
+                	<input type="text" ng-model="filterText.$" class="form-control" placeholder="type / click message" />
+                	
+                	<span ng-if="filterText.$"
+		              ng-click="filterText.$ = '';hIdx=-1;current.page=1;"
+		              class="glyphicon glyphicon-remove form-control-feedback" 
+		              style="cursor: pointer; pointer-events: all;"
+		              uib-tooltip="clear">
+       				</span>
+				</div>
+            </div>
+            <div class="col-md-6" >
+            <div ng-show="filterData.length > 10">
+            <!-- ng-show="filterData.length > 10"> -->
+               <uib-pagination 
+               		class="pagination-sm pagination" 
+               		total-items="filterData.length" 
+               		ng-model="current.page"
+					ng-change="pageChanged()" 
+					boundary-link-numbers="true"
+					rotate="false"
+					boundary-links="false"
+					force-ellipses="false"
+					max-size="3"
+					previous-text="Prev"
+					items-per-page=10></uib-pagination>
+               </div>
+            
+            </div>
+        </div>
+
+        <!-- 	<div class="row">
+                <div class="col-md-2 text-right">Message Parts:</div>
+                <div class="col-md-1">{{messageDetail.messageData.vxuParts.length}}</div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-2 text-right">Filtered Parts:</div>
+                <div class="col-md-1">{{messageDetail.messageData.filteredParts.length}}</div>
+            </div> -->
+            <!-- <ul uib-pagination total-items="messageDetail.messageData.vxuParts.length" ng-model="messageDetail.messageData.vxuParts | filter: filterText" max-size="5" class="pagination-sm" boundary-links="true" num-pages="numPages"></ul> -->
+        <div class="row">
+            <div class="col-md-12" style="min-height:450px;">
+                <table class="table table-striped">
+                    <thead>
+	                    <tr>
+	                        <th class="col-md-3">Value<!--  <input type="text" ng-model="filterText.value" /> --></th>
+	                        <th class="col-md-1">Segment<!--  <input type="text" ng-model="filterText.value" /> --></th>
+	                        <th class="col-md-2">Location
+	                            <!--   <input type="text" ng-model="filterText.location" /> --></th>
+	                        <th class="col-md-2">Field Repetition<!--  <input type="text" ng-model="filterText.value" /> --></th>
+	                        <th class="col-md-4">Location Description
+	                            <!-- <input type="text" ng-model="filterText.locationDescription" /> --></th>
+	                    </tr>
+                    </thead>
+					<tbody>
+	                    <tr style="cursor:pointer;" ng-repeat="part in filterData = (messageDetail.messageData.vxuParts | filter: filterText) | limitTo:10:10*(current.page-1)" ng-click="setHoverIndex(part)" ng-class="{'h7h':hIdx==part.valueIndex}">
+	                        <td>{{::part.value}}</td>
+	                        <td>{{::part.segmentIndex}}</td>
+	                        <td>{{::part.location}}</td>
+	                        <td>{{::part.fieldRepetition}}</td>
+	                        <td>{{::part.locationDescription}}</td>
+	                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row" style="height: 20px;margin-top:50px;">
+            &nbsp;
+        </div>
+    </div>
+</div>

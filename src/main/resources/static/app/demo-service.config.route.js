@@ -2,7 +2,7 @@ angular.module('messageHubDemoApp')
 
     .config(function ($stateProvider, $urlRouterProvider) {
 
-        $urlRouterProvider.otherwise("demo-page");
+        $urlRouterProvider.otherwise("messages");
 
         $stateProvider
             .state('demo', {
@@ -15,8 +15,53 @@ angular.module('messageHubDemoApp')
                     }]
                 }
             })
-        ;
-        $stateProvider
+        
+		.state('landing-page', {
+		      url: "/messages",
+		      templateUrl : 'app/home/landing-page.html',
+		      controller:"LandingPageController",
+		      resolve:{
+		    	  urlParams:['$stateParams', function($stateParams) {
+						return {};
+					}]
+		      }
+		    
+		})
+        
+    	.state('message-list', {
+			url:'/messages/:providerKey/date/:date/?page&filters',   
+			templateUrl : 'app/list/message-list.html',
+			controller:"MessageListController", 
+    	})
+    	
+		.state('message-detail', {
+	      url: "/messages/{id}",
+	      templateUrl : 'app/detail/message-detail.html',
+	      controller: 'MessageDetailController', 
+	      resolve:{
+	    	     messageDetail: ['$stateParams', 'MessageDetailFactory',  function($stateParams, MessageDetailFactory){
+	    	    	 return {
+//		    	    	 messageErrors 	: ESSRMessageErrorsFactory.get({id:$stateParams.id}),
+//		    	    	 messageStats 	: ESSRMessageStatsFactory.get({id:$stateParams.id}),
+		    	    	 messageData 	: MessageDetailFactory.get({id: $stateParams.id})
+	    	    	   };
+	    	     }]
+	    	  }
+		})
+        
+        .state('file', {
+            url: "/file-page",
+            templateUrl: 'app/file-demo/file-page.html',
+            controller: "FilePageController",
+            resolve: {
+                urlParams: ['$stateParams', function ($stateParams) {
+                    return {};
+                }]
+            }
+        })
+        
+        
+        
         .state('reportDemo', {
             url: "/report-demo",
             templateUrl: 'app/report-demo/report-demo.html',

@@ -3,16 +3,12 @@ package org.immregistries.dqa.hub.report;
 import java.util.List;
 
 import org.immregistries.dqa.hl7util.builder.AckResult;
-import org.immregistries.dqa.validator.report.Measureable;
+import org.immregistries.dqa.validator.report.VxuScoredReport;
 import org.immregistries.dqa.validator.report.ReportableCode;
 import org.joda.time.DateTime;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
-
 public class MessageEvaluation {
 	
-	private List<Measureable> messageMeasures;
-	private List<ReportableCode> messageCodes;
 	private int vaccineCount;
 	private AckResult messageResult;
 	private boolean messageProcessed;
@@ -20,6 +16,7 @@ public class MessageEvaluation {
 	private String messageVxu;
 	private int patientAge;
 	private DateTime messageReceivedTime;
+	private VxuScoredReport messageReport;
 	
 	
 	public int getVaccineCount() {
@@ -52,19 +49,6 @@ public class MessageEvaluation {
 	public void setMessageReceivedTime(DateTime messageReceivedTime) {
 		this.messageReceivedTime = messageReceivedTime;
 	}
-	public List<Measureable> getMessageMeasures() {
-		return messageMeasures;
-	}
-	public void setMessageMeasures(List<Measureable> messageMeasures) {
-		this.messageMeasures = messageMeasures;
-	}
-	public List<ReportableCode> getMessageCodes() {
-		return messageCodes;
-	}
-	public void setMessageCodes(List<ReportableCode> messageCodes) {
-		this.messageCodes = messageCodes;
-	}
-
 	public String getMessageAck() {
 		return messageAck;
 	}
@@ -76,5 +60,11 @@ public class MessageEvaluation {
 	}
 	public void setMessageVxu(String messageVxu) {
 		this.messageVxu = messageVxu;
+	}
+	public VxuScoredReport getMessageReport() {
+		return messageReport;
+	}
+	public void setMessageReport(VxuScoredReport messageReport) {
+		this.messageReport = messageReport;
 	}
 }

@@ -1,5 +1,21 @@
 angular.module('messageHubDemoApp')
 
+	.factory('MessageCountHistoryFactory', function($resource) {
+	    return $resource('provider/:providerKey/counts/year/:year');
+	})
+	
+	.factory('MessageListFactory',	function($resource) {
+		return $resource('messages/:providerKey/date/:date/messages/:messages/page/:page/?filters=:filters');
+	})
+	
+	.factory('MessageDetailFactory', function($resource) {
+		return $resource('messages/:id');
+	})
+	
+	.factory('FacilityList', function($resource) {
+	    return $resource('facilities/');
+	})
+
     .factory('Hl7JsonPoster', function ($resource) {
         return $resource('messages/json');//posts a json object
     })

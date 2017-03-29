@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.immregistries.dqa.hl7util.Reportable;
-import org.immregistries.dqa.hl7util.SeverityLevel;
 import org.immregistries.dqa.hl7util.builder.AckBuilder;
 import org.immregistries.dqa.hl7util.builder.AckData;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
-import org.immregistries.dqa.validator.issue.ValidationIssue;
 import org.immregistries.dqa.vxu.DqaMessageHeader;
 import org.springframework.stereotype.Service;
 

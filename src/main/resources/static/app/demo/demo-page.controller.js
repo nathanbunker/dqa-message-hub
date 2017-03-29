@@ -14,7 +14,7 @@ angular.module('messageHubDemoApp')
             activate();
 
             function activate() {
-                console.log("LANDING PAGE CONTROLLER ACTIVATE");
+                console.log("DemoPageController ACTIVATE");
             }
 
             // submit an address to be cleansed (or find already-mapped address)
