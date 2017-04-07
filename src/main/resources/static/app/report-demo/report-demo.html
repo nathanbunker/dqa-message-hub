@@ -210,7 +210,7 @@
 							        </tr>
 	    							<tr ng-repeat-start="field in section.scores">
 								 		<td align="left">{{field.reportFieldDefinition.label}}</td>
-							            <td align="center">{{field.reportFieldDefinition.field.Hl7Field}}</td>
+							            <td align="center">{{field.reportFieldDefinition.hl7Field}}</td>
 							            <td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
 							            <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
 							            <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
@@ -218,7 +218,8 @@
 								 	</tr>
 								 	<tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
 								        <td style="text-align:right;">{{issue.issueType}}</td>
-								        <td style="text-align:right;">-{{issue.issueDemerit}}</td>
+								        <td></td>
+								        <td style="text-align:center;">-{{issue.issueDemerit}}</td>
 								        <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
 								    </tr>
 								 </table>
