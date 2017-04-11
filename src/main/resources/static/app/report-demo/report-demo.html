@@ -218,7 +218,8 @@
 								 	</tr>
 								 	<tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
 								        <td style="text-align:right;">{{issue.issueType}}</td>
-								        <td style="text-align:right;">-{{issue.issueDemerit}}</td>
+								        <td></td>
+								        <td style="text-align:center;">-{{issue.issueDemerit}}</td>
 								        <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
 								    </tr>
 								 </table>
