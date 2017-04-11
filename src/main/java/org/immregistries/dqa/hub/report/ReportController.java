@@ -1,11 +1,17 @@
 
 package org.immregistries.dqa.hub.report;
 
+import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
+import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.ReportScorer;
 import org.immregistries.dqa.validator.report.VxuScoredReport;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,6 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
     private static final Log logger = LogFactory.getLog(ReportController.class);
 
+    @Autowired
+    private Hl7MessageConsumer msgr;  
+ 
+    @Autowired
+    private SenderMetricsService metricsSvc;
+    
     private ReportScorer scorer = ReportScorer.INSTANCE;
     
     @RequestMapping(value = "/demo")
@@ -27,9 +39,16 @@ public class ReportController {
     
     @RequestMapping(value = "/message", method = RequestMethod.POST)
     public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission) throws Exception {
-    	logger.info("ReportController scoreMessage demo!");
-    	logger.info("processing this message: [" + submission.getMessage() + "]");
-    	VxuScoredReport report = scorer.getDefaultReportForMessage(submission.getMessage()); 
+    	logger.info("ReportController scoreMessage demo! sender:" + submission.getFacilityCode());
+    	String submitter = submission.getFacilityCode();
+    	if (StringUtils.isEmpty(submitter)) {
+    		submitter = "DQA";
+    	}
+    	
+    	msgr.processMessageAndMakeAck(submission);
+    	
+    	DqaMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date());
+    	VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics); 
     	return report;
     }
     

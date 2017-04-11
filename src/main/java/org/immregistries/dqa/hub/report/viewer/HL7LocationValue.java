@@ -1,4 +1,4 @@
-package org.immregistries.dqa.hub.persistence;
+package org.immregistries.dqa.hub.report.viewer;
 
 public class HL7LocationValue {
 	private String value;

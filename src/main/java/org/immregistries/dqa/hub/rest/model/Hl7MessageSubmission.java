@@ -5,7 +5,7 @@ public class Hl7MessageSubmission {
 	private String message;
 	private String user;
 	private String password;
-	private String facilityCode;
+	private String sendingOrganization;
 	
 	
 	public String getMessage() {
@@ -27,10 +27,10 @@ public class Hl7MessageSubmission {
 		this.password = password;
 	}
 	public String getFacilityCode() {
-		return facilityCode;
+		return sendingOrganization;
 	}
 	public void setFacilityCode(String facilityCode) {
-		this.facilityCode = facilityCode;
+		this.sendingOrganization = facilityCode;
 	}
 
 }

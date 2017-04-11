@@ -1,30 +1,69 @@
 package org.immregistries.dqa.hub.submission;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.immregistries.dqa.hl7util.Reportable;
 import org.immregistries.dqa.hl7util.builder.AckBuilder;
 import org.immregistries.dqa.hl7util.builder.AckData;
+import org.immregistries.dqa.hub.report.SenderMetricsService;
+import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
+import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
+import org.immregistries.dqa.validator.report.DqaMessageMetrics;
+import org.immregistries.dqa.validator.report.ReportScorer;
 import org.immregistries.dqa.vxu.DqaMessageHeader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class Hl7MessageConsumer {
 
-	
-	public String makeAck(Hl7MessageSubmission messageSubmission)
+	private DqaMessageService validator = DqaMessageService.INSTANCE;
+    private ReportScorer scorer = ReportScorer.INSTANCE;
+    @Autowired
+    private SenderMetricsService metricsSvc;
+	@Autowired
+	private MessageMetadataJpaRepository metaRepo;
+    
+	public String processMessageAndMakeAck(Hl7MessageSubmission messageSubmission)
 	{
 		String message = messageSubmission.getMessage();
-        DqaMessageService validator = DqaMessageService.INSTANCE;
+		
+		String sender = messageSubmission.getFacilityCode();
+		
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
         
-        List<ValidationRuleResult> resultList = validationResults.getValidationResults();
+        this.saveMetricsFromValidationResults(sender, validationResults);
         
+        String ack = makeAckFromValidationResults(validationResults);
+        
+        this.saveMessageForSender(message, ack, sender);
+        
+        return ack;
+	}
+	
+	public void saveMessageForSender(String message, String ack, String sender) {
+		MessageMetadata mm = new MessageMetadata();
+        mm.setInputTime(new Date());
+        mm.setMessage(message);
+        mm.setResponse(ack);
+        mm.setProvider(sender);
+        metaRepo.save(mm);
+	}
+	
+	public void saveMetricsFromValidationResults(String sender, DqaMessageServiceResponse validationResults) {
+		 	DqaMessageMetrics metrics = scorer.getDqaMetricsFor(validationResults);
+	        metricsSvc.addToSenderMetrics(sender,  new Date(), metrics);
+	}
+	
+	public String makeAckFromValidationResults(DqaMessageServiceResponse validationResults) {
+
+        List<ValidationRuleResult> resultList = validationResults.getValidationResults();
         List<Reportable> reportables = new ArrayList<Reportable>();
         //This code needs to get put somewhere better. 
         for (ValidationRuleResult result : resultList) {
@@ -48,7 +87,6 @@ public class Hl7MessageConsumer {
         data.setReportables(reportables);
         
         String ack = ackBuilder.buildAckFrom(data);
-        
         return ack;
 	}
 }

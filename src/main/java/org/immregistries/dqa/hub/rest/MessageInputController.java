@@ -8,9 +8,9 @@ import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.immregistries.dqa.hub.persistence.MessageMetadata;
-import org.immregistries.dqa.hub.persistence.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.report.MessageEvaluation;
+import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
+import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +31,19 @@ public class MessageInputController {
     
     @Autowired 
     MessageMetadataJpaRepository metaRepo;
-
+    
+    @Autowired
+    private Hl7MessageConsumer msgr;  
+    
     @RequestMapping(value = "in", method = RequestMethod.POST)
+    public String scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission) throws Exception {
+    	logger.info("ReportController scoreMessage demo!");
+    	logger.info("processing this message: [" + submission.getMessage() + "]");
+    	String ack = msgr.processMessageAndMakeAck(submission);
+    	return ack;
+    }
+
+    @RequestMapping(value = "in/msg-only", method = RequestMethod.POST)
     public String hl7MessageEndpoint(@RequestBody String message) throws Exception {
         logger.info("hl7 message interface endpoint!");
         
@@ -42,16 +53,9 @@ public class MessageInputController {
         submission.setFacilityCode(provider);
         submission.setMessage(message);
         submission.setPassword("none");
-        submission.setUser("dqa");
+        submission.setUser("none");
         
-        String ack = messageConsumer.makeAck(submission);
-        
-        MessageMetadata mm = new MessageMetadata();
-        mm.setInputTime(new Date());
-        mm.setMessage(message);
-        mm.setResponse(ack);
-        mm.setProvider("DQA Default");
-        metaRepo.save(mm);
+        String ack = messageConsumer.processMessageAndMakeAck(submission);
 
         return ack;
     }
@@ -65,20 +69,13 @@ public class MessageInputController {
         logger.info(response);
         
         Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
-        
-        MessageMetadata mm = new MessageMetadata();
-        mm.setInputTime(new Date());
-        mm.setMessage(MESSAGEDATA);
-        mm.setProvider(FACILITYID);
-        metaRepo.save(mm);
-        
         messageSubmission.setMessage(MESSAGEDATA);
         messageSubmission.setUser(USERID);
         messageSubmission.setPassword(PASSWORD);
         messageSubmission.setFacilityCode(FACILITYID);
         
-        
-        return messageConsumer.makeAck(messageSubmission);
+        String ack = messageConsumer.processMessageAndMakeAck(messageSubmission);
+        return  ack;
     }
     
     @RequestMapping(value = "form-file", method = RequestMethod.POST)
@@ -139,39 +136,20 @@ public class MessageInputController {
     public MessageEvaluation jsonFormPost(@RequestBody Hl7MessageSubmission submission) {
     	logger.info("hl7 message interface endpoint! message: " + submission.getMessage() + " user: " + submission.getUser() + " password: " + submission.getPassword() + " facilityId: " + submission.getFacilityCode());
     	String vxu = submission.getMessage();
-    	
-      
-        
-        
-    	logger.info("message: " + vxu);
     	String ack = "";
-    	
     	if (vxu != null) {
-    		ack = messageConsumer.makeAck(submission);
-    	
+    		ack = messageConsumer.processMessageAndMakeAck(submission);
     		vxu = vxu.replaceAll("[\\r]+", "\n");
-    	
     		if (ack != null) {
     			ack = ack.replaceAll("[\\r]+", "\n");
     		}
     	}
     	
-    	
     	MessageEvaluation me = new MessageEvaluation();
     	me.setMessageAck(ack);
     	me.setMessageVxu(vxu);
-    	this.saveMessage(vxu, ack, submission.getFacilityCode(), new Date());
     	logger.info("ACK: \n"+ack);
         return me;
-    }
-    
-    protected void saveMessage(String message, String ack, String sender, Date inputTime) {
-    	 MessageMetadata mm = new MessageMetadata();
-         mm.setInputTime(new Date());
-         mm.setMessage(message);
-         mm.setProvider(sender);
-         mm.setResponse(ack);
-         metaRepo.save(mm);
     }
     
     String exampleMessageText = 

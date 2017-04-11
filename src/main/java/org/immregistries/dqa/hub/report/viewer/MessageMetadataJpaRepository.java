@@ -1,4 +1,4 @@
-package org.immregistries.dqa.hub.persistence;
+package org.immregistries.dqa.hub.report.viewer;
 
 import java.util.Date;
 import java.util.List;

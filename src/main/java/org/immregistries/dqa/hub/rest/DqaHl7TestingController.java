@@ -31,7 +31,7 @@ public class DqaHl7TestingController {
         Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
         messageSubmission.setMessage(message);
         
-        return messageConsumer.makeAck(messageSubmission);
+        return messageConsumer.processMessageAndMakeAck(messageSubmission);
     }
     
 
