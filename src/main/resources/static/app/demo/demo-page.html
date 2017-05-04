@@ -45,13 +45,15 @@
 						<thead>
 							<tr>
 								<th class="col-md-3">Issue</th>
+								<th class="col-md-1">Code</th>
 								<th class="col-md-1">Severity</th>
 								<th class="col-md-8">Location</th>
 							</tr>
 						</thead>
 						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
 						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'ERROR'}">
-							<td>{{issue.issue}}</td>
+							<td>{{issue.applicationErrorCode.alternateText}}</td>
+							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
 							<td>{{issue.severity}}</td>
 							<td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
@@ -70,13 +72,15 @@
 						<thead>
 							<tr>
 								<th class="col-md-3">Issue</th>
+								<th class="col-md-1">Code</th>
 								<th class="col-md-1">Severity</th>
 								<th class="col-md-8">Location</th>
 							</tr>
 						</thead>
 						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
 						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'WARN'}">
-							<td>{{issue.issue}}</td>
+							<td>{{issue.applicationErrorCode.alternateText}}</td>
+							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
 							<td>{{issue.severity}}</td>
 							<td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
@@ -94,13 +98,15 @@
 						<thead>
 							<tr>
 								<th class="col-md-3">Issue</th>
+								<th class="col-md-1">Code</th>
 								<th class="col-md-1">Severity</th>
 								<th class="col-md-8">Location</th>
 							</tr>
 						</thead>
 						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
 						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'ACCEPT'}">
-							<td>{{issue.issue}}</td>
+							<td>{{issue.applicationErrorCode.alternateText}}</td>
+							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
 							<td>{{issue.severity}}</td>
 							<td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
