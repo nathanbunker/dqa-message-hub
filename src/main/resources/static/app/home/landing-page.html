@@ -4,7 +4,7 @@
 		<div class="row">
 			<div class="form-group typeahead col-md-12">
 					<label for="facilityPicker" class="control-label">Site: </label>
-					<input placeholder="Type a pin or name to find a Provider" type="text" typeahead-on-select="getProviderHistory()" select-on-click ng-model="searchOptionsForm.provider"  uib-typeahead="provider as provider for provider in providerList | filter:$viewValue | limitTo:50" typeahead-min-length="1" typeahead-show-hint="true" class="form-control">
+					<input placeholder="Type a pin or name to find a Provider" type="text" typeahead-on-select="getProviderHistory()" select-on-click ng-model="searchOptionsForm.provider"  uib-typeahead="provider as provider for provider in providerList | filter:$viewValue | limitTo:50" typeahead-min-length="0" typeahead-show-hint="true" class="form-control">
 			</div>
 		</div>
 		

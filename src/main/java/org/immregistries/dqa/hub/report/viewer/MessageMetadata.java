@@ -11,6 +11,7 @@ import javax.persistence.Lob;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name="MESSAGE_METADATA")
@@ -30,6 +31,7 @@ public class MessageMetadata {
 	@javax.persistence.Temporal(TemporalType.DATE)
 	private Date inputTime;
 	
+	@NotNull
 	private String provider;
 	
 	public Date getInputTime() {

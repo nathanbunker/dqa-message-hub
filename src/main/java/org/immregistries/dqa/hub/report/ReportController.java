@@ -41,8 +41,9 @@ public class ReportController {
     public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission) throws Exception {
     	logger.info("ReportController scoreMessage demo! sender:" + submission.getFacilityCode());
     	String submitter = submission.getFacilityCode();
+    	
     	if (StringUtils.isEmpty(submitter)) {
-    		submitter = "DQA";
+    		submission.setFacilityCode("DQA");
     	}
     	
     	msgr.processMessageAndMakeAck(submission);

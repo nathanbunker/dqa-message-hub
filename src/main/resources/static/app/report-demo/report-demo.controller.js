@@ -1,7 +1,7 @@
 angular.module('messageHubDemoApp')
 
     .controller('ReportDemoController', ['$scope', 'Hl7JsonPoster', 'ReportMessage', 'Hl7JsonExample',
-        function ($scope, $poster, $example, $exampleMessage) {
+        function ($scope, $poster, $reportMessage, $exampleMessage) {
             
     		$scope.report = {};
     		$scope.messageIn = {};
@@ -13,8 +13,8 @@ angular.module('messageHubDemoApp')
             }
             
             $scope.getReport = function () {
-                console.log("getting example");
-                $example.save($scope.messageIn, function (data) {
+                console.log($scope.messageIn);
+                $reportMessage.save($scope.messageIn, function (data) {
                     if (data != null) {
                         $scope.report = data;
                         $scope.error = false;

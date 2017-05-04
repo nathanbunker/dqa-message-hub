@@ -3,16 +3,13 @@ package org.immregistries.dqa.hub.rest;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-// -------------
-import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.immregistries.dqa.hub.report.MessageEvaluation;
-import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
+import org.immregistries.dqa.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+// -------------
 
 @RequestMapping(value = "/messages")
 @RestController
 public class MessageInputController {
-    private static final Log logger = LogFactory.getLog(MessageInputController.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageInputController.class);
 
     @Autowired 
     private Hl7MessageConsumer messageConsumer;
@@ -36,30 +34,12 @@ public class MessageInputController {
     private Hl7MessageConsumer msgr;  
     
     @RequestMapping(value = "in", method = RequestMethod.POST)
-    public String scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission) throws Exception {
+    public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission) throws Exception {
     	logger.info("ReportController scoreMessage demo!");
     	logger.info("processing this message: [" + submission.getMessage() + "]");
-    	String ack = msgr.processMessageAndMakeAck(submission);
+    	Hl7MessageHubResponse ack = msgr.processMessageAndMakeAck(submission);
     	return ack;
     }
-
-    @RequestMapping(value = "in/msg-only", method = RequestMethod.POST)
-    public String hl7MessageEndpoint(@RequestBody String message) throws Exception {
-        logger.info("hl7 message interface endpoint!");
-        
-        String provider = "DQA Default";
-        
-        Hl7MessageSubmission submission = new Hl7MessageSubmission();
-        submission.setFacilityCode(provider);
-        submission.setMessage(message);
-        submission.setPassword("none");
-        submission.setUser("none");
-        
-        String ack = messageConsumer.processMessageAndMakeAck(submission);
-
-        return ack;
-    }
-    
 
     @RequestMapping(value = "form-standard", method = RequestMethod.POST)
     public String urlEncodedHttpFormPost(
@@ -74,7 +54,7 @@ public class MessageInputController {
         messageSubmission.setPassword(PASSWORD);
         messageSubmission.setFacilityCode(FACILITYID);
         
-        String ack = messageConsumer.processMessageAndMakeAck(messageSubmission);
+        String ack = messageConsumer.processMessageAndMakeAck(messageSubmission).getAck();
         return  ack;
     }
     
@@ -82,8 +62,6 @@ public class MessageInputController {
     public String urlEncodedHttpFormFilePost(@RequestParam("file")
     		MultipartFile file) throws Exception {
     	
-        logger.info(file);
-        
 //        String REGEX = "^MSH\\|.*";
         String line;
 //        String MESSAGEDATA = "";
@@ -133,23 +111,31 @@ public class MessageInputController {
     
     
     @RequestMapping(value = "json", method = RequestMethod.POST)
-    public MessageEvaluation jsonFormPost(@RequestBody Hl7MessageSubmission submission) {
+    public Hl7MessageHubResponse jsonFormPost(@RequestBody Hl7MessageSubmission submission) {
     	logger.info("hl7 message interface endpoint! message: " + submission.getMessage() + " user: " + submission.getUser() + " password: " + submission.getPassword() + " facilityId: " + submission.getFacilityCode());
+    	
+    	
     	String vxu = submission.getMessage();
-    	String ack = "";
+    	
     	if (vxu != null) {
-    		ack = messageConsumer.processMessageAndMakeAck(submission);
+    		Hl7MessageHubResponse response = messageConsumer.processMessageAndMakeAck(submission);
     		vxu = vxu.replaceAll("[\\r]+", "\n");
+    		response.setVxu(vxu);
+    		
+    		//process the ack to display right on the web: 
+    		String ack = response.getAck();
     		if (ack != null) {
     			ack = ack.replaceAll("[\\r]+", "\n");
     		}
+    		response.setAck(ack);
+    		logger.info("ACK: \n"+ack);
+    		return response;
+    	} else {
+    		Hl7MessageHubResponse response = new Hl7MessageHubResponse();
+    		response.setSender(submission.getFacilityCode());
+    		response.setAck("INVALID REQUEST:  VXU is empty");
+    		return response;
     	}
-    	
-    	MessageEvaluation me = new MessageEvaluation();
-    	me.setMessageAck(ack);
-    	me.setMessageVxu(vxu);
-    	logger.info("ACK: \n"+ack);
-        return me;
     }
     
     String exampleMessageText = 

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.immregistries.dqa.hl7util.builder.AckResult;
 import org.immregistries.dqa.validator.report.VxuScoredReport;
-import org.immregistries.dqa.validator.report.ReportableCode;
 import org.joda.time.DateTime;
 
 public class MessageEvaluation {

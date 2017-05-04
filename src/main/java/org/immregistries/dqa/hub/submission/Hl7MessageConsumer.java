@@ -10,6 +10,7 @@ import org.immregistries.dqa.hl7util.builder.AckData;
 import org.immregistries.dqa.hub.report.SenderMetricsService;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
+import org.immregistries.dqa.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
@@ -30,11 +31,14 @@ public class Hl7MessageConsumer {
 	@Autowired
 	private MessageMetadataJpaRepository metaRepo;
     
-	public String processMessageAndMakeAck(Hl7MessageSubmission messageSubmission)
+	public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission)
 	{
 		String message = messageSubmission.getMessage();
 		
 		String sender = messageSubmission.getFacilityCode();
+		if (sender == null) {
+			sender = "DQA Unspecified";
+		}
 		
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
         
@@ -44,7 +48,13 @@ public class Hl7MessageConsumer {
         
         this.saveMessageForSender(message, ack, sender);
         
-        return ack;
+        Hl7MessageHubResponse response = new Hl7MessageHubResponse();
+        
+        response.setAck(ack);
+        response.setDqaResponse(validationResults);
+        response.setSender(sender);
+        
+        return response;
 	}
 	
 	public void saveMessageForSender(String message, String ack, String sender) {
