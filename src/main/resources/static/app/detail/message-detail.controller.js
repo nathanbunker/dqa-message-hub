@@ -1,104 +1,154 @@
 angular.module('messageHubDemoApp')
 
-    .controller('MessageDetailController', ['$sce','$scope', 'messageDetail',
-        function ($sce, $scope, messageDetail) {
+	.controller('MessageDetailController', ['$sce', '$scope', 'messageDetail',
+		function ($sce, $scope, messageDetail) {
 
-            $scope.filterText = {$: ''};
+			$scope.filterText = {$: ''};
 
-            $scope.messageDetail = messageDetail;
-            $scope.spannedMessageRequest = "";
-            $scope.messageRequestParts = [];
-            $scope.hIdx = -1;
-            
-            $scope.current = {
-            		page :1
-            }
-            
-            $scope.goBack = function () {
-                window.history.back();
-            };
-            
-            activate();
-            
-            function activate() {
-            	console.log("Activating MESSAGE DETAIL Controller!");
-            	//Prep the list by annotating it with the array index.
-            	$scope.messageDetail.messageData.$promise.then(function(data) {
-            		$scope.messageRequestParts = makeArrayWithSeparatorsIncluded(data.messageReceived, data.vxuParts);
-            	});
-            }
-            
-            $scope.pageChanged = function() {
-//          	  var startPos = ($scope.current.page - 1) * 3;
-          	  //$scope.displayItems = $scope.totalItems.slice(startPos, startPos + 3);
-//          	  console.log($scope.current.page);
-          	};
-            
-            
-            $scope.setHoverIndex = function(part) {
-            	$scope.hIdx = part.valueIndex;
-            };
-            
-            $scope.messageClicked = function(locationText, index) {
-            	if (locationText > "" && index >= 0) {
-            		$scope.hIdx = index;
-            		$scope.filterText.$ = '';
-            		for (var x = 0 ; x < $scope.messageDetail.messageData.vxuParts.length ; x++) {
-            			if ($scope.messageDetail.messageData.vxuParts[x].valueIndex == index) {
-            				var valuePosition = (x / 10);
-            				var calucatedPage = Math.floor(valuePosition) + 1;
-            				$scope.current.page = calucatedPage;
-            			}
-            		}
-            	}
-            }
-            
-//            $scope.$watch('current.page', function () {
-//            	console.log("current page: " + $scope.current.page);
-//            }, true);
-            
-           
-           makeArrayWithSeparatorsIncluded = function(inputString, valueList)  {
-//        	   console.log("popping and locking!");
-        	   
-				var popOffString = inputString;
-				//Put MSH into the new String.
-				var list = [];
-				var firstElement = {
-						value: popOffString.substring(0,3),
-						valueIndex : -100,
+			$scope.messageDetail = messageDetail;
+			$scope.spannedMessageRequest = "";
+			$scope.messageRequestParts = [];
+			$scope.hIdx = -1;
+
+			$scope.current = {};
+
+			$scope.goBack = function () {
+				window.history.back();
+			};
+
+			activate();
+
+			function activate() {
+				console.log("Activating MESSAGE DETAIL Controller!");
+				//Prep the list by annotating it with the array index.
+				$scope.messageDetail.messageData.$promise.then(function (data) {
+					$scope.messageRequestParts = makeArrayWithSeparatorsIncluded(data.messageReceived, data.vxuParts);
+					$scope.segmentList = getSegmentList(data.vxuParts);
+				});
+			}
+
+			$scope.setHoverIndex = function (part) {
+				$scope.hIdx = part.valueIndex;
+			};
+
+			/**
+			 * Handles what happens when a part of the message is clicked (highlighting the part, etc.).
+			 *
+			 * @param index index of the message part that was clicked
+			 */
+			$scope.messageClicked = function (index) {
+				$scope.filterText.$ = '';
+
+				// if the clicked part is the same as the currently-selected part, clear the selection
+				if ($scope.hIdx === index) {
+					$scope.hIdx = -1;
+					$scope.current.segment = undefined;
+				} else {
+					$scope.hIdx = index;
+					$scope.current.segment = $scope.messageDetail.messageData.vxuParts[index].segmentIndex;
+				}
+			};
+
+			/**
+			 * Gets a list of segment names and IDs. Used to generate navigation buttons.
+			 *
+			 * @param valueList List of parts of the message
+			 * @returns {Array} List of all segments (lines) in the message
+			 */
+			var getSegmentList = function (valueList) {
+				var segmentList = [];
+
+				for (var i = 0, len = valueList.length; i < len; i++) {
+					var valueItem = valueList[i];
+					var value = valueItem.value;
+
+					if (valueItem.location.substring(4, 5) === '0') {
+						segmentList.push({
+							name: value,
+							index: valueItem.segmentIndex
+						})
 					}
-				
-				list.push(firstElement);
-				
-				popOffString = popOffString.substring(3);
+				}
+
+				return segmentList;
+			};
+
+			/**
+			 * Get all of the parts of the message for display.
+			 *
+			 * @param inputString message as a single string
+			 * @param valueList   JSON list of values
+			 * @returns {Array}   List of message parts
+			 */
+			var makeArrayWithSeparatorsIncluded = function (inputString, valueList) {
+				var popOffString = inputString;
+				var list = [];
+				var separatorElement;
+
 				//append spans around each value, and include some metadata...
 				for (var i = 0, len = valueList.length; i < len; i++) {
-//					console.log("adding data for: ");
 					var valueItem = valueList[i];
-//					console.log(valueItem);
+
 					//find the next spot that value is in the string.
 					var value = valueItem.value;
 					var idxStart = popOffString.indexOf(value);
-					var separatorValue = popOffString.substring(0,idxStart);
+					var separatorValue = popOffString.substring(0, idxStart);
+
 					if (separatorValue) {
-						var separatorElement = {
-								value: separatorValue,
-									valueIndex : -10
+						separatorElement = {
+							value: separatorValue,
+							valueIndex: -10
 						};
 						list.push(separatorElement);
 					}
+
 					list.push(valueItem);
-					/* then the value */
+
+					// then the value
 					popOffString = popOffString.substring(idxStart + value.length);
 				}
-				var separatorElement = {
-						value: popOffString,
-						valueIndex : -10, 
-						location: "", 
-						locationDescription: ""
+
+				separatorElement = {
+					value: popOffString,
+					valueIndex: -10,
+					location: "",
+					locationDescription: ""
 				};
+
 				list.push(separatorElement);
-			return list;
-          };
-}]);
+				return list;
+			};
+
+			/**
+			 * Toggles the currently-selected segment tab/button. If the clicked button is the same as the
+			 * currently-selected button, the currently-selected segment will be reset so none are selected.
+			 *
+			 * @param index Index of the clicked button.
+			 */
+			$scope.toggleTab = function (index) {
+				if ($scope.current.segment === index) {
+					$scope.current.segment = undefined;
+				} else {
+					$scope.current.segment = index;
+				}
+
+				$scope.filterText.$ = '';
+				clearSelectedPart();
+			};
+
+			/**
+			 * Clears out selections when the search text is changed. Clears the currently-selected segment button, as
+			 * well as the highlighted message part/result.
+			 */
+			$scope.clearSearch = function () {
+				$scope.current.segment = undefined;
+				clearSelectedPart();
+			};
+
+			/**
+			 * Clears the currently-selected message part/result.
+			 */
+			function clearSelectedPart() {
+				$scope.hIdx = -1;
+			}
+		}]);
