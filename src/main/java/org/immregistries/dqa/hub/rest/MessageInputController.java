@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import org.immregistries.dqa.hl7util.test.MessageGenerator;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
@@ -137,25 +138,14 @@ public class MessageInputController {
     		return response;
     	}
     }
-    
-    String exampleMessageText = 
-     "MSH|^~\\&|||||20170203184141-0700||VXU^V04^VXU_V04|25VK-K.01.03.pr|P|2.5.1|\n"
-    +"PID|||25VK-K.01.03^^^AIRA-TEST^MR|||Brooks^Butterfly|20130206|M||2106-3^White^HL70005|233 Cherokee Ln^^Flint^MI^48501^USA^P||^PRN^PH^^^810^9573567|||||||||2186-5^not Hispanic or Latino^HL70005|\n"
-    +"PD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20170203|20170203|\n"
-    +"NK1|1|Krog^Butterfly^^^^^L|MTH^Mother^HL70063|233 Cherokee Ln^^Flint^MI^48501^USA^P|^PRN^PH^^^810^9573567|\n"
-    +"ORC|RE||H57E4302.3^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L|\n"
-    +"RXA|0|1|20170203||94^MMRV^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||V7737HT||MSD^Merck and Co^MVX||||A|\n"
-    +"RXR|SC^^HL70162|RA^^HL70163|\n"
-    +"OBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V02^VFC eligible - Medicaid/Medicaid Managed Care^HL70064||||||F|||20170203|||VXC40^Eligibility captured at the immunization level^CDCPHINVS|\n"
-    +"OBX|2|CE|30956-7^Vaccine Type^LN|2|94^MMRV^CVX||||||F|\n"
-    +"OBX|3|TS|29768-9^Date vaccine information statement published^LN|2|20100521||||||F|\n"
-    +"OBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20170203||||||F|";
+
+    MessageGenerator mg = new MessageGenerator();
 
     @RequestMapping(value = "json/example", method = RequestMethod.GET)
     public Hl7MessageSubmission getExampleJsonFormPost() {
     	logger.info("Getting example!");
     	Hl7MessageSubmission example = new Hl7MessageSubmission();
-    	example.setMessage(exampleMessageText);
+    	example.setMessage(mg.getUniqueMessage());
     	example.setUser("regularUser");
     	example.setPassword("password123");
     	example.setFacilityCode("DQATestFacility");

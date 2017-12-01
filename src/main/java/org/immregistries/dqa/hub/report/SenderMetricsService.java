@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.dqa.codebase.client.reference.CodesetType;
+import org.immregistries.dqa.validator.issue.Detection;
 import org.immregistries.dqa.validator.issue.IssueObject;
-import org.immregistries.dqa.validator.issue.MessageAttribute;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.vxu.code.CodeReceived;
 import org.slf4j.Logger;
@@ -38,11 +38,11 @@ public class SenderMetricsService {
 		out.getObjectCounts().put(IssueObject.PATIENT,  metrics.getPatientCount());
 		out.getObjectCounts().put(IssueObject.MESSAGE_HEADER,  metrics.getPatientCount());
 		out.getObjectCounts().put(IssueObject.VACCINATION,  metrics.getVaccinationCount());
-		Map<MessageAttribute, Integer> attrCounts = out.getAttributeCounts();
+		Map<Detection, Integer> attrCounts = out.getAttributeCounts();
 		Map<CodeReceived, Integer> codeCounts = out.getCodeCounts();
 		
 		for (SenderAttributeMetrics sam : metrics.getAttributes()) {
-			MessageAttribute ma = MessageAttribute.getByDqaErrorCodeString(sam.getDqaAttributeCode());
+			Detection ma = Detection.getByDqaErrorCodeString(sam.getDqaAttributeCode());
 			attrCounts.put(ma, sam.getAttributeCount());
 		}
 		
@@ -66,7 +66,7 @@ public class SenderMetricsService {
 		}
 		
 		Map<IssueObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
-		Map<MessageAttribute, Integer> attributeCounts = incomingMetrics.getAttributeCounts();
+		Map<Detection, Integer> attributeCounts = incomingMetrics.getAttributeCounts();
 		Map<CodeReceived, Integer> codeCounts = incomingMetrics.getCodeCounts();
 		
 		for (IssueObject io : objectCounts.keySet()) {
@@ -88,7 +88,7 @@ public class SenderMetricsService {
 		}
 		
 		
-		for (MessageAttribute attr : attributeCounts.keySet()) {
+		for (Detection attr : attributeCounts.keySet()) {
 			//find the right metrics object...
 			List<SenderAttributeMetrics> sams = metrics.getAttributes();
 			Integer count = attributeCounts.get(attr);
