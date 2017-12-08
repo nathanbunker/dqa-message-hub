@@ -50,7 +50,7 @@ angular.module('messageHubDemoApp')
 		})
         
         .state('file', {
-            url: "/file-page",
+            url: "/file-demo",
             templateUrl: 'app/file-demo/file-page.html',
             controller: "FilePageController",
             resolve: {
