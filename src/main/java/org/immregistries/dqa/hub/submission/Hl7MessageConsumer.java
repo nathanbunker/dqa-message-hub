@@ -12,6 +12,8 @@ import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.dqa.nist.validator.connector.Assertion;
+import org.immregistries.dqa.nist.validator.connector.NISTValidator;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
@@ -25,11 +27,21 @@ import org.springframework.stereotype.Service;
 public class Hl7MessageConsumer {
 
 	private DqaMessageService validator = DqaMessageService.INSTANCE;
+	private NISTValidator nistValidator = null;
     private ReportScorer scorer = ReportScorer.INSTANCE;
     @Autowired
     private SenderMetricsService metricsSvc;
 	@Autowired
 	private MessageMetadataJpaRepository metaRepo;
+	
+	private NISTValidator getNISTValidator()
+	{
+	  if (nistValidator == null)
+	  {
+	    nistValidator = new NISTValidator();
+	  }
+	  return nistValidator;
+	}
     
 	public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission)
 	{
@@ -40,11 +52,15 @@ public class Hl7MessageConsumer {
 			sender = "DQA Unspecified";
 		}
 		
+		NISTValidator nistValidator = getNISTValidator();
+		List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
+		
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
+        
         
         this.saveMetricsFromValidationResults(sender, validationResults);
         
-        String ack = makeAckFromValidationResults(validationResults);
+        String ack = makeAckFromValidationResults(validationResults, nistReportableList);
         
         this.saveMessageForSender(message, ack, sender);
         
@@ -71,10 +87,10 @@ public class Hl7MessageConsumer {
 	        metricsSvc.addToSenderMetrics(sender,  new Date(), metrics);
 	}
 	
-	public String makeAckFromValidationResults(DqaMessageServiceResponse validationResults) {
+	public String makeAckFromValidationResults(DqaMessageServiceResponse validationResults, List<Reportable> nistReportablesList) {
 
         List<ValidationRuleResult> resultList = validationResults.getValidationResults();
-        List<Reportable> reportables = new ArrayList<Reportable>();
+        List<Reportable> reportables = new ArrayList<Reportable>(nistReportablesList);
         //This code needs to get put somewhere better. 
         for (ValidationRuleResult result : resultList) {
         	reportables.addAll(result.getIssues());
