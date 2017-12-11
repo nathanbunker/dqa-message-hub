@@ -6,10 +6,10 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.dqa.codebase.client.reference.CodesetType;
+import org.immregistries.dqa.validator.engine.codes.CodeReceived;
 import org.immregistries.dqa.validator.issue.Detection;
 import org.immregistries.dqa.validator.issue.IssueObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
-import org.immregistries.dqa.vxu.code.CodeReceived;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
