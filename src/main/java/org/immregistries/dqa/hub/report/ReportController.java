@@ -6,16 +6,17 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.dqa.hub.report.viewer.MessageListContainer;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.dqa.hub.submission.Hl7MessageConsumer;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.ReportScorer;
 import org.immregistries.dqa.validator.report.VxuScoredReport;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RequestMapping(value = "/report")
 @RestController
@@ -52,8 +53,16 @@ public class ReportController {
     	VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics); 
     	return report;
     }
-    
-	private String testMessage = 
+
+	@RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}")
+	public VxuScoredReport getReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+    	logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
+    	DqaMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
+    	VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
+    	return report;
+    }
+
+	private String testMessage =
 			  "MSH|^~\\&|||||20170301131228-0500||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|P|2.5.1|"+
 			"\nPID|||3WzJ-A.01.01^^^AIRA-TEST^MR||McCracken^Vinvella^^^^^L|Butler^Pauline|20130225|F||2076-8^Native Hawaiian or Other Pacific Islander^HL70005|81 Page Pl^^GR^MI^49544^USA^P||^PRN^PH^^^616^9245843|||||||||2135-2^Hispanic or Latino^HL70005|"+
 			"\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20170301|20170301|"+

@@ -1,7 +1,7 @@
 angular.module('messageHubDemoApp')
 
-.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory','$q',
-                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, $q){
+.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory', 'Reporter', '$q',
+                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, Reporter,  $q){
 	
 	/**
 	 * On PAGE LOAD: 
@@ -35,6 +35,7 @@ angular.module('messageHubDemoApp')
 			totalElements:0,//Don't modify this except with the actual list length. Modifying this causes a page reload...  
 			messages:[],
 	};
+	$scope.report = {};
 	
 	$scope.toggleStat = function(id) {
 		$scope.searchOptions.filters.statisticId = id;
@@ -104,7 +105,7 @@ angular.module('messageHubDemoApp')
         			repopulatePageForDate(next.toDate());
                 });
 		}
-	}
+	};
 	
 	function repopulatePageForDate(date) {
 		$scope.searchOptions.date = date;
@@ -329,7 +330,7 @@ angular.module('messageHubDemoApp')
 		console.log("getMessageList");
 		$scope.listloaded = false;
 //		$scope.resultsMetaData.messages = {};
-		console.log("MessageListFactory.get")
+		console.log("MessageListFactory.get");
 		MessageListFactory.get({
 			providerKey : $scope.provider.key,
 			date : $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
@@ -342,8 +343,17 @@ angular.module('messageHubDemoApp')
 			$scope.listloaded = true;
 			console.log("getMessageList message list loaded.");
 //		}).$promise.then(function() {
-		})
-		
+		});
+        console.log("Reporter.get");
+        Reporter.get({
+			providerKey : $scope.provider.key,
+			date : $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+		}, function(data) {
+			$scope.report= data;
+			console.log("getMessageList message list loaded.");
+//		}).$promise.then(function() {
+		});
+
 		console.log("getMessageList call started");
 	};
 	
