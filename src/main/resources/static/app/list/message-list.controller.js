@@ -347,7 +347,7 @@ angular.module('messageHubDemoApp')
         console.log("Reporter.get");
         Reporter.get({
 			providerKey : $scope.provider.key,
-			date : $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+			date : $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
 		}, function(data) {
 			$scope.report= data;
 			console.log("getMessageList message list loaded.");

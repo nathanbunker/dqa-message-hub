@@ -27,6 +27,10 @@ angular.module('messageHubDemoApp')
     .factory('ReportExample', function ($resource) {
     	return $resource('report/demo');//gets a json object with an example message
     })
+
+    .factory('Reporter', function ($resource) {
+        return $resource('report/:providerKey/date/:date');//gets a json object with an example message
+    })
     
     .factory('ReportMessage', function ($resource) {
     	return $resource('report/message');//gets a json object with an example message
