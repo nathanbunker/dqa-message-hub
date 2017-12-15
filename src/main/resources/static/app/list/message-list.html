@@ -107,17 +107,87 @@
     </div>
 </div>
 
-
 <!--REPORT SECTION: -->
 	<div>
 		<div class="row">
 			<div class="col-md-12">
 				<div class="heading row">
-					<h4 ng-click="showReport = !showReport">Report</h4>
+					<h4 ng-click="showReport = !showReport">Report - Score: <span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></h4>
 				</div>
 			</div>
 		</div>
-		<div class="row" ng-show="!showReport">
+        <div  class="heading row"  ng-show="showReport">
+            <div class="col-md-12">
+                    <h4>Codes Received</h4>
+            </div>
+        </div>
+
+        <div  class="heading row"  ng-show="showReport">
+            <div class="col-md-12">
+                    <h4>Issues Detected</h4>
+            </div>
+        </div>
+
+        <div class="heading row">
+            <h5>Errors</h5>
+        </div>
+        <div id="errorFindings">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="col-md-3">Issue</th>
+                    <th class="col-md-1">Code</th>
+                    <th class="col-md-1">Severity</th>
+                    <th class="col-md-8">Location</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'ERROR'}">
+                    <td>{{issue.applicationErrorCode.alternateText}}</td>
+                    <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                    <td>{{issue.severity}}</td>
+                    <td>
+                        <span ng-repeat="location in issue.hl7LocationList">
+									{{location.segmentId}}-{{location.fieldPosition}}
+						</span>
+                    </td>
+                    <td> </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="heading row">
+            <h5>Warnings</h5>
+        </div>
+        <div id="errorFindings">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th class="col-md-3">Issue</th>
+                    <th class="col-md-1">Code</th>
+                    <th class="col-md-1">Severity</th>
+                    <th class="col-md-8">Location</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
+                    <td>{{issue.applicationErrorCode.alternateText}}</td>
+                    <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                    <td>{{issue.severity}}</td>
+                    <td><span ng-repeat="location in issue.hl7LocationList">
+									{{location.segmentId}}-{{location.fieldPosition}}
+								</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <!--END ISSUE LISTING-->
+
+		<div class="row" ng-show="showReport">
             <!--ng-if="loaded" ng-show="!showReport">-->
 			<div class="col-md-12">
 				<div class="heading row">

@@ -36,10 +36,10 @@ public class SenderMetrics {
 	private int score;
 	
 	@OneToMany(mappedBy="senderMetrics", cascade = CascadeType.ALL)
-	private List<SenderCodeMetrics> codes = new ArrayList<>();
+	private List<CodeCount> codes = new ArrayList<>();
 	
 	@OneToMany(mappedBy="senderMetrics", cascade = CascadeType.ALL)
-	private List<SenderAttributeMetrics> attributes = new ArrayList<>();
+	private List<SenderDetectionMetrics> attributes = new ArrayList<>();
 	
 	public long getId() {
 		return id;
@@ -71,16 +71,16 @@ public class SenderMetrics {
 	public void setScore(int score) {
 		this.score = score;
 	}
-	public List<SenderCodeMetrics> getCodes() {
+	public List<CodeCount> getCodes() {
 		return codes;
 	}
-	public void setCodes(List<SenderCodeMetrics> codes) {
+	public void setCodes(List<CodeCount> codes) {
 		this.codes = codes;
 	}
-	public List<SenderAttributeMetrics> getAttributes() {
+	public List<SenderDetectionMetrics> getAttributes() {
 		return attributes;
 	}
-	public void setAttributes(List<SenderAttributeMetrics> attributes) {
+	public void setAttributes(List<SenderDetectionMetrics> attributes) {
 		this.attributes = attributes;
 	}
 	public Date getMetricsDate() {

@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.dqa.codebase.client.reference.CodesetType;
-import org.immregistries.dqa.validator.engine.codes.CodeReceived;
 import org.immregistries.dqa.validator.issue.Detection;
 import org.immregistries.dqa.validator.issue.IssueObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
+import org.immregistries.dqa.validator.report.codes.CodeCollection;
+import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,24 +33,25 @@ public class SenderMetricsService {
 		
 		logger.info("Metrics found for " + sender + " day: " + day);
 		logger.info("Metrics: " + metrics);
-		
-		DqaMessageMetrics out = new DqaMessageMetrics();
+      DqaMessageMetrics out = new DqaMessageMetrics();
+      if (metrics == null) {
+          return out;
+      }
+
 		out.getObjectCounts().put(IssueObject.PATIENT,  metrics.getPatientCount());
 		out.getObjectCounts().put(IssueObject.MESSAGE_HEADER,  metrics.getPatientCount());
 		out.getObjectCounts().put(IssueObject.VACCINATION,  metrics.getVaccinationCount());
 		Map<Detection, Integer> attrCounts = out.getAttributeCounts();
-		Map<CodeReceived, Integer> codeCounts = out.getCodeCounts();
+		CodeCollection codes = out.getCodes();
 		
-		for (SenderAttributeMetrics sam : metrics.getAttributes()) {
-			Detection ma = Detection.getByDqaErrorCodeString(sam.getDqaAttributeCode());
+		for (SenderDetectionMetrics sam : metrics.getAttributes()) {
+			Detection ma = Detection.getByDqaErrorCodeString(sam.getDqaDetectionCode());
 			attrCounts.put(ma, sam.getAttributeCount());
 		}
 		
-		for (SenderCodeMetrics sam : metrics.getCodes()) {
-			CodeReceived cr = new CodeReceived();
-			cr.setCodeset(CodesetType.getByTypeCode(sam.getCodeSet()));
-			cr.setValue(sam.getValue());
-			codeCounts.put(cr, sam.getCodeCount());
+		for (CodeCount sam : metrics.getCodes()) {
+			CollectionBucket cc = new CollectionBucket(sam.getCodeType(), sam.getAttribute(), sam.getCodeValue(), sam.getCodeCount());
+			codes.add(cc);
 		}
 		
 		return out;
@@ -66,9 +67,8 @@ public class SenderMetricsService {
 		}
 		
 		Map<IssueObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
-		Map<Detection, Integer> attributeCounts = incomingMetrics.getAttributeCounts();
-		Map<CodeReceived, Integer> codeCounts = incomingMetrics.getCodeCounts();
-		
+		Map<Detection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
+
 		for (IssueObject io : objectCounts.keySet()) {
 			Integer count = objectCounts.get(io);
 			if (count != null && count > 0) {
@@ -88,22 +88,22 @@ public class SenderMetricsService {
 		}
 		
 		
-		for (Detection attr : attributeCounts.keySet()) {
+		for (Detection attr : detectionCounts.keySet()) {
 			//find the right metrics object...
-			List<SenderAttributeMetrics> sams = metrics.getAttributes();
-			Integer count = attributeCounts.get(attr);
+			List<SenderDetectionMetrics> sams = metrics.getAttributes();
+			Integer count = detectionCounts.get(attr);
 			if (count != null && count > 0) {
-				SenderAttributeMetrics thisOne = null;
-				for (SenderAttributeMetrics sam : sams) {
-					if (attr.getDqaErrorCode().equals(sam.getDqaAttributeCode())) {
+				SenderDetectionMetrics thisOne = null;
+				for (SenderDetectionMetrics sam : sams) {
+					if (attr.getDqaErrorCode().equals(sam.getDqaDetectionCode())) {
 						//it's the same attribute!!! use it!
 						thisOne = sam;
 					}
 				}
 				//If you didn't find one, make a new one. 
 				if (thisOne == null) {
-					thisOne = new SenderAttributeMetrics();
-					thisOne.setDqaAttributeCode(attr.getDqaErrorCode()); 
+					thisOne = new SenderDetectionMetrics();
+					thisOne.setDqaDetectionCode(attr.getDqaErrorCode());
 					thisOne.setSenderMetrics(metrics);
 					sams.add(thisOne);
 				}
@@ -111,16 +111,32 @@ public class SenderMetricsService {
 				thisOne.setAttributeCount(addedCounts);
 			}
 		}
-		
-		for (CodeReceived code : codeCounts.keySet()) {
+
+    CodeCollection codes = incomingMetrics.getCodes();
+		List<CodeCount> counts = metrics.getCodes();
+		metrics.setCodes(counts);
+
+//		for (CodeBucket cb : codes.getCodeCountList()) {
+//			//look and see if it already is represented in the set.  add to it if it is, add it if its not.
+//        for (CodeCount cc : counts) {
+//            //need to find the count that corresponds to the bucket.
+//        }
+//			CodeCount cc = new CodeCount();
+//			cc.setCodeType(bucket.getType());
+//			cc.setAttribute(bucket.getAttribute());
+//			cc.setCodeValue(bucket.getValue());
+//			cc.setCodeCount(bucket.getCount());
+//		}
+
+		for (CodeCount code : counts) {
 			//find the right metrics object...
-			List<SenderCodeMetrics> scms = metrics.getCodes();
-			Integer count = attributeCounts.get(code);
+			List<CodeCount> scms = metrics.getCodes();
+			Integer count = detectionCounts.get(code);
 			if (count != null && count > 0) {
-				SenderCodeMetrics thisOne = null;
-				for (SenderCodeMetrics scm : scms) {
-					if (code.getCodeset().getType().equals(scm.getCodeSet())) {
-						if (code.getValue().equals(scm.getValue())) {
+				CodeCount thisOne = null;
+				for (CodeCount scm : scms) {
+					if (code.getCodeType().equals(scm.getCodeType())) {
+						if (code.getCodeValue().equals(scm.getCodeValue())) {
 							//it's the same one!!! use it!
 							thisOne = scm;
 						}
@@ -128,9 +144,9 @@ public class SenderMetricsService {
 				}
 				//If you didn't find one, make a new one. 
 				if (thisOne == null) {
-					thisOne = new SenderCodeMetrics();
-					thisOne.setCodeSet(code.getCodeset().getType());
-					thisOne.setValue(code.getValue());
+					thisOne = new CodeCount();
+					thisOne.setCodeType(code.getCodeType());
+					thisOne.setCodeValue(code.getCodeValue());
 					thisOne.setSenderMetrics(metrics);
 					scms.add(thisOne);
 				}

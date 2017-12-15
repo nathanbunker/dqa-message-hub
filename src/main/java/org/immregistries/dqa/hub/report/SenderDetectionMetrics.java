@@ -13,21 +13,19 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="SENDER_ATTR_METRICS")
-public class SenderAttributeMetrics {
+@Table(name="SENDER_DETECTION_METRICS")
+public class SenderDetectionMetrics {
 	@Id
-	@SequenceGenerator(name="SENDER_ATTR_METRICS_GENERATOR", sequenceName="SENDER_ATTR_METRICS_SEQ", allocationSize = 100)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SENDER_ATTR_METRICS_GENERATOR")
-	@Column(name="SENDER_ATTR_METRICS_ID")
+	@SequenceGenerator(name="SENDER_DETECTION_METRICS_GENERATOR", sequenceName="SENDER_DETECTION_METRICS_SEQ", allocationSize = 100)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SENDER_DETECTION_METRICS_GENERATOR")
+	@Column(name="SENDER_DETECTION_METRICS_ID")
 	private long id;
 	
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name="sender_metrics_id")
 	private SenderMetrics senderMetrics;
-	
-	private String dqaAttributeCode;
-	
+	private String dqaDetectionCode;
 	private int attributeCount = 0;
 	
 	public long getId() {
@@ -36,11 +34,11 @@ public class SenderAttributeMetrics {
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getDqaAttributeCode() {
-		return dqaAttributeCode;
+	public String getDqaDetectionCode() {
+		return dqaDetectionCode;
 	}
-	public void setDqaAttributeCode(String dqaAttributeCode) {
-		this.dqaAttributeCode = dqaAttributeCode;
+	public void setDqaDetectionCode(String dqaDetectionCode) {
+		this.dqaDetectionCode = dqaDetectionCode;
 	}
 	public int getAttributeCount() {
 		return attributeCount;
