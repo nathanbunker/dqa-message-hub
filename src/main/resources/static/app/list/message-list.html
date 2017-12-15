@@ -122,142 +122,121 @@
             </div>
         </div>
 
-        <div  class="heading row"  ng-show="showReport">
-            <div class="col-md-12">
-                    <h4>Issues Detected</h4>
+        <div ng-show="showReport">
+            <div class="heading row">
+                <h5>Detections (errors/warnings)</h5>
+            </div>
+            <div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="col-md-1">Count</th>
+                        <th class="col-md-3">Issue</th>
+                        <th class="col-md-1">Code</th>
+                        <th class="col-md-1">Severity</th>
+                        <th class="col-md-8">Location</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'ERROR'}">
+                        <td>{{issue.count}}</td>
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span ng-repeat="location in issue.hl7LocationList">
+									{{location.segmentId}}-{{location.fieldPosition}}
+						</span>
+                        </td>
+                    </tr>
+                    <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
+                        <td>{{issue.count}}</td>
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span ng-repeat="location in issue.hl7LocationList">
+									{{location.segmentId}}-{{location.fieldPosition}}
+						</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="heading row">
-            <h5>Errors</h5>
-        </div>
-        <div id="errorFindings">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th class="col-md-3">Issue</th>
-                    <th class="col-md-1">Code</th>
-                    <th class="col-md-1">Severity</th>
-                    <th class="col-md-8">Location</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'ERROR'}">
-                    <td>{{issue.applicationErrorCode.alternateText}}</td>
-                    <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                    <td>{{issue.severity}}</td>
-                    <td>
-                        <span ng-repeat="location in issue.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-						</span>
-                    </td>
-                    <td> </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
+            <!--END ISSUE LISTING-->
 
-        <div class="heading row">
-            <h5>Warnings</h5>
+            <div class="row" ng-show="showReport">
+                <!--ng-if="loaded" ng-show="!showReport">-->
+                <div class="col-md-12">
+                    <div class="heading row">
+                        <h4>Completeness</h4>
+                    </div>
+                    <div id="completeness">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p class="dottedbox"> Completeness measures how many required, expected and recommended fields have been received and also indicates if expected vaccinations have been reported. </p>
+                                <h3>Score</h3>
+                                <table>
+                                    <tr>
+                                        <th align="center">Completeness Score</th>
+                                        <th align="center">Description</th>
+                                    </tr>
+                                    <tr>
+                                        <td align="center"><span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></th>
+                                        <td align="center"><span class="score"><span class="good">Good</span></span>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div ng-repeat="section in report.scoreGroups">
+                                    <h3>{{section.label}}</h3>
+                                    <table>
+                                        <tr>
+                                            <th align="left">Patient Fields</th>
+                                            <th align="left">HL7 Field</th>
+                                            <th>Score</th>
+                                            <th>Value Present</th>
+                                            <!-- <th>Score Percent</th> -->
+                                            <!-- <th>Evaluation</th> -->
+                                        </tr>
+                                        <tr>
+                                            <td class="highlight">Overall</td>
+                                            <td class="highlight"></td>
+                                            <td class="highlight" align="center">{{section.sectionScore.scored}}/{{section.sectionScore.potential}}</td>
+                                            <td class="highlight" align="center">&nbsp</td>
+                                            <!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
+                                            <!-- 						            <td class="highlight" align="center"><span class="good">Excellent</span></td> -->
+                                        </tr>
+                                        <tr ng-repeat-start="field in section.scores">
+                                            <td align="left">{{field.reportFieldDefinition.label}}</td>
+                                            <td align="center">{{field.reportFieldDefinition.field.hl7Field}}</td>
+                                            <td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
+                                            <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
+                                            <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
+                                            <!-- <td align="center"><span class="excellent">Excellent</span></td> -->
+                                        </tr>
+                                        <tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
+                                            <td style="text-align:right;">{{issue.issueType}}</td>
+                                            <td></td>
+                                            <td style="text-align:center;">-{{issue.issueDemerit}}</td>
+                                            <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div id="errorFindings">
-            <table class="table">
-                <thead>
-                <tr>
-                    <th class="col-md-3">Issue</th>
-                    <th class="col-md-1">Code</th>
-                    <th class="col-md-1">Severity</th>
-                    <th class="col-md-8">Location</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
-                    <td>{{issue.applicationErrorCode.alternateText}}</td>
-                    <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                    <td>{{issue.severity}}</td>
-                    <td><span ng-repeat="location in issue.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-								</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <div  class="heading row"  ng-show="showReport">
+            <div class="col-md-12">
+                <h4>Issues Detected</h4>
+            </div>
         </div>
-
-
-        <!--END ISSUE LISTING-->
-
-		<div class="row" ng-show="showReport">
-            <!--ng-if="loaded" ng-show="!showReport">-->
-			<div class="col-md-12">
-				<div class="heading row">
-					<h4>Completeness</h4>
-				</div>
-				<!-- 			<div class="text-primary text-center loading"
-                                    ng-if="messageEvaluation.messageAck == null">
-                                    <i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <br /> <span>Generating Report...</span>
-                                </div> -->
-				<div id="completeness">
-					<div class="row">
-						<div class="col-md-12">
-							<p class="dottedbox"> Completeness measures how many required, expected and recommended fields have been received and also indicates if expected vaccinations have been reported. </p>
-							<h3>Score</h3>
-							<table>
-								<tr>
-									<th align="center">Completeness Score</th>
-									<th align="center">Description</th>
-								</tr>
-								<tr>
-									<td align="center"><span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></th>
-									<td align="center"><span class="score"><span class="good">Good</span></span>
-									</th>
-								</tr>
-							</table>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-md-12">
-							<div ng-repeat="section in report.scoreGroups">
-								<h3>{{section.label}}</h3>
-								<table>
-									<tr>
-										<th align="left">Patient Fields</th>
-										<th align="left">HL7 Field</th>
-										<th>Score</th>
-										<th>Value Present</th>
-										<!-- <th>Score Percent</th> -->
-										<!-- <th>Evaluation</th> -->
-									</tr>
-									<tr>
-										<td class="highlight">Overall</td>
-										<td class="highlight"></td>
-										<td class="highlight" align="center">{{section.sectionScore.scored}}/{{section.sectionScore.potential}}</td>
-										<td class="highlight" align="center">&nbsp</td>
-										<!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
-										<!-- 						            <td class="highlight" align="center"><span class="good">Excellent</span></td> -->
-									</tr>
-									<tr ng-repeat-start="field in section.scores">
-										<td align="left">{{field.reportFieldDefinition.label}}</td>
-										<td align="center">{{field.reportFieldDefinition.field.hl7Field}}</td>
-										<td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
-										<td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
-										<!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
-										<!-- <td align="center"><span class="excellent">Excellent</span></td> -->
-									</tr>
-									<tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
-										<td style="text-align:right;">{{issue.issueType}}</td>
-										<td></td>
-										<td style="text-align:center;">-{{issue.issueDemerit}}</td>
-										<td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
-									</tr>
-								</table>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 <div class="row">
 	<div class="col-md-4">
