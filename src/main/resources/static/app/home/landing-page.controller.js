@@ -1,7 +1,7 @@
 angular.module('messageHubDemoApp')
 
-.controller('LandingPageController', ['$scope', '$state', '$filter', 'googleChartApiConfig', 'urlParams', 'FacilityList','MessageCountHistoryFactory',
-                                     function($scope, $state, $filter, googleChartApiConfig, urlParams, FacilityList , MessageCountHistoryFactory){
+.controller('LandingPageController', ['$scope', '$state', '$filter', 'googleChartApiConfig', 'urlParams', 'FacilityList','MessageCountHistoryFactory', 'Reporter',
+                                     function($scope, $state, $filter, googleChartApiConfig, urlParams, FacilityList , MessageCountHistoryFactory, Reporter){
 	$scope.provider = {pin:""};
 	$scope.providerList = [];
 	$scope.providerChosen = false;
@@ -15,6 +15,8 @@ angular.module('messageHubDemoApp')
 			one: {ready: false},
 			two: {ready: false}
 	};
+	
+	$scope.scoreChartRows = [];
 	
 	activate();
 	
@@ -63,7 +65,6 @@ angular.module('messageHubDemoApp')
 			}
 		}
 		makeCalendar(calendarJunk);
-		
 	}
 	
 	function makeCalendar(calendarJunk) {
@@ -78,10 +79,82 @@ angular.module('messageHubDemoApp')
 		        calendarJunk.chart.data.rows = dataToRows(historyData, calendarJunk.year);
 		        console.log("Calendar rows are set!");
 		        calendarJunk.status.ready = true;
+		        
+		        makeScoreChart(historyData);
 			}, function(error) {
 				$scope.errorMsg = "Error Looking up facility history!"
 			});
 	}
+	
+	function makeScoreChart(historyData) {
+ 		if (historyData.length > 0) {
+			for (idx in historyData) {
+				
+				var mNew = new moment(historyData[idx].day, "YYYY-MM-DD");
+			
+				 Reporter.get({
+							providerKey: $scope.searchOptionsForm.provider,
+							date : $filter('date')(mNew.toDate(), 'yyyyMMdd')
+						}, function(data) {
+							var score = data.reportScore.scored;
+							var row = makeCalendarEntry(mNew, score);
+							$scope.scoreChartRows.push(row);
+							console.log("getMessageList message list loaded.");
+				//		}).$promise.then(function() {
+						});	
+			
+			}
+			
+			google.charts.load('current', {'packages':['line']});
+      		google.charts.setOnLoadCallback(drawChart);
+		}
+	
+	
+	}
+	
+	
+	// Google Line Chart function to draw chart
+	
+	function drawChart() {
+
+      var data = new google.visualization.DataTable();
+      data.addColumn('date', 'Date');
+      data.addColumn('number', $scope.provider);
+      
+      for (idx = 0; idx < $scope.scoreChartRows.length; idx++) {
+      	
+      	if ($scope.scoreChartRows.length < 2) {
+      		data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), 0] ]);
+      	}
+      	
+      	//data.addColumn('number', $scope.providerList[0,idx]);
+      	data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), $scope.scoreChartRows[idx].c[1].v] ]);
+      }
+      
+      //console.log($scope.scoreChartRows.length);
+
+      var options = {
+        chart: {
+          title: 'Provider Chart',
+          subtitle: ''
+        },
+        width: 900,
+        height: 500,
+        hAxis: {
+          format: 'M/d/yy',
+          title: 'Date'
+        },
+        vAxis: {
+          title: 'Total Score'
+        }
+      };
+
+      var chart = new google.charts.Line(document.getElementById('line_top_x'));
+
+      chart.draw(data, google.charts.Line.convertOptions(options));
+    }
+	
+	//
 	
 	function dataToRows(dataIn, year) {
 		var rows = [];
