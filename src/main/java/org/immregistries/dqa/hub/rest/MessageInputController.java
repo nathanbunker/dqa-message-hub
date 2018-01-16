@@ -38,9 +38,9 @@ public class MessageInputController {
     MessageMetadataJpaRepository metaRepo;
     
     @Autowired
-    private Hl7MessageConsumer msgr;  
-    
-    @RequestMapping(value = "in", method = RequestMethod.POST)
+    private Hl7MessageConsumer msgr;
+
+	@RequestMapping(value = "in", method = RequestMethod.POST)
     public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission) throws Exception {
     	logger.info("ReportController scoreMessage demo!");
     	logger.info("processing this message: [" + submission.getMessage() + "]");
@@ -68,14 +68,14 @@ public class MessageInputController {
     @RequestMapping(value = "form-file", method = RequestMethod.POST)
     public ArrayList<String> urlEncodedHttpFormFilePost(@RequestParam("file")
     		MultipartFile file) throws Exception {
-    	
+
         String REGEX = "^MSH\\|.*";
         String line;
         String MESSAGEDATA = "";
         String USERID = "user";
         String PASSWORD = "pass";
-        String FACILITYID = "SF-000001";
-        String fileName = file.getOriginalFilename();
+	      String fileName = "DQATestFacility";
+	      String FACILITYID = fileName ;
         String messageResult;
         String ackResult;
         int count = 0;

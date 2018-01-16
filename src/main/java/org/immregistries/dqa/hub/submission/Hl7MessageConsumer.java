@@ -19,7 +19,9 @@ import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.ReportScorer;
+import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.vxu.DqaMessageHeader;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,49 +44,64 @@ public class Hl7MessageConsumer {
 	  }
 	  return nistValidator;
 	}
-    
-	public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission)
-	{
-		String message = messageSubmission.getMessage();
-		
-		String sender = messageSubmission.getFacilityCode();
-		if (sender == null) {
-			sender = "DQA Unspecified";
-		}
-		
-		NISTValidator nistValidator = getNISTValidator();
-		List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
-		
+
+    public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission) {
+        String message = messageSubmission.getMessage();
+
+        String sender = messageSubmission.getFacilityCode();
+        if (sender == null) {
+            sender = "DQA Unspecified";
+        }
+
+        NISTValidator nistValidator = getNISTValidator();
+        List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
+
+        //force serial processing...
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
-        
-        
-        this.saveMetricsFromValidationResults(sender, validationResults);
-        
+        Date randomSentDate = getRandomDate();
+        this.saveMetricsFromValidationResults(sender, validationResults, randomSentDate);
         String ack = makeAckFromValidationResults(validationResults, nistReportableList);
-        
-        this.saveMessageForSender(message, ack, sender);
-        
+        this.saveMessageForSender(message, ack, sender, randomSentDate);
+
         Hl7MessageHubResponse response = new Hl7MessageHubResponse();
-        
         response.setAck(ack);
         response.setDqaResponse(validationResults);
         response.setSender(sender);
-        
+
         return response;
-	}
-	
-	public void saveMessageForSender(String message, String ack, String sender) {
+    }
+
+    int daysSpread = 60;
+	  Date getRandomDate() {
+        DateTime dt = new DateTime();
+        int randomDays = (int) Math.floor(Math.random() * daysSpread);
+        DateTime thisDate = dt.minusDays(randomDays);
+        if (thisDate.getDayOfWeek() >= 6) {
+            int randomWeekDay = (int) Math.floor(Math.random() * 5) + 1;
+            int day = thisDate.getDayOfWeek();
+            if (day == 7) {
+                randomWeekDay = randomWeekDay - 1;
+            }
+            thisDate = thisDate.minusDays(randomWeekDay);
+        }
+
+        Date sentDate = thisDate.toDate();
+        return sentDate;
+    }
+
+	public void saveMessageForSender(String message, String ack, String sender, Date sentDate) {
 		MessageMetadata mm = new MessageMetadata();
-        mm.setInputTime(new Date());
+		//for demo day, let's make a random date in the last month.
+        mm.setInputTime(sentDate);
         mm.setMessage(message);
         mm.setResponse(ack);
         mm.setProvider(sender);
         metaRepo.save(mm);
 	}
 	
-	public void saveMetricsFromValidationResults(String sender, DqaMessageServiceResponse validationResults) {
+	public void saveMetricsFromValidationResults(String sender, DqaMessageServiceResponse validationResults, Date metricsDate) {
 		 	DqaMessageMetrics metrics = scorer.getDqaMetricsFor(validationResults);
-	        metricsSvc.addToSenderMetrics(sender,  new Date(), metrics);
+	        metricsSvc.addToSenderMetrics(sender,  metricsDate, metrics);
 	}
 	
 	public String makeAckFromValidationResults(DqaMessageServiceResponse validationResults, List<Reportable> nistReportablesList) {

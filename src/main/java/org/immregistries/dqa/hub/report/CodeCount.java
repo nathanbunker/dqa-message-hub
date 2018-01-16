@@ -13,12 +13,12 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="SENDER_CODE_METRICS")
-public class SenderCodeMetrics {
+@Table(name="CODE_COUNT")
+public class CodeCount {
 	@Id
-	@SequenceGenerator(name="SENDER_CODE_METRICS_GENERATOR", sequenceName="SENDER_CODE_METRICS_SEQ", allocationSize = 100)
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SENDER_CODE_METRICS_GENERATOR")
-	@Column(name="SENDER_CODE_METRICS_ID")
+	@SequenceGenerator(name="CODE_COUNT_GENERATOR", sequenceName="CODE_COUNT_SEQ", allocationSize = 100)
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CODE_COUNT_GENERATOR")
+	@Column(name="CODE_COUNT_ID")
 	private long id;
 	
 	@JsonIgnore
@@ -26,27 +26,34 @@ public class SenderCodeMetrics {
 	@JoinColumn(name="sender_metrics_id")
 	private SenderMetrics senderMetrics;
 	
-	private String codeSet;
-	private String value;
+	private String codeType;
+	private String attribute;
+	private String codeValue;
 	private int codeCount;
-	
+
 	public long getId() {
 		return id;
+	}
+	public String getAttribute() {
+		return attribute;
+	}
+	public void setAttribute(String attribute) {
+		this.attribute = attribute;
 	}
 	public void setId(long id) {
 		this.id = id;
 	}
-	public String getCodeSet() {
-		return codeSet;
+	public String getCodeType() {
+		return codeType;
 	}
-	public void setCodeSet(String codeSet) {
-		this.codeSet = codeSet;
+	public void setCodeType(String codeType) {
+		this.codeType = codeType;
 	}
-	public String getValue() {
-		return value;
+	public String getCodeValue() {
+		return codeValue;
 	}
-	public void setValue(String value) {
-		this.value = value;
+	public void setCodeValue(String codeValue) {
+		this.codeValue = codeValue;
 	}
 	public int getCodeCount() {
 		return codeCount;

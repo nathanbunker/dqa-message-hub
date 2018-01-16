@@ -345,6 +345,7 @@ angular.module('messageHubDemoApp')
 //		}).$promise.then(function() {
 		});
         console.log("Reporter.get");
+        $scope.report = {};
         Reporter.get({
 			providerKey : $scope.provider.key,
 			date : $filter('date')($scope.searchOptions.date, 'yyyyMMdd')

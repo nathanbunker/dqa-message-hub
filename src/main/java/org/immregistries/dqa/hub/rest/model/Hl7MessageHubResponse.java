@@ -1,13 +1,16 @@
 package org.immregistries.dqa.hub.rest.model;
 
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
+import org.immregistries.dqa.validator.report.codes.CodeCollection;
 
 public class Hl7MessageHubResponse {
 	private String vxu;
 	private String ack;
+
 	private DqaMessageServiceResponse dqaResponse;
+
 	private String sender;
-	
+
 	public String getAck() {
 		return ack;
 	}
