@@ -9,14 +9,14 @@
 <div>
     <div class="row" ng-repeat='(fileId, fileUpload) in fileUploads'
          style="border:2px dotted grey; padding:10px;margin:10px;">
-        <div class="col-md-4" style="padding:5px">
+        <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
             <span style="padding:5px">{{fileUpload.fileName}}</span>
         </div>
-        <div class="col-md-2" style="padding:5px">
+        <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;">
             {{fileUpload.numberOfMessages}} messages
         </div>
-        <div class="col-md-4" style="padding:5px">
-            <uib-progressbar style="margin-bottom:0px;"ng-class="{'active progress-striped' : fileUpload.numberUnProcessed > 0 }" max="fileUpload.numberOfMessages" value="fileUpload.numberProcessed"><span style="color:white; white-space:nowrap;">{{fileUpload.percentage}} %</span></uib-progressbar>
+        <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
+            <uib-progressbar type="success" style="margin-bottom:0px;"ng-class="{'active progress-striped' : fileUpload.numberUnProcessed > 0 }" max="fileUpload.numberOfMessages" value="fileUpload.numberProcessed"><span style="color:white; white-space:nowrap;">{{fileUpload.percentage}} %</span></uib-progressbar>
         </div>
         <div class="col-md-2">
             <button class="btn btn-default" type="submit" ng-click="downloadAcks(fileUpload.fileId)" ng-disabled="fileUpload.status != 'finished'">Download Acks</button>
