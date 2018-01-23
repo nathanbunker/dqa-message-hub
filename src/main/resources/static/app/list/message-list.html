@@ -120,6 +120,26 @@
             <div class="col-md-12">
                     <h4>Codes Received</h4>
             </div>
+            <div>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="col-md-1">Count</th>
+                        <th class="col-md-3">Value</th>
+                        <th class="col-md-4">Type</th>
+                        <th class="col-md-4">Age</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="count in report.codes.codeCountList | filter:{ type : 'VACCINE_GROUP'}">
+                        <td>{{count.count}}</td>
+                        <td>{{count.value}}</td>
+                        <td>{{count.type}}</td>
+                        <td>{{count.attribute}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div ng-show="showReport">
@@ -241,7 +261,8 @@
 <div class="row">
 	<div class="col-md-4">
 		<h4>Messages  
-		<span ng-if="resultsMetaData.totalElements">({{resultsMetaData.totalElements}})</h4></span>
+		<span ng-if="resultsMetaData.totalElements">({{resultsMetaData.totalElements}})</span>
+        </h4>
 	</div>
 	
 </div>

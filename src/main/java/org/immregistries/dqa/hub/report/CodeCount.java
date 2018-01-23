@@ -67,4 +67,9 @@ public class CodeCount {
 	public void setSenderMetrics(SenderMetrics senderMetrics) {
 		this.senderMetrics = senderMetrics;
 	}
+
+    @Override public String toString() {
+        return "CodeCount{" + "id=" + id + ", senderMetrics=" + senderMetrics.getId() + ", codeType='" + codeType + '\'' + ", attribute='" + attribute + '\''
+            + ", codeValue='" + codeValue + '\'' + ", codeCount=" + codeCount + '}';
+    }
 }

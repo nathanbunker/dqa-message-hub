@@ -89,5 +89,9 @@ public class SenderMetrics {
 	public void setMetricsDate(Date metricsDate) {
 		this.metricsDate = metricsDate;
 	}
-	
+
+	@Override public String toString() {
+		return "SenderMetrics{" + "id=" + id + ", sender='" + sender + '\'' + ", metricsDate=" + metricsDate + ", patientCount=" + patientCount
+			+ ", vaccinationCount=" + vaccinationCount + ", score=" + score + ", codes=" + codes + ", attributes=" + attributes + '}';
+	}
 }

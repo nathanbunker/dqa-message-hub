@@ -51,19 +51,32 @@ angular.module('messageHubDemoApp')
         }
     };
 }])
+
 .service('fileUpload', ['$http', function ($http) {
-    this.uploadFileToUrl = function(file, uploadUrl){
+    this.uploadFileToUrl = function(file){
         var fd = new FormData();
         fd.append('file', file);
-        $http.post(uploadUrl, fd, {
+
+        return $http.post("file/upload-messages", fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
-        })
-        .success(function(){
-        })
-        .error(function(){
         });
-    }
+    };
+
+    this.initiateFileProcess = function(fileId){
+        var fd = new FormData();
+        fd.append('fileId', fileId);
+
+        return $http.post("file/process-file",fd, {
+            transformRequest: angular.identity,
+            headers: {'Content-Type': undefined}
+        });
+    };
+
+    this.reportFileProcess = function(fileId){
+        return $http.get("file/report-file?fileId="+fileId);
+    };
+
 }])
 
 

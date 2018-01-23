@@ -88,26 +88,27 @@
     </style>
 </head>
 <body>
-<div style="background-color: grey; height: 100px; color: white; padding-bottom: 20px;">
+<div ng-app="messageHubDemoApp">
+
+    <div style="background-color: grey; height: 100px; color: white; padding-bottom: 20px;">
         <div class="container">
-            <div class="row">
+            <div class="row" >
                 <div class="col-md-8">
-					<div class="dropdown">
-					  <button class="dropbtn" style="padding-top: 20px; height: 100px; padding-bottom: 19px;"><i class="glyphicon glyphicon-equalizer" aria-hidden="true"></i> DQA Menu <i class="fa fa-caret-down"></i></button>
-					  <div class="dropdown-content">
-					  	<a href="/#/messages">Dashboard</a>
-					    <a href="/#/demo-page">DQA Demo</a>
-					    <a href="/#/file-demo">File Demo</a>
-					    <a href="/#/report-demo">Report Demo</a>
-					    <a href="/#/file-input">File Input</a>
-					  </div>
-					</div>
+                    <div class="dropdown" >
+                        <button class="dropbtn" ng-click="hideMenu = !hideMenu" style="padding-top: 20px; height: 100px; padding-bottom: 19px;"><i class="glyphicon glyphicon-equalizer" aria-hidden="true"></i> DQA Menu <i class="fa fa-caret-down"></i></button>
+                        <div class="dropdown-content" ng-show="hideMenu" ng-click="hideMenu = !hideMenu">
+                            <a ui-sref="landing-page">Dashboard</a>
+                            <a ui-sref="demo">DQA Demo</a>
+                            <a ui-sref="file">File Demo</a>
+                            <a ui-sref="reportDemo">Report Demo</a>
+                            <a ui-sref="file-input">File Input</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-</div>
+    </div>
 
-<div ng-app="messageHubDemoApp">
     <div class="container override-container-padding" style="padding-top:20px;">
         <div ui-view></div>
 

@@ -41,8 +41,6 @@ angular.module('messageHubDemoApp')
 	      resolve:{
 	    	     messageDetail: ['$stateParams', 'MessageDetailFactory',  function($stateParams, MessageDetailFactory){
 	    	    	 return {
-//		    	    	 messageErrors 	: ESSRMessageErrorsFactory.get({id:$stateParams.id}),
-//		    	    	 messageStats 	: ESSRMessageStatsFactory.get({id:$stateParams.id}),
 		    	    	 messageData 	: MessageDetailFactory.get({id: $stateParams.id})
 	    	    	   };
 	    	     }]
@@ -73,9 +71,6 @@ angular.module('messageHubDemoApp')
             }
         })
         ;
-        
-
-        
         $stateProvider
             .state('file-input', {
                 url: "/file-input",

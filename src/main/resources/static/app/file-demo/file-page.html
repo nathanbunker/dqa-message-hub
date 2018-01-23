@@ -1,26 +1,41 @@
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <h2>File Upload</h2>
         </div>
-        <input type="file" file-model="myFile"/>
- 
-        <button class="btn btn-primary" type="submit" ng-click="uploadFile()">Submit</button>
-      </div>
+
     </div>
-    <br />
-    <div class="row" ng-show="stats != null">
-      <div class="col-md-12">
-        <pre>{{stats.responseMessage}}</pre>
-      </div>
-    </div>
-    <br />
-    <h2 ng-click="showAcks = !showAcks">View HL7 Acks <span class="glyphicon" ng-class="showAcks ? 'glyphicon-chevron-down' : 'glyphicon-chevron-up'"></span></h2>
-    <div ng-show="showAcks">
-      <div ng-repeat="eval in response">
-        <div class="row">
-          <div>
-            <p class="hl7display" ng-bind-html="eval.messageAck | newline"></p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <br />
-    <button class="btn btn-primary" type="submit" ng-click="downloadFile()">Download</button>
+
 </div>
+<div>
+    <div class="row" ng-repeat='(fileId, fileUpload) in fileUploads'
+         style="border:2px dotted grey; padding:10px;margin:10px;">
+        <div class="col-md-4">
+            <span style="padding:5px">{{fileUpload.fileName}}</span>
+        </div>
+        <div class="col-md-2">
+            {{fileUpload.numberOfMessages}} messages
+        </div>
+
+        <div class="col-md-6">
+            <uib-progressbar style="margin-bottom:0px;"ng-class="{'active progress-striped' : fileUpload.numberUnProcessed > 0 }" max="fileUpload.numberOfMessages" value="fileUpload.numberProcessed"><span style="color:white; white-space:nowrap;">{{fileUpload.percentage}} %</span></uib-progressbar>
+        </div>
+    </div>
+</div>
+<div>
+    <div class="row" style="border:2px dotted grey; padding:10px;margin:10px;">
+        <div class="col-md-4">
+            <input type="file" file-model="myFile" style="padding:5px"/>
+        </div>
+        <div class="col-md-8">
+            <button class="btn btn-primary" type="submit" ng-click="uploadFile()">Submit</button>
+        </div>
+    </div>
+</div>
+<br/>
+<!--<div class="row">-->
+    <!--<div class="col-md-12">-->
+        <!--FILE UPLOAD:-->
+        <!--<pre>{{fileUpload}}</pre>-->
+    <!--</div>-->
+<!--</div>-->
