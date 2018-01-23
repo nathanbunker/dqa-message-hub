@@ -2,50 +2,56 @@ angular.module('messageHubDemoApp')
     .controller('FilePageController', ['$scope', 'fileUpload',
         function ($scope, fileUpload) {
 
+            //The container for watching the file uploads.
             $scope.fileUploads = {};
-            $scope.fileIds = [];
+
+            //The value from the file input.
             $scope.myFile = {};
-            $scope.cycle = false;
 
+            //The function that sends the file and watches the process.
             $scope.uploadFile = function () {
-
+                //Get the file from the file input control on the front end.
                 var file = $scope.myFile;
-                console.log('file is ');
-                console.dir(file);
 
+                //Submit the file to be processed, initiate the process, and watch it.
                 fileUpload.uploadFileToUrl(file)
+                //once the file has been submitted to be in the queue, success will be triggered.
                     .success(function(data){
-                        console.log("file upload info: ");
-                        console.log(data);
-                        console.log(data.fileId);
-                        fileUpload.initiateFileProcess(data.fileId);
+                        //Save the information about the file upload to the scope map.
                         $scope.fileUploads[data.fileId] = data;
-                        console.log("Initiated process");
-                        //$scope.cycle = true;
-                        //$scope.cycle = false;
+                        //Then we must initiate the file process to get it started.
+                        fileUpload.initiateFileProcess(data.fileId);
+                        //Once its started, we need to initiate the process watcher.
                         watchFileProcess(data.fileId);
-                        angular.element("input[type='file']").val(null);
+                        //And then clear the value from the file input to prepare to submit another file.
+                        angular.element("#fileInput").val(null);
                     })
+                    //If there's an error uploading, notify the user.
                     .error(function(){
                         console.log("ERROR SUBMITTING FILE.");
+                        alert("ERROR Submitting file");
                 });
             };
 
             function watchFileProcess(fileId) {
-                console.log("about to loop for file id: " + fileId);
-                setTimeout(function(){
-                    console.log("Looking up current status for " + fileId);
-                            fileUpload.reportFileProcess(fileId)
-                                .success(function (data) {
-                                    $scope.fileUploads[fileId] = data;
-                                    console.log("fileId:"+fileId+"::fileUploads::"+ $scope.fileUploads[fileId]);
-                                    console.log("Current status: " + $scope.fileUpload);
-                                    if (data.status === 'started') {
-                                        watchFileProcess(fileId);
-                                    }
-                                });
-                    }, 500);
+                setTimeout(function () {
+                    fileUpload.reportFileProcess(fileId)
+                        //Once the data is returned, save it, and take a look.
+                        .success(function (data) {
+                            //replace the data in the map with the new information about the process.
+                            $scope.fileUploads[fileId] = data;
+                            //And if it's not done, trigger another update.
+                            if (data.status === 'started') {
+                                //Call again to get an update.  this is recursion. w00t!
+                                watchFileProcess(fileId);
+                            }
+                        });
+                 //repeat the lookup at the time interval below.
+                }, 1000);
+            }
 
+            $scope.downloadAcks = function(fileId) {
+                alert("downloading " + fileId);//Don't leave this.  this is just to detect if things are working.
             }
 
         }]);
