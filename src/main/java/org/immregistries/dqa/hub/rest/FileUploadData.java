@@ -88,7 +88,10 @@ public class FileUploadData {
     }
 
     public int getPercentage() {
-        return (int) (getNumberProcessed() * 100)  / getNumberOfMessages();
+        if (getNumberOfMessages() == 0) {
+            return 100;
+        }
+        return (int) (getNumberProcessed() * 100)  / this.getNumberOfMessages();
     }
 
 }
