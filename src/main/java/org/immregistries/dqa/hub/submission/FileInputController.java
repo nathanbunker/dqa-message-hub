@@ -36,6 +36,7 @@ import java.util.zip.ZipInputStream;
 
         String fileId = "file" + String.valueOf(new Date().getTime());
         FileUploadData fileUpload = new FileUploadData(facilityId, file.getOriginalFilename(), fileId);
+
         this.fileQueue.put(fileId, fileUpload);
 
         //These are to check if it's a zip file, and to use it yes:
@@ -45,7 +46,7 @@ import java.util.zip.ZipInputStream;
         if (entry == null) {
             //it's not a zip file.  process as text file.
             logger.info("Not a zip file!");
-            fileUpload.getHl7Messages().addAll(this.getMessagesFromInputStream(inputStream));
+            fileUpload.getHl7Messages().addAll(this.getMessagesFromInputStream(file.getInputStream()));
         } else {
             //Process the first one.
             fileUpload.getHl7Messages().addAll(getMessagesFromInputStream(zis));
@@ -63,13 +64,16 @@ import java.util.zip.ZipInputStream;
     }
 
     private List<String> getMessagesFromInputStream(InputStream inputStream) throws IOException {
+
         List<String> messages = new ArrayList<>();
         StringBuilder oneMessage = new StringBuilder();
         String line;
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
         while ((line = bufferedReader.readLine()) != null) {
+            logger.info("Line: " + line);
             if (line.matches(MSH_REGEX)) {
-                if (oneMessage.length() == 0) {
+                if (oneMessage.length() <= 0) {
                     oneMessage.append(line);
                 } else {
                     messages.add(oneMessage.toString());
