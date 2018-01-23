@@ -51,7 +51,21 @@ angular.module('messageHubDemoApp')
             }
 
             $scope.downloadAcks = function(fileId) {
-                alert("downloading " + fileId);//Don't leave this.  this is just to detect if things are working.
+                var fileInfo = $scope.fileUploads[fileId];
+                var fileName = fileInfo.fileName;
+                var text = fileInfo.ackMessages.join("\r");
+                download(fileName, text);
+            };
+
+            function download(filename, text) {
+                console.log("Creating file named " + filename);
+                var element = document.createElement('a');
+                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+                element.setAttribute('download', filename + "-acks.txt");
+                element.style.display = 'none';
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
             }
 
         }]);
