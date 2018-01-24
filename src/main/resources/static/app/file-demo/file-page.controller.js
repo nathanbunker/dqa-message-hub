@@ -1,12 +1,29 @@
 angular.module('messageHubDemoApp')
     .controller('FilePageController', ['$scope', 'fileUpload',
         function ($scope, fileUpload) {
-
             //The container for watching the file uploads.
             $scope.fileUploads = {};
 
             //The value from the file input.
             $scope.myFile = {};
+
+            initialize();
+            function initialize() {
+                fileUpload.getQueues().success(function(data){
+                    if (data.uploads) {
+                        for (var x = data.uploads.length - 1; x >= 0; x--) {
+                            var upload = data.uploads[x];
+                            $scope.fileUploads[upload.fileId] = upload;
+                            watchFileProcess(upload.fileId);
+                        }
+                    }
+                });
+            }
+
+            $scope.removeFile = function(fileId) {
+                fileUpload.removeFile(fileId);
+                $scope.fileUploads[fileId] = null;
+            };
 
             //The function that sends the file and watches the process.
             $scope.uploadFile = function () {

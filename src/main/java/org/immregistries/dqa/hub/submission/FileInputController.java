@@ -100,6 +100,25 @@ import java.util.zip.ZipInputStream;
         return this.fileQueue.get(fileId);
     }
 
+    private class FileProcessingQueue {
+        List<FileUploadData> uploads = new ArrayList<>();
+
+        public List<FileUploadData> getUploads() {
+            return uploads;
+        }
+
+        public void setUploads(List<FileUploadData> uploads) {
+            this.uploads = uploads;
+        }
+    }
+
+    @RequestMapping(value = "get-queues", method = RequestMethod.GET)
+    public FileProcessingQueue getQueues() {
+        FileProcessingQueue queue = new FileProcessingQueue();
+        queue.getUploads().addAll(this.fileQueue.values());
+        return queue;
+    }
+
     @RequestMapping(value = "stop-file", method = RequestMethod.POST) public void stopFile(@RequestParam("fileId") String fileId) {
         this.fileQueue.get(fileId).setStatus("Stop");
     }

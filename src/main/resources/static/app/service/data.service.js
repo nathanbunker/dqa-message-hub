@@ -77,6 +77,12 @@ angular.module('messageHubDemoApp')
         return $http.get("file/report-file?fileId="+fileId);
     };
 
+    this.getQueues = function(){
+        return $http.get("file/get-queues");
+    };
+
+
+
 }])
 
 
