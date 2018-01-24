@@ -131,7 +131,7 @@ public class MessageInputController {
     	example.setMessage(mg.getUniqueMessage());
     	example.setUser("regularUser");
     	example.setPassword("password123");
-    	example.setFacilityCode("DQATestFacility");
+    	example.setFacilityCode("MQETestFacility");
         return example;
     }
 

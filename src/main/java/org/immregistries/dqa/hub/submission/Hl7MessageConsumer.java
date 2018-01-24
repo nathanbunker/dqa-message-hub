@@ -50,7 +50,7 @@ public class Hl7MessageConsumer {
 
         String sender = messageSubmission.getFacilityCode();
         if (sender == null) {
-            sender = "DQA Unspecified";
+            sender = "MQE Unspecified";
         }
 
         NISTValidator nistValidator = getNISTValidator();
@@ -122,8 +122,8 @@ public class Hl7MessageConsumer {
         data.setMessageProfileId(header.getMessageProfile());
         data.setMessageVersionId(header.getMessageVersion());
         data.setProcessingControlId(header.getProcessingStatus());
-        data.setReceivingApplication("DQA Message Hub App");
-        data.setReceivingFacility("DQA Facility");
+        data.setReceivingApplication("MQE Message Hub App");
+        data.setReceivingFacility("MQE Facility");
         data.setSendingFacility(header.getSendingFacility());
         data.setSendingApplication(header.getSendingApplication());
         data.setResponseType("?");
