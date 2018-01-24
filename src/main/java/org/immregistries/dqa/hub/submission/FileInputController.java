@@ -102,6 +102,7 @@ import java.util.zip.ZipInputStream;
 
     @RequestMapping(value = "remove-file", method = RequestMethod.DELETE)
     public void removeFile(@RequestParam("fileId") String fileId) {
+        this.fileQueue.get(fileId).setStatus("Stopped");
         this.fileQueue.remove(fileId);
     }
 

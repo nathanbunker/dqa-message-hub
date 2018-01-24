@@ -53,17 +53,19 @@ angular.module('messageHubDemoApp')
             function watchFileProcess(fileId) {
                 setTimeout(function () {
                     fileUpload.reportFileProcess(fileId)
-                        //Once the data is returned, save it, and take a look.
+                    //Once the data is returned, save it, and take a look.
                         .success(function (data) {
-                            //replace the data in the map with the new information about the process.
-                            $scope.fileUploads[fileId] = data;
-                            //And if it's not done, trigger another update.
-                            if (data.status === 'started') {
-                                //Call again to get an update.  this is recursion. w00t!
-                                watchFileProcess(fileId);
+                            if (data) {
+                                //replace the data in the map with the new information about the process.
+                                $scope.fileUploads[fileId] = data;
+                                //And if it's not done, trigger another update.
+                                if (data.status === 'started') {
+                                    //Call again to get an update.  this is recursion. w00t!
+                                    watchFileProcess(fileId);
+                                }
                             }
                         });
-                 //repeat the lookup at the time interval below.
+                    //repeat the lookup at the time interval below.
                 }, 1000);
             }
 
