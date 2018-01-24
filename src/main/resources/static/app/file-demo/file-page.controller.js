@@ -22,7 +22,7 @@ angular.module('messageHubDemoApp')
 
             $scope.removeFile = function(fileId) {
                 fileUpload.removeFile(fileId);
-                $scope.fileUploads[fileId] = null;
+                delete $scope.fileUploads[fileId];
             };
 
             //The function that sends the file and watches the process.

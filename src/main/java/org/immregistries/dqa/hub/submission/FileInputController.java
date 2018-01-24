@@ -23,7 +23,7 @@ import java.util.zip.ZipInputStream;
 
     @Autowired private MessageInputController messageController;
 
-    private Map<String, FileUploadData> fileQueue = new HashMap<>();
+    private Map<String, FileUploadData> fileQueue = new LinkedHashMap<>();
 
     private static final String MSH_REGEX = "^MSH\\|.*";
     private static final String HL7_SEGMENT_REGEX = "^\\w\\w\\w\\|.*";
@@ -98,6 +98,11 @@ import java.util.zip.ZipInputStream;
     @RequestMapping(value = "report-file", method = RequestMethod.GET)
     public FileUploadData reportFile(@RequestParam("fileId") String fileId) {
         return this.fileQueue.get(fileId);
+    }
+
+    @RequestMapping(value = "remove-file", method = RequestMethod.DELETE)
+    public void removeFile(@RequestParam("fileId") String fileId) {
+        this.fileQueue.remove(fileId);
     }
 
     private class FileProcessingQueue {
