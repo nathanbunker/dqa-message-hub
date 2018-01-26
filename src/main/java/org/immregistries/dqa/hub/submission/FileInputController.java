@@ -25,7 +25,8 @@ import java.util.zip.ZipInputStream;
 
     private Map<String, FileUploadData> fileQueue = new LinkedHashMap<>();
 
-    private static final String MSH_REGEX = "^MSH\\|.*";
+    private static final String MSH_REGEX = "^\\s*MSH\\|\\^~\\\\&\\|.*";
+    private static final String FHS_BHS_REGEX = "^\\s*(FHS|BHS)\\|.*";
     private static final String HL7_SEGMENT_REGEX = "^\\w\\w\\w\\|.*";
 
     @RequestMapping(value = "upload-messages", method = RequestMethod.POST)
@@ -72,18 +73,21 @@ import java.util.zip.ZipInputStream;
 
         while ((line = bufferedReader.readLine()) != null) {
             logger.info("Line: " + line);
-            if (line.matches(MSH_REGEX)) {
-                if (oneMessage.length() <= 0) {
-                    oneMessage.append(line);
+            
+            if (!line.matches(FHS_BHS_REGEX)) {
+                if (line.matches(MSH_REGEX)) {
+                    if (oneMessage.length() <= 0) {
+                        oneMessage.append(line);
+                    } else {
+                        messages.add(oneMessage.toString());
+                        oneMessage.setLength(0);
+                        oneMessage.append(line);
+                    }
                 } else {
-                    messages.add(oneMessage.toString());
-                    oneMessage.setLength(0);
-                    oneMessage.append(line);
-                }
-            } else {
-                if (line.matches(HL7_SEGMENT_REGEX)) {
-                    oneMessage.append("\r\n");
-                    oneMessage.append(line);
+                    if (line.matches(HL7_SEGMENT_REGEX)) {
+                        oneMessage.append("\r\n");
+                        oneMessage.append(line);
+                    }
                 }
             }
         }
@@ -161,3 +165,4 @@ import java.util.zip.ZipInputStream;
         return fileUpload;
     }
 }
+
