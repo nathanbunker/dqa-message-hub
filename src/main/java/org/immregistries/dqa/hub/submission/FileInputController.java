@@ -104,9 +104,27 @@ import java.util.zip.ZipInputStream;
         return this.fileQueue.get(fileId);
     }
 
-    @RequestMapping(value = "remove-file", method = RequestMethod.DELETE)
+
+    @RequestMapping(value = "report-acks", method = RequestMethod.GET)
+    public List<String> reportAcks(@RequestParam("fileId") String fileId) {
+        FileUploadData ud = this.fileQueue.get(fileId);
+
+        if (ud != null) {
+            return ud.getAckMessages();
+        }
+
+        return new ArrayList<>();
+    }
+
+    @RequestMapping(value = "remove-file", method = RequestMethod.GET)
     public void removeFile(@RequestParam("fileId") String fileId) {
-        this.fileQueue.get(fileId).setStatus("Stopped");
+
+        FileUploadData data = this.fileQueue.get(fileId);
+
+        if (data != null) {
+            data.setStatus("deleted");
+        }
+
         this.fileQueue.remove(fileId);
     }
 
@@ -129,8 +147,20 @@ import java.util.zip.ZipInputStream;
         return queue;
     }
 
-    @RequestMapping(value = "stop-file", method = RequestMethod.POST) public void stopFile(@RequestParam("fileId") String fileId) {
-        this.fileQueue.get(fileId).setStatus("Stop");
+    @RequestMapping(value = "stop-file", method = RequestMethod.GET)
+    public void stopFile(@RequestParam("fileId") String fileId) {
+        FileUploadData fud = this.fileQueue.get(fileId);
+        if (fud != null) {
+            fud.setStatus("Stop");
+        }
+    }
+
+    @RequestMapping(value = "unpause-file", method = RequestMethod.GET)
+    public void unpauseFile(@RequestParam("fileId") String fileId) {
+        FileUploadData fud = this.fileQueue.get(fileId);
+        if (fud != null && fud.getPercentage() < 100) {
+            fud.setStatus("started");
+        }
     }
 
     @RequestMapping(value = "process-file", method = RequestMethod.POST)
@@ -145,13 +175,13 @@ import java.util.zip.ZipInputStream;
 
         try {
             for (String message : fileUpload.getHl7Messages()) {
-
-                if (!"started".equals(fileUpload.getStatus())) {
-                    return fileUpload;
-                } else {
-                    logger.info("File " + fileId + " Stopped. Remaining Messages to process: " + fileUpload.getNumberUnProcessed());
+                while(!"started".equals(fileUpload.getStatus())) {
+                    Thread.sleep(1000);
+                    logger.warn("File " + fileId + " Stopped. Waiting for restart. Remaining Messages to process: " + fileUpload.getNumberUnProcessed());
+                    if ("deleted".equals(fileUpload.getStatus())) {
+                        return fileUpload;
+                    }
                 }
-
                 String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, fileUpload.getFacilityId());
                 fileUpload.addAckMessage(ackResult);
             }

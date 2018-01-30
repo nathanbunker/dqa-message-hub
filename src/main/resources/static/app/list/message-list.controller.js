@@ -43,16 +43,16 @@ angular.module('messageHubDemoApp')
 		populateCalendar();
 		$scope.reloadPageData();
         $scope.showStats = false;
-	}
+	};
 	
 	$scope.readyHandler = function(chartWrapper) {
 		console.log("Message list Controller.  READY HANDLER");
 		$scope.calendarChartWrapper = chartWrapper;
-	}
+	};
 	
 	$scope.goToSiteSearch = function() {
 		$window.location.href = '/#/messages/';
-	}
+	};
 	
 	$scope.incrementDate = function(incAmt) {
 		console.log("incrementDate: ENTRY");
@@ -70,7 +70,7 @@ angular.module('messageHubDemoApp')
 		var atCurrentYear = $scope.calendarDisplayYear == $scope.currentYear;
 		
 		for (idx in entries) {
-			if (entries[idx].day == workingDate.format("YYYY-MM-DD")) {
+			if (entries[idx].day === workingDate.format("YYYY-MM-DD")) {
 				var nextIndex = parseInt(idx) + parseInt(incAmt);
 				console.log("incrementDate: index: " + idx + " next index: " + nextIndex + " max: " + max + " incAmt: " + incAmt);
 				var canDoNext = nextIndex < max && nextIndex >= 0;
@@ -125,7 +125,7 @@ angular.module('messageHubDemoApp')
 		console.log("Loading New Page Data...")
 		populateURL();
 		getMessageList();
-	}
+	};
 	
 	function populateURL() {
 		console.log("filters: ");
@@ -143,11 +143,11 @@ angular.module('messageHubDemoApp')
 	
 	$scope.prevYear = function() {
 		changeYear(-1);
-	}
+	};
 	
 	$scope.nextYear = function() {
 		changeYear(1);
-	}
+	};
 	
 	function changeYear(inc) {
 		if (inc > 0 && $scope.calendarDisplayYear < $scope.currentYear) {

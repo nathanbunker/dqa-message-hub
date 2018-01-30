@@ -31,41 +31,41 @@
 </div>
 
 
-<div class="row">
-   <div class="col-md-4">
-		<button type="button" class="btn btn-primary btn-sm" ng-click="openModal()"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>
-   </div>
-</div>
+<!--<div class="row">-->
+   <!--<div class="col-md-4">-->
+		<!--<button type="button" class="btn btn-primary btn-sm" ng-click="openModal()"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>-->
+   <!--</div>-->
+<!--</div>-->
 
-<div class="row" ng-if="searchOptions.filters.messageSearchText">
-   <div class="col-md-12">
-   		<span class="col-md-2 h5" style="color:grey;">
-	    	<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('messageSearchText')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
-				Message Search:
-		</span>
-		<span class="col-md-8 h4">{{::searchOptions.filters.messageSearchText}}</span>
-   </div>
-</div>
-<div class="row" ng-if="searchOptions.filters.ackStatus">
-   <div class="col-md-12">
-   		<span class="col-md-2 h5" style="color:grey;">
-			<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('ackStatus')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
-			Ack Status:
-		</span>
-		<span class="col-md-8 h4">
-			{{searchOptions.filters.ackStatus}}
-		</span> 
-   </div>
-</div>
-<div class="row" ng-if="searchOptions.filters.statisticId" >
-   <div class="col-md-12">
-		<span class="col-md-2 h5" style="color:grey;">
-			<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('statisticId')"> <i class="fa fa-times" aria-hidden="true"></i> </button>
-			ESSR Statistic:
-		</span>
-		<span class="col-md-8 h4">{{filterStatName}}</span>
-   </div>
-</div>
+<!--<div class="row" ng-if="searchOptions.filters.messageSearchText">-->
+   <!--<div class="col-md-12">-->
+   		<!--<span class="col-md-2 h5" style="color:grey;">-->
+	    	<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('messageSearchText')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
+				<!--Message Search:-->
+		<!--</span>-->
+		<!--<span class="col-md-8 h4">{{::searchOptions.filters.messageSearchText}}</span>-->
+   <!--</div>-->
+<!--</div>-->
+<!--<div class="row" ng-if="searchOptions.filters.ackStatus">-->
+   <!--<div class="col-md-12">-->
+   		<!--<span class="col-md-2 h5" style="color:grey;">-->
+			<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('ackStatus')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
+			<!--Ack Status:-->
+		<!--</span>-->
+		<!--<span class="col-md-8 h4">-->
+			<!--{{searchOptions.filters.ackStatus}}-->
+		<!--</span> -->
+   <!--</div>-->
+<!--</div>-->
+<!--<div class="row" ng-if="searchOptions.filters.statisticId" >-->
+   <!--<div class="col-md-12">-->
+		<!--<span class="col-md-2 h5" style="color:grey;">-->
+			<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('statisticId')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
+			<!--ESSR Statistic:-->
+		<!--</span>-->
+		<!--<span class="col-md-8 h4">{{filterStatName}}</span>-->
+   <!--</div>-->
+<!--</div>-->
 
 <div class="row"  >
 	<div class="col-md-12"  >
@@ -175,16 +175,15 @@
 
         <uib-tab index="1" heading="Errors/Warnings">
             <div class="heading row">
-                <h5>Detections (errors/warnings)</h5>
+                <h4>Detections</h4>
             </div>
-            <div>
+            <div><h4>Errors</h4>
                 <table class="table">
                     <thead>
                     <tr>
                         <th class="col-md-1">Count</th>
                         <th class="col-md-3">Issue</th>
                         <th class="col-md-1">Code</th>
-                        <th class="col-md-1">Severity</th>
                         <th class="col-md-8">Location</th>
                     </tr>
                     </thead>
@@ -193,17 +192,29 @@
                         <td>{{issue.count}}</td>
                         <td>{{issue.applicationErrorCode.alternateText}}</td>
                         <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                        <td>{{issue.severity}}</td>
                         <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 						</span>
                         </td>
                     </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div><h4>Warnings</h4>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th class="col-md-1">Count</th>
+                        <th class="col-md-3">Issue</th>
+                        <th class="col-md-1">Code</th>
+                        <th class="col-md-8">Location</th>
+                    </tr>
+                    </thead>
+                    <tbody>
                     <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
                         <td>{{issue.count}}</td>
                         <td>{{issue.applicationErrorCode.alternateText}}</td>
                         <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                        <td>{{issue.severity}}</td>
                         <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 						</span>
@@ -214,33 +225,55 @@
             </div>
         </uib-tab>
         <uib-tab index="2" heading="Codes">
-            <div  class="heading row" >
-                <div class="col-md-12">
-                    <h4>Codes Received</h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="img/codes_received.png">
                 </div>
-                <div>
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th class="col-md-1">Count</th>
-                            <th class="col-md-3">Value</th>
-                            <th class="col-md-4">Type</th>
-                            <th class="col-md-4">Age</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="count in report.codes.codeCountList | filter:{ type : 'VACCINE_GROUP'}">
-                            <td>{{count.count}}</td>
-                            <td>{{count.value}}</td>
-                            <td>{{count.type}}</td>
-                            <td>{{count.attribute}}</td>
-                        </tr>
-                        </tbody>
-                    </table>
+            </div>
+            <!--<div  class="heading row" >-->
+                <!--<div class="col-md-12">-->
+                    <!--<h4>Codes Received</h4>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<table class="table">-->
+                        <!--<thead>-->
+                        <!--<tr>-->
+                            <!--<th class="col-md-1">Count</th>-->
+                            <!--<th class="col-md-3">Value</th>-->
+                            <!--<th class="col-md-4">Type</th>-->
+                            <!--<th class="col-md-4">Age</th>-->
+                        <!--</tr>-->
+                        <!--</thead>-->
+                        <!--<tbody>-->
+                        <!--<tr ng-repeat="count in report.codes.codeCountList | filter:{ type : 'VACCINE_GROUP'}">-->
+                            <!--<td>{{count.count}}</td>-->
+                            <!--<td>{{count.value}}</td>-->
+                            <!--<td>{{count.type}}</td>-->
+                            <!--<td>{{count.attribute}}</td>-->
+                        <!--</tr>-->
+                        <!--</tbody>-->
+                    <!--</table>-->
+                <!--</div>-->
+            <!--</div>-->
+        </uib-tab>
+        <uib-tab index="3" heading="Vaccines">
+            <div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="img/vaccine_groups.png">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <img src="img/vaccines_admin.png">
+                    </div>
+                    <div class="col-md-6">
+                        <img src="img/vaccines_admin_by_type.png">
+                    </div>
                 </div>
             </div>
         </uib-tab>
-        <uib-tab index="3" heading="Report">
+        <uib-tab index="4" heading="Report">
             <div>
                 <div class="row">
                     <div class="col-md-12">

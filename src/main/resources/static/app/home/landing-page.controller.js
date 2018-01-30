@@ -50,7 +50,7 @@ angular.module('messageHubDemoApp')
 		if (calendarNumber == 2) {
 			resetRowsCalendar2();
 			calendarJunk = {
-					chart: $scope.myChart2Object,
+					chart: $scope.landingPageChart2,
 					year: new Date().getFullYear() - 1, 
 					calendarNumber: 2, 
 					status: $scope.calendarStatus.two
@@ -58,7 +58,7 @@ angular.module('messageHubDemoApp')
 		} else if (calendarNumber == 1) {
 			resetRowsCalendar1();
 			calendarJunk = {
-					chart: $scope.myChartObject,
+					chart: $scope.landingPageChart1,
 					year: new Date().getFullYear(),
 					calendarNumber: 1, 
 					status: $scope.calendarStatus.one
@@ -105,8 +105,8 @@ angular.module('messageHubDemoApp')
 			
 			}
 			
-			google.charts.load('current', {'packages':['line']});
-      		google.charts.setOnLoadCallback(drawChart);
+			//google.charts.load('current', {'packages':['line']});
+      		//google.charts.setOnLoadCallback(drawChart);
 		}
 	
 	
@@ -114,46 +114,46 @@ angular.module('messageHubDemoApp')
 	
 	
 	// Google Line Chart function to draw chart
-	
-	function drawChart() {
-
-      var data = new google.visualization.DataTable();
-      data.addColumn('date', 'Date');
-      data.addColumn('number', $scope.provider);
-      
-      for (idx = 0; idx < $scope.scoreChartRows.length; idx++) {
-      	
-      	if ($scope.scoreChartRows.length < 2) {
-      		data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), 0] ]);
-      	}
-      	
-      	//data.addColumn('number', $scope.providerList[0,idx]);
-      	data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), $scope.scoreChartRows[idx].c[1].v] ]);
-      }
-      
-      //console.log($scope.scoreChartRows.length);
-
-      var options = {
-        chart: {
-          title: 'Provider Chart',
-          subtitle: ''
-        },
-        width: 900,
-        height: 500,
-        hAxis: {
-          format: 'M/d/yy',
-          title: 'Date'
-        },
-        vAxis: {
-          title: 'Total Score'
-        }
-      };
-
-      var chart = new google.charts.Line(document.getElementById('line_top_x'));
-
-      chart.draw(data, google.charts.Line.convertOptions(options));
-    }
-	
+	//
+	//function drawChart() {
+    //
+     // var data = new google.visualization.DataTable();
+     // data.addColumn('date', 'Date');
+     // data.addColumn('number', $scope.provider);
+     //
+     // for (idx = 0; idx < $scope.scoreChartRows.length; idx++) {
+     //
+     // 	if ($scope.scoreChartRows.length < 2) {
+     // 		data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), 0] ]);
+     // 	}
+     //
+     // 	//data.addColumn('number', $scope.providerList[0,idx]);
+     // 	data.addRows([ [new Date($scope.scoreChartRows[idx].c[0].v.getYear(), $scope.scoreChartRows[idx].c[0].v.getMonth(), $scope.scoreChartRows[idx].c[0].v.getDate()), $scope.scoreChartRows[idx].c[1].v] ]);
+     // }
+     //
+     // //console.log($scope.scoreChartRows.length);
+    //
+     // var options = {
+     //   chart: {
+     //     title: 'Provider Chart',
+     //     subtitle: ''
+     //   },
+     //   width: 900,
+     //   height: 500,
+     //   hAxis: {
+     //     format: 'M/d/yy',
+     //     title: 'Date'
+     //   },
+     //   vAxis: {
+     //     title: 'Total Score'
+     //   }
+     // };
+     // //
+     // //var chart = new google.charts.Line(document.getElementById('line_top_x'));
+     // //
+     // //chart.draw(data, google.charts.Line.convertOptions(options));
+    //}
+	//
 	//
 	
 	function dataToRows(dataIn, year) {
@@ -239,7 +239,7 @@ angular.module('messageHubDemoApp')
         	$scope.searchOptionsForm.date = m.toDate();
         	$scope.search();
         }
-    }	
+    };
 
 	FacilityList.query(function(facilities) {
         $scope.providerList = facilities;
@@ -247,14 +247,14 @@ angular.module('messageHubDemoApp')
 		if (urlParams.pin) {
 			var list = $scope.providerList;
 			for (provider in list) {
-				if (provider == urlParams.pin) {
+				if (provider === urlParams.pin) {
 					$scope.searchOptionsForm.provider = provider;
 					$scope.getProviderHistory();
 					return;
 				}
 			}
 		}
-		if ($scope.providerList.length == 1) {
+		if ($scope.providerList.length === 1) {
 			$scope.searchOptionsForm.provider = $scope.providerList[0];
 			$scope.getProviderHistory();
 		}
@@ -267,7 +267,7 @@ angular.module('messageHubDemoApp')
 	}
 	
 	function resetRowsCalendar1() {
-		$scope.myChartObject.data.rows = [{
+		$scope.landingPageChart1.data.rows = [{
 			c : [ {
 				v : new moment('2017-01-01', "YYYY-MM-DD", true).toDate()
 			}, {
@@ -277,7 +277,7 @@ angular.module('messageHubDemoApp')
 	}
 	
 	function resetRowsCalendar2() {
-		$scope.myChart2Object.data.rows = [{
+		$scope.landingPageChart2.data.rows = [{
 			c : [ {
 				v : new moment('2016-01-01', "YYYY-MM-DD", true).toDate()
 			}, {
@@ -290,11 +290,11 @@ angular.module('messageHubDemoApp')
 	googleChartApiConfig.version = '1.1';
 	  
 	//This year's calendar. 
-	$scope.myChartObject = {};
+	$scope.landingPageChart1 = {};
 	    
-	$scope.myChartObject.type = "Calendar";
+	$scope.landingPageChart1.type = "Calendar";
 	    
-	    $scope.myChartObject.data = {
+	    $scope.landingPageChart1.data = {
 	    	"cols": [
 	    	         {id: "date", label: "Date", type: "date"},
 	    	         {id: "count", label: "Message Count", type: "number"},
@@ -303,7 +303,7 @@ angular.module('messageHubDemoApp')
 	        "rows": []
 	    };
 
-	    $scope.myChartObject.options = {
+	    $scope.landingPageChart1.options = {
 //	        title: 'Recent Activity',
 	        
 	        height: 200,
@@ -323,11 +323,11 @@ angular.module('messageHubDemoApp')
 	    };
 	    
 	    //Last year's calendar. 
-	    $scope.myChart2Object = {};
+	    $scope.landingPageChart2 = {};
 	    
-		$scope.myChart2Object.type = "Calendar";
+		$scope.landingPageChart2.type = "Calendar";
 		    
-		    $scope.myChart2Object.data = {
+		    $scope.landingPageChart2.data = {
 		    	"cols": [
 		    	         {id: "date", label: "Date", type: "date"},
 		    	         {id: "count", label: "Message Count", type: "number"},
@@ -341,7 +341,7 @@ angular.module('messageHubDemoApp')
 				}]
 		    };
 
-		    $scope.myChart2Object.options = {
+		    $scope.landingPageChart2.options = {
 		        title: '',
 		        height: 200,
 		        calendar: { cellSize: 19 , 
@@ -360,4 +360,4 @@ angular.module('messageHubDemoApp')
 		    };
 	
 	
-}])
+}]);

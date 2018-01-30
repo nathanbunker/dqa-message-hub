@@ -66,7 +66,6 @@ angular.module('messageHubDemoApp')
     this.initiateFileProcess = function(fileId){
         var fd = new FormData();
         fd.append('fileId', fileId);
-
         return $http.post("file/process-file",fd, {
             transformRequest: angular.identity,
             headers: {'Content-Type': undefined}
@@ -76,8 +75,20 @@ angular.module('messageHubDemoApp')
     this.reportFileProcess = function(fileId){
         return $http.get("file/report-file?fileId="+fileId);
     };
+
+    this.pauseFileProcess = function(fileId){
+        return $http.get("file/stop-file?fileId="+fileId);
+    };
+
+    this.unpauseFileProcess = function(fileId){
+        return $http.get("file/unpause-file?fileId="+fileId);
+    };
+
+    this.getAcks = function(fileId){
+        return $http.get("file/report-acks?fileId="+fileId);
+    };
     this.removeFile = function(fileId){
-        return $http.delete("file/remove-file?fileId="+fileId);
+        return $http.get("file/remove-file?fileId="+fileId);
     };
     this.getQueues = function(){
         return $http.get("file/get-queues");

@@ -1,5 +1,6 @@
 package org.immregistries.dqa.hub.rest;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,13 @@ public class FileUploadData {
     private String fileName;
     private String fileId;
 
+    private int messagesSize;
+    private int processed;
+
+    @JsonIgnore
     private List<String> hl7Messages = new ArrayList<>();
+
+    @JsonIgnore
     private List<String> ackMessages = new ArrayList<>();
 
     public FileUploadData() {
@@ -40,7 +47,7 @@ public class FileUploadData {
     }
 
     public List<String> getAckMessages() {
-        return this.ackMessages;
+        return new ArrayList<>(this.ackMessages);
     }
 
     public String getFacilityId() {
@@ -65,10 +72,6 @@ public class FileUploadData {
 
     public void setFileId(String fileId) {
         this.fileId = fileId;
-    }
-
-    public void addVXUMessage(String message) {
-        this.hl7Messages.add(message);
     }
 
     public void addAckMessage(String message) {

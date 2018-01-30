@@ -58,10 +58,12 @@ public class Hl7MessageConsumer {
 
         //force serial processing...
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
-        Date randomSentDate = getRandomDate();
-        this.saveMetricsFromValidationResults(sender, validationResults, randomSentDate);
+//        Date sentDate = new Date();
+        Date sentDate = validationResults.getMessageObjects().getMessageHeader().getMessageDate();
+
+        this.saveMetricsFromValidationResults(sender, validationResults, sentDate);
         String ack = makeAckFromValidationResults(validationResults, nistReportableList);
-        this.saveMessageForSender(message, ack, sender, randomSentDate);
+        this.saveMessageForSender(message, ack, sender, sentDate);
 
         Hl7MessageHubResponse response = new Hl7MessageHubResponse();
         response.setAck(ack);
@@ -93,6 +95,7 @@ public class Hl7MessageConsumer {
 		MessageMetadata mm = new MessageMetadata();
 		//for demo day, let's make a random date in the last month.
         mm.setInputTime(sentDate);
+        message = message.replaceAll("\\n\\r","\\r");
         mm.setMessage(message);
         mm.setResponse(ack);
         mm.setProvider(sender);
