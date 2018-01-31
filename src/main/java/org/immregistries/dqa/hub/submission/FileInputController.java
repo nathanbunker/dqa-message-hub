@@ -85,7 +85,7 @@ import java.util.zip.ZipInputStream;
                     }
                 } else {
                     if (line.matches(HL7_SEGMENT_REGEX)) {
-                        oneMessage.append("\r\n");
+                        oneMessage.append("\r");
                         oneMessage.append(line);
                     }
                 }
