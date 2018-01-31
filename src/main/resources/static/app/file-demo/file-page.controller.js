@@ -4,53 +4,37 @@ angular.module('messageHubDemoApp')
             //The container for watching the file uploads.
             $scope.fileUploads = {};
             //The value from the file input.
-            $scope.myFile = {};
+            $scope.myFile      = {};
 
             initialize();
+
+            //When the page first starts up, check for existing uploads
+            //and add them to the list.
             function initialize() {
-                fileUpload.getQueues().success(function(data){
+                fileUpload.getQueues()
+                    .success(function (data) {
+                    //if there are uploads, cycle through them and add them
                     if (data.uploads) {
                         for (var x = data.uploads.length - 1; x >= 0; x--) {
-                            var upload = data.uploads[x];
-                            $scope.fileUploads[upload.fileId] = upload;
-                            watchFileProcess(upload.fileId);
+                            $scope.fileUploads[data.uploads[x].fileId] = data.uploads[x];
+                            watchFileProcess(data.uploads[x].fileId);
                         }
                     }
                 });
             }
 
-            $scope.cancelRemove = function(fileId) {
+            $scope.cancelRemove = function (fileId) {
                 console.log("UNDO Removing file: " + fileId);
-                var timeout = $scope.fileUploads[fileId].deleteTimeout;
-                clearTimeout(timeout);
+                clearTimeout($scope.fileUploads[fileId].deleteTimeout);
                 $scope.fileUploads[fileId].deleteRequested = false;
-                $scope.fileUploads[fileId].countdown = 0;
+                $scope.fileUploads[fileId].countdown       = 0;
 
                 fileUpload.unpauseFileProcess(fileId);
                 $scope.fileUploads[fileId].status = 'started';
                 watchFileProcess(fileId);
-                //
-                //if ($scope.fileUploads[fileId].percentage < 100) {
-                //        fileUpload.reportFileProcess(fileId)
-                //            .success(function (data) {
-                //                console.log("file is finished? : " + !(data.percentage < 100));
-                //                console.log("file percent? : " + data.percentage);
-                //                if (data.percentage < 100) {
-                //                    //Once the data is returned, save it, and take a look.
-                //
-                //                } else {
-                //                    $scope.fileUploads[fileId] = data;
-                //                    $scope.fileUploads[fileId].status = "finished";
-                //                }
-                //            });
-                //} else {
-                //    $scope.fileUploads[fileId].status = "finished";
-                //}
-
             };
 
-            $scope.removeFile = function(fileId) {
-
+            $scope.removeFile = function (fileId) {
                 if ($scope.fileUploads[fileId] && $scope.fileUploads[fileId].deleteRequested) {
                     console.log("Remove already requested for: " + fileId);
                     //it's already marked for being deleted.
@@ -58,8 +42,8 @@ angular.module('messageHubDemoApp')
                 }
 
                 $scope.fileUploads[fileId].deleteRequested = true;
-                $scope.fileUploads[fileId].status = 'deleting';
-                $scope.fileUploads[fileId].countdown = 100;
+                $scope.fileUploads[fileId].status          = 'deleting';
+                $scope.fileUploads[fileId].countdown       = 100;
                 fileUpload.pauseFileProcess(fileId);
                 countdown(fileId);
 
@@ -73,11 +57,11 @@ angular.module('messageHubDemoApp')
             };
 
             function countdown(fileId) {
-                setTimeout(function() {
+                setTimeout(function () {
                     if ($scope.fileUploads[fileId]) {
                         $scope.fileUploads[fileId].countdown = Math.round($scope.fileUploads[fileId].countdown - 3.8);
+                        $scope.$apply();
                         if ($scope.fileUploads[fileId].countdown > 0) {
-                            $scope.$apply();
                             countdown(fileId);
                         }
                     }
@@ -86,13 +70,10 @@ angular.module('messageHubDemoApp')
 
             //The function that sends the file and watches the process.
             $scope.uploadFile = function () {
-                //Get the file from the file input control on the front end.
-                var file = $scope.myFile;
-
                 //Submit the file to be processed, initiate the process, and watch it.
-                fileUpload.uploadFileToUrl(file)
+                fileUpload.uploadFileToUrl($scope.myFile)
                 //once the file has been submitted to be in the queue, success will be triggered.
-                    .success(function(data){
+                    .success(function (data) {
                         //Save the information about the file upload to the scope map.
                         $scope.fileUploads[data.fileId] = data;
                         //Then we must initiate the file process to get it started.
@@ -103,42 +84,38 @@ angular.module('messageHubDemoApp')
                         angular.element("#fileInput").val(null);
                     })
                     //If there's an error uploading, notify the user.
-                    .error(function(){
+                    .error(function () {
                         console.log("ERROR SUBMITTING FILE.");
                         alert("ERROR Submitting file");
-                });
+                    });
             };
 
             function watchFileProcess(fileId) {
-
-                setTimeout(function () {
-                    var upload = $scope.fileUploads[fileId];
-                    if (!upload || upload.status !== 'deleting') {
-                        //console.log("watching...");
-                        //console.log(upload);
+                    if (!$scope.fileUploads[fileId] || $scope.fileUploads[fileId].status !== 'deleting') {
                         fileUpload.reportFileProcess(fileId)
-                        //Once the data is returned, save it, and take a look.
+                            //Once the data is returned, save it, and take a look. Repeat if necessary.
                             .success(function (data) {
                                 if (data) {
                                     //replace the data in the map with the new information about the process.
                                     $scope.fileUploads[fileId] = data;
-                                    //And if it's not done, trigger another update.
-                                    if (data.status === 'started') {
-                                        //Call again to get an update.  this is recursion. w00t!
-                                        watchFileProcess(fileId);
-                                    }
+                                    //repeat the lookup at the time interval below.
+                                    setTimeout(function () {
+                                        //if the process is still going.
+                                        if (data.status === 'started') {
+                                            //Call again to get an update.  this is recursion. w00t!
+                                            watchFileProcess(fileId);
+                                        }
+                                    }, 1000);
                                 }
                             });
                     }
-                    //repeat the lookup at the time interval below.
-                }, 500);
-        }
+            }
 
-            $scope.downloadAcks = function(fileId) {
+            $scope.downloadAcks = function (fileId) {
                 fileUpload.getAcks(fileId)
                     .success(function (data) {
                         var fileName = $scope.fileUploads[fileId].fileName;
-                        var text = data.join("\r");
+                        var text     = data.join("\r");
                         download(fileName, text);
                     });
             };
@@ -153,5 +130,4 @@ angular.module('messageHubDemoApp')
                 element.click();
                 document.body.removeChild(element);
             }
-
         }]);
