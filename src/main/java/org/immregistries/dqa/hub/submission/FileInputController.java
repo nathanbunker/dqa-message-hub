@@ -183,6 +183,9 @@ import java.util.zip.ZipInputStream;
                     }
                 }
                 String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, fileUpload.getFacilityId());
+
+                //If the ack ends with a line break, remove it.
+                ackResult = ackResult.replaceAll("\\r$", "");
                 fileUpload.addAckMessage(ackResult);
             }
             fileUpload.setStatus("finished");
