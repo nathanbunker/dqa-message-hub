@@ -13,7 +13,6 @@ public class DemoController {
     
     @RequestMapping(value = "/")
     public String start() throws Exception {
-    	logger.info("test start demo!");
         return "app/demo-app.html";
         //Use the results to build an ACK using the DQA util project.
     }
