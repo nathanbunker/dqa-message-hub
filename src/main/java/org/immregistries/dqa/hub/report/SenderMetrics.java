@@ -37,10 +37,13 @@ public class SenderMetrics {
 	
 	@OneToMany(mappedBy="senderMetrics", cascade = CascadeType.ALL)
 	private List<CodeCount> codes = new ArrayList<>();
-	
+
 	@OneToMany(mappedBy="senderMetrics", cascade = CascadeType.ALL)
 	private List<SenderDetectionMetrics> attributes = new ArrayList<>();
-	
+
+	@OneToMany(mappedBy="senderMetrics", cascade = CascadeType.ALL)
+	private List<VaccineCount> vaccineCounts = new ArrayList<>();
+
 	public long getId() {
 		return id;
 	}
@@ -82,6 +85,12 @@ public class SenderMetrics {
 	}
 	public void setAttributes(List<SenderDetectionMetrics> attributes) {
 		this.attributes = attributes;
+	}
+	public List<VaccineCount> getVaccineCounts() {
+		return vaccineCounts;
+	}
+	public void setVaccineCounts(List<VaccineCount> vaccineCounts) {
+		this.vaccineCounts = vaccineCounts;
 	}
 	public Date getMetricsDate() {
 		return metricsDate;

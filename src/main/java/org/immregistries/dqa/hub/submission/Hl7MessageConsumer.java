@@ -12,8 +12,8 @@ import org.immregistries.dqa.hub.report.viewer.MessageMetadata;
 import org.immregistries.dqa.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.dqa.hub.rest.model.Hl7MessageSubmission;
-import org.immregistries.dqa.nist.validator.connector.Assertion;
-import org.immregistries.dqa.nist.validator.connector.NISTValidator;
+//import org.immregistries.dqa.nist.validator.connector.Assertion;
+//import org.immregistries.dqa.nist.validator.connector.NISTValidator;
 import org.immregistries.dqa.validator.DqaMessageService;
 import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
@@ -29,21 +29,21 @@ import org.springframework.stereotype.Service;
 public class Hl7MessageConsumer {
 
 	private DqaMessageService validator = DqaMessageService.INSTANCE;
-	private NISTValidator nistValidator = null;
+//	private NISTValidator nistValidator = null;
     private ReportScorer scorer = ReportScorer.INSTANCE;
     @Autowired
     private SenderMetricsService metricsSvc;
 	@Autowired
 	private MessageMetadataJpaRepository metaRepo;
-	
-	private NISTValidator getNISTValidator()
-	{
-	  if (nistValidator == null)
-	  {
-	    nistValidator = new NISTValidator();
-	  }
-	  return nistValidator;
-	}
+//
+//	private NISTValidator getNISTValidator()
+//	{
+//	  if (nistValidator == null)
+//	  {
+//	    nistValidator = new NISTValidator();
+//	  }
+//	  return nistValidator;
+//	}
 
     public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission) {
         String message = messageSubmission.getMessage();
@@ -53,8 +53,8 @@ public class Hl7MessageConsumer {
             sender = "MQE Unspecified";
         }
 
-        NISTValidator nistValidator = getNISTValidator();
-        List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
+//        NISTValidator nistValidator = getNISTValidator();
+//        List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
 
         //force serial processing...
         DqaMessageServiceResponse validationResults = validator.processMessage(message);
@@ -62,7 +62,8 @@ public class Hl7MessageConsumer {
         Date sentDate = validationResults.getMessageObjects().getMessageHeader().getMessageDate();
 
         this.saveMetricsFromValidationResults(sender, validationResults, sentDate);
-        String ack = makeAckFromValidationResults(validationResults, nistReportableList);
+//        String ack = makeAckFromValidationResults(validationResults, nistReportableList);
+        String ack = makeAckFromValidationResults(validationResults, new ArrayList<Reportable>());
         this.saveMessageForSender(message, ack, sender, sentDate);
 
         Hl7MessageHubResponse response = new Hl7MessageHubResponse();

@@ -9,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.immregistries.dqa.validator.issue.Detection;
 import org.immregistries.dqa.validator.issue.IssueObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
-import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
+import org.immregistries.dqa.validator.report.codes.VaccineBucket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,13 @@ import org.springframework.stereotype.Service;
 
     @Autowired SenderMetricsJpaRepository senderRepo;
     @Autowired CodeCountJpaRepository codeRepo;
+    @Autowired VaccineCountJpaRepository vaccCountRepo;
 
+    public void saveMetrics(SenderMetrics metrics) {
+        logger.info("Metrics: " + metrics);
+        senderRepo.save(metrics);
+        senderRepo.flush();
+    }
     public DqaMessageMetrics getMetricsFor(String sender, Date day) {
     	return getMetricsFor(sender, day, day);
     }
@@ -58,6 +64,15 @@ import org.springframework.stereotype.Service;
             codes.add(cc);
         }
         out.getCodes().setCodeCountList(codes);
+
+        List<VaccineCount> vaccines = metrics.getVaccineCounts();
+        logger.info("Vaccine counts: " + vaccines);
+        List<VaccineBucket> vbList = new ArrayList<>();
+        for (VaccineCount vc : vaccines) {
+            VaccineBucket vb = new VaccineBucket(vc.getVaccineCvx(), vc.getAge(), vc.isAdministered(), vc.getCount());
+            vbList.add(vb);
+        }
+        out.getVaccinations().addAll(vbList);
 
         return out;
     }
@@ -146,11 +161,45 @@ import org.springframework.stereotype.Service;
             metrics.getCodes().add(cc);
         }
 
-        //logger.warn("codes: " + metrics.getCodes());
+        this.aggregateVaccineCounts(metrics, incomingMetrics.getVaccinations().getCodeCountList());
+
+
+
+        saveMetrics(metrics);
         logger.info("Metrics: " + metrics);
         senderRepo.save(metrics);
         senderRepo.flush();
 
         return metrics;
     }
+
+    private void aggregateVaccineCounts(SenderMetrics metrics, List<VaccineBucket> vaccinations) {
+        //Add to the sender vaccine metrics.
+        List<VaccineBucket> vRemaining = new ArrayList<>(vaccinations);
+        List<VaccineCount> vaccineCounts = metrics.getVaccineCounts();
+
+        //		for (CodeBucket cb : codes.getCodeCountList()) {
+        //			//look and see if it already is represented in the set.  add to it if it is, add it if its not.
+        for (VaccineCount vc : vaccineCounts) {
+            VaccineBucket cb = new VaccineBucket(vc.getVaccineCvx(), vc.getAge(), vc.isAdministered());
+            int idx = vaccinations.indexOf(cb);
+            if (idx > -1) {
+                //add the counts to the list.
+                VaccineBucket cbIn = vaccinations.get(idx);
+                vc.setCount(vc.getCount() + cbIn.getCount());
+                vRemaining.remove(cbIn);
+            }
+        }
+
+        for (VaccineBucket bucket : vRemaining) {
+            //none of these are in the db yet.
+            VaccineCount vc = new VaccineCount();
+            vc.setVaccineCvx(bucket.getCode());
+            vc.setAge(bucket.getAge());
+            vc.setAdministered(bucket.isAdministered());
+            vc.setSenderMetrics(metrics);
+            metrics.getVaccineCounts().add(vc);
+        }
+    }
+
 }

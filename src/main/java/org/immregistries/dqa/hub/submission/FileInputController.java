@@ -13,6 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -23,6 +25,7 @@ import java.util.zip.ZipInputStream;
 
     @Autowired private MessageInputController messageController;
 
+    private Pattern msh7 = Pattern.compile("^MSH\\|\\^~\\\\&\\|(?:\\|[^|]*?){4}([^|]+)\\|");
     private Map<String, FileUploadData> fileQueue = new LinkedHashMap<>();
 
     private static final String MSH_REGEX = "^\\s*MSH\\|\\^~\\\\&\\|.*";
@@ -186,6 +189,13 @@ import java.util.zip.ZipInputStream;
 
                 //If the ack ends with a line break, remove it.
                 ackResult = ackResult.replaceAll("\\r$", "");
+                try {
+                    logger.info("Finding date from message:" + message);
+                    String msgDate = msh7.matcher(message).group(1);
+                    fileUpload.addDateMsg(msgDate);
+                } catch (Exception e) {
+                    logger.error("Error finding date from message: " + message, e);
+                }
                 fileUpload.addAckMessage(ackResult);
             }
             fileUpload.setStatus("finished");

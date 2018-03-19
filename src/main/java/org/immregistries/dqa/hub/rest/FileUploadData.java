@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FileUploadData {
     private static final Logger logger = LoggerFactory.getLogger(FileUploadData.class);
@@ -18,6 +20,8 @@ public class FileUploadData {
 
     private int messagesSize;
     private int processed;
+
+    private Map<String, Integer> messageDates = new HashMap<>();
 
     @JsonIgnore
     private List<String> hl7Messages = new ArrayList<>();
@@ -33,6 +37,19 @@ public class FileUploadData {
         this.fileName = fileName;
         this.fileId = fileId;
     }
+
+    public Map<String, Integer> getMessageDates() {
+        return messageDates;
+    }
+
+    public void addDateMsg(String date) {
+        Integer i = this.messageDates.get(date);
+        if (i == null) {
+            i = 0;
+        }
+        this.messageDates.put(date, ++i);
+    }
+
 
     public String getStatus() {
         return status;
