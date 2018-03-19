@@ -1,7 +1,7 @@
 angular.module('messageHubDemoApp')
 
-.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory', 'Reporter', '$q',
-                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, Reporter,  $q){
+.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory', 'Reporter', '$q', 'Coder',
+                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, Reporter,  $q, Coder){
 	
 	/**
 	 * On PAGE LOAD: 
@@ -36,6 +36,14 @@ angular.module('messageHubDemoApp')
 			messages:[],
 	};
 	$scope.report = {};
+	$scope.codesMap= {test : [{
+      "type": "Vaccination Information Source",
+      "attribute": "RXA-9",
+      "value": "02",
+      "count": 1,
+      "status": "Valid",
+      "label": "Historical information - from other provider"
+    }]};
 	
 	$scope.toggleStat = function(id) {
 		$scope.searchOptions.filters.statisticId = id;
@@ -354,6 +362,18 @@ angular.module('messageHubDemoApp')
 			console.log("getMessageList message list loaded.");
 //		}).$promise.then(function() {
 		});
+		Coder.get({
+			providerKey : $scope.provider.key,
+			dateStart : $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+			dateEnd : $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
+		}, function(data) {
+			
+			$scope.codesMap = data;
+			//alert(codeTypeArray);
+			console.log("getMessageList codes list loaded.");
+//		}).$promise.then(function() {
+		});
+
 
 		console.log("getMessageList call started");
 	};

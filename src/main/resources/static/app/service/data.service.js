@@ -104,6 +104,10 @@ angular.module('messageHubDemoApp')
     	return $resource('messages/msg-download');//gets a string with ack info
     })
 
+    .factory('Coder', function ($resource) {
+        return $resource('codes/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
+    })
+
 	.directive('fileModel', ['$parse', function ($parse) {
 	    return {
 	        restrict: 'A',

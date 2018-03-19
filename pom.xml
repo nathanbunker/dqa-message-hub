@@ -114,6 +114,11 @@
 			<version>1.2.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.immregistries</groupId>
+			<artifactId>dqa-nist-validator-connector</artifactId>
+			<version>0.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>

@@ -225,36 +225,37 @@
             </div>
         </uib-tab>
         <uib-tab index="2" heading="Codes">
+            <div class="heading row">
+                <h4>Codes Received</h4>
+            </div>
             <div class="row">
-                <div class="col-md-6">
-                    <img src="img/codes_received.png">
+                <div class="col-md-9">
+                    <!--<img src="img/codes_received.png">-->
+	                <!--<pre>{{codesMap|json}}</pre>-->
+                    <div ng-repeat='(codeType, codeArray) in codesMap.map '>
+	                    <h3>{{codeType}}</h3>
+						<table class="table">
+	                    <thead>
+	                    <tr>
+	                        <th class="col-md-2">Code</th>
+	                        <th class="col-md-4">Label</th>
+	                        <th class="col-md-2">Status</th>
+	                        <th class="col-md-1">Count</th>
+	                    </tr>
+	                    </thead>
+	                    <tbody>
+	                     <tr ng-repeat="code in orderedCodes = (codeArray | orderBy:'-value')">
+	                     	<td>{{code.value}}</td>
+	                     	<td>{{code.label}}</td>
+	                     	<td>{{code.status}}</td>
+	                     	<!--<td>{{code.attribute}}</td>-->
+	                     	<td>{{code.count}}</td>
+	                     </tr>
+	                     </tbody>
+	                     </table>
+	                </div>
                 </div>
             </div>
-            <!--<div  class="heading row" >-->
-                <!--<div class="col-md-12">-->
-                    <!--<h4>Codes Received</h4>-->
-                <!--</div>-->
-                <!--<div>-->
-                    <!--<table class="table">-->
-                        <!--<thead>-->
-                        <!--<tr>-->
-                            <!--<th class="col-md-1">Count</th>-->
-                            <!--<th class="col-md-3">Value</th>-->
-                            <!--<th class="col-md-4">Type</th>-->
-                            <!--<th class="col-md-4">Age</th>-->
-                        <!--</tr>-->
-                        <!--</thead>-->
-                        <!--<tbody>-->
-                        <!--<tr ng-repeat="count in report.codes.codeCountList | filter:{ type : 'VACCINE_GROUP'}">-->
-                            <!--<td>{{count.count}}</td>-->
-                            <!--<td>{{count.value}}</td>-->
-                            <!--<td>{{count.type}}</td>-->
-                            <!--<td>{{count.attribute}}</td>-->
-                        <!--</tr>-->
-                        <!--</tbody>-->
-                    <!--</table>-->
-                <!--</div>-->
-            <!--</div>-->
         </uib-tab>
         <uib-tab index="3" heading="Vaccines">
             <div>

@@ -9,11 +9,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
-@Table(name="CODE_COUNT")
+@Table(name="CODE_COUNT",uniqueConstraints=@UniqueConstraint(name="UNIQUE_CODE_COUNT", columnNames={"ATTRIBUTE","SENDER_METRICS_ID","CODE_TYPE","CODE_VALUE"}))
 public class CodeCount {
 	@Id
 	@SequenceGenerator(name="CODE_COUNT_GENERATOR", sequenceName="CODE_COUNT_SEQ", allocationSize = 100)
@@ -26,8 +27,10 @@ public class CodeCount {
 	@JoinColumn(name="sender_metrics_id")
 	private SenderMetrics senderMetrics;
 	
+	@Column(name="CODE_TYPE")
 	private String codeType;
 	private String attribute;
+	@Column(name="CODE_VALUE")
 	private String codeValue;
 	private int codeCount;
 

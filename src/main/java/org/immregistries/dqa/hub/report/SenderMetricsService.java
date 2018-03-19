@@ -24,13 +24,16 @@ import org.springframework.stereotype.Service;
     @Autowired CodeCountJpaRepository codeRepo;
 
     public DqaMessageMetrics getMetricsFor(String sender, Date day) {
-
+    	return getMetricsFor(sender, day, day);
+    }
+    public DqaMessageMetrics getMetricsFor(String sender, Date dayStart, Date dayEnd) {
+    	
         if (StringUtils.isEmpty(sender)) {
             sender = "DQA";
         }
 
-        SenderMetrics metrics = senderRepo.findBySenderAndMetricsDate(sender, day);
-        logger.info("Metrics found for " + sender + " day: " + day);
+        SenderMetrics metrics = senderRepo.findBySenderAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(sender, dayStart, dayEnd);
+        logger.info("Metrics found for " + sender + " dayStart: " + dayStart + " dayEnd: " + dayEnd);
         logger.info("Metrics: " + metrics);
         DqaMessageMetrics out = new DqaMessageMetrics();
         if (metrics == null) {
@@ -114,7 +117,7 @@ import org.springframework.stereotype.Service;
         }
 
         List<CollectionBucket> codes = incomingMetrics.getCodes().getCodeCountList();
-        logger.warn("codes: " + codes);
+        //logger.warn("codes: " + codes);
 
         List<CollectionBucket> remainingToProcess = new ArrayList<>(codes);
         List<CodeCount> counts = metrics.getCodes();
@@ -124,7 +127,7 @@ import org.springframework.stereotype.Service;
         for (CodeCount cc : counts) {
             CollectionBucket cb = new CollectionBucket(cc.getCodeType(), cc.getAttribute(), cc.getCodeValue());
             int idx = codes.indexOf(cb);
-            if (idx > 0) {
+            if (idx > -1) {
                 //add the counts to the list.
                 CollectionBucket cbIn = codes.get(idx);
                 cc.setCodeCount(cc.getCodeCount() + cbIn.getCount());
@@ -143,6 +146,7 @@ import org.springframework.stereotype.Service;
             metrics.getCodes().add(cc);
         }
 
+        //logger.warn("codes: " + metrics.getCodes());
         logger.info("Metrics: " + metrics);
         senderRepo.save(metrics);
         senderRepo.flush();
