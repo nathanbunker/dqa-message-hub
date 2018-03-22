@@ -19,7 +19,6 @@ import org.immregistries.dqa.validator.DqaMessageServiceResponse;
 import org.immregistries.dqa.validator.engine.ValidationRuleResult;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.ReportScorer;
-import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.vxu.DqaMessageHeader;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +113,7 @@ public class Hl7MessageConsumer {
         List<Reportable> reportables = new ArrayList<Reportable>(nistReportablesList);
         //This code needs to get put somewhere better. 
         for (ValidationRuleResult result : resultList) {
-        	reportables.addAll(result.getIssues());
+        	reportables.addAll(result.getValidationDetections());
         }
         
         AckBuilder ackBuilder = AckBuilder.INSTANCE;

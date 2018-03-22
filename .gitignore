@@ -21,3 +21,5 @@
 *.iml
 
 *.db
+
+\.vscode/

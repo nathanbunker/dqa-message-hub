@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.dqa.validator.issue.Detection;
-import org.immregistries.dqa.validator.issue.IssueObject;
+import org.immregistries.dqa.validator.detection.Detection;
+import org.immregistries.dqa.validator.detection.MessageObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineBucket;
@@ -46,9 +46,9 @@ import org.springframework.stereotype.Service;
             return out;
         }
 
-        out.getObjectCounts().put(IssueObject.PATIENT, metrics.getPatientCount());
-        out.getObjectCounts().put(IssueObject.MESSAGE_HEADER, metrics.getPatientCount());
-        out.getObjectCounts().put(IssueObject.VACCINATION, metrics.getVaccinationCount());
+        out.getObjectCounts().put(MessageObject.PATIENT, metrics.getPatientCount());
+        out.getObjectCounts().put(MessageObject.MESSAGE_HEADER, metrics.getPatientCount());
+        out.getObjectCounts().put(MessageObject.VACCINATION, metrics.getVaccinationCount());
         Map<Detection, Integer> attrCounts = out.getAttributeCounts();
 
         for (SenderDetectionMetrics sam : metrics.getAttributes()) {
@@ -86,10 +86,10 @@ import org.springframework.stereotype.Service;
             metrics.setMetricsDate(day);
         }
 
-        Map<IssueObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
+        Map<MessageObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
         Map<Detection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
 
-        for (IssueObject io : objectCounts.keySet()) {
+        for (MessageObject io : objectCounts.keySet()) {
             Integer count = objectCounts.get(io);
             if (count != null && count > 0) {
                 switch (io) {
