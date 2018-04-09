@@ -17,3 +17,9 @@
 \.settings/
 
 \.springBeans
+
+*.iml
+
+*.db
+
+\.vscode/

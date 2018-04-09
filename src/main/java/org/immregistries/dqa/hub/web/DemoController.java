@@ -1,4 +1,3 @@
-
 package org.immregistries.dqa.hub.web;
 
 import org.apache.commons.logging.Log;
@@ -9,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(value = "/")
 @Controller
 public class DemoController {
-    private static final Log logger = LogFactory.getLog(DemoController.class);
-    
-    @RequestMapping(value = "/")
-    public String start() throws Exception {
-    	logger.info("test start demo!");
-        return "app/demo-app.html";
-        //Use the results to build an ACK using the DQA util project.
-    }
-    
+
+  private static final Log logger = LogFactory.getLog(DemoController.class);
+
+  @RequestMapping(value = "/")
+  public String start() throws Exception {
+    return "app/demo-app.html";
+    //Use the results to build an ACK using the DQA util project.
+  }
+
 }

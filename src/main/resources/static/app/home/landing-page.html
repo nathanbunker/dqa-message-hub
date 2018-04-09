@@ -1,0 +1,55 @@
+<div>
+	<div class="modal-body">
+	
+		<div class="row">
+			<div class="form-group typeahead col-md-12">
+					<label for="facilityPicker" class="control-label">Site: </label>
+					<input placeholder="Type a pin or name to find a Provider" type="text" typeahead-on-select="getProviderHistory()" select-on-click ng-model="searchOptionsForm.provider"  uib-typeahead="provider as provider for provider in providerList | filter:$viewValue | limitTo:50" typeahead-min-length="0" typeahead-show-hint="true" class="form-control">
+			</div>
+		</div>
+		
+		<div>
+			<div class="row" ng-show="providerChosen == true">
+				<div class="col-md-12">
+					<h4 class="recently">
+						Recent Activity
+					</h4>
+				</div>	
+			</div>
+			
+			<div class="row" ng-if="providerChosen == true">
+				<div ng-show="!calendarStatus.one.ready" style="position:absolute;z-index:2;margin-top:114px;margin-left:541px;">
+					<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+					<span class="sr-only">Chart Populating...</span>
+				</div>
+				<div class="col-md-12" 
+					agc-on-select="handleChartClick(selectedItem)" 
+					google-chart 
+					chart="landingPageChart1">
+				</div>
+			</div>
+			
+			<div class="row" ng-if="providerChosen == true">
+			
+				<div ng-show="!calendarStatus.two.ready" style="position:absolute;z-index:2;margin-top:310px;margin-left:541px;">
+					<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
+					<span class="sr-only">Chart Populating...</span>
+				</div>
+			
+				<div class="col-md-12" 
+					agc-on-select="handleChartClick(selectedItem)" 
+					google-chart 
+					chart="landingPageChart2">
+				</div>
+				
+			</div>
+		</div>
+		<div class="row" ng-if="errorMsg > ''">
+			<div class="col-md-11 col-md-offset-1"><h4>{{errorMsg}}</h4>
+			</div>
+		</div>
+
+		<!--<div id="line_top_x"></div>-->
+		
+	</div>
+</div>

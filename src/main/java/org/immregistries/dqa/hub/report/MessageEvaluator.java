@@ -5,10 +5,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageEvaluator {
-	
-	public MessageEvaluation evaluate(DqaMessageServiceResponse validationResults) {
-		MessageEvaluation me = new MessageEvaluation();
-		
-		return me;
-	}
+
+  public MessageEvaluation evaluate(DqaMessageServiceResponse validationResults) {
+    MessageEvaluation me = new MessageEvaluation();
+
+    return me;
+  }
 }

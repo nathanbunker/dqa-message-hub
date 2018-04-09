@@ -10,13 +10,13 @@ import org.springframework.boot.context.web.SpringBootServletInitializer;
 @EnableConfigurationProperties
 //@ComponentScan(basePackages={"org.immregistries.dqa.hub"})
 public class DqaMessageHubApplicationConfig extends SpringBootServletInitializer {
-	
-	@Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder applicationBuilder) {
-        return applicationBuilder.sources(DqaMessageHubApplicationConfig.class);
-    }
 
-    public static void main(String[] args) throws Exception {
-    	new SpringApplication(DqaMessageHubApplicationConfig.class).run(args);
-    }
+  @Override
+  protected SpringApplicationBuilder configure(SpringApplicationBuilder applicationBuilder) {
+    return applicationBuilder.sources(DqaMessageHubApplicationConfig.class);
+  }
+
+  public static void main(String[] args) throws Exception {
+    new SpringApplication(DqaMessageHubApplicationConfig.class).run(args);
+  }
 }
