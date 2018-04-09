@@ -1,119 +1,147 @@
 <div>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="heading row">
-					<h4>Input VXU</h4>
-				</div>
-				<div class="row">
-					<div class="form-group col-xs-12">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="heading row">
+        <h4>Input VXU</h4>
+      </div>
+      <div class="row">
+        <div class="form-group col-xs-12">
 						<textarea id="Message" class="form-control" ng-trim="false"
-							rows="10" ng-model="messageIn.message"></textarea>
-					</div>
-				</div>
+                      rows="10" ng-model="messageIn.message"></textarea>
+        </div>
+      </div>
 
-				<button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>
-				<button class="btn btn-primary" type="submit" ng-click="getExample()">Example</button>
-			</div>
-		</div>
-		<br /><br /><br />
-		<div class="row">
-			<div class="col-md-12" ng-show="messageEvaluation.ack != null">
-				<div class="heading row">
-					<h4>Message ACK</h4>
-				</div>
-				<div class="text-primary text-center loading"
-					ng-if="messageEvaluation.ack == null">
-					<i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <br /> <span>Validating
+      <button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>
+      <button class="btn btn-primary" type="submit" ng-click="getExample()">Example</button>
+    </div>
+  </div>
+  <br/><br/><br/>
+  <div class="row">
+    <div class="col-md-12" ng-show="messageEvaluation.ack != null">
+      <div class="heading row">
+        <h4>Message ACK</h4>
+      </div>
+      <div class="text-primary text-center loading"
+           ng-if="messageEvaluation.ack == null">
+        <i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <br/> <span>Validating
 						Message...</span>
-				</div>
-				<div id="messageAck" ng-show="messageEvaluation != null">
-					<div class="row">
-						<div class="col-md-12">
-							<pre>{{messageEvaluation.ack}}</pre>
-						</div>
-					</div>
-				</div>
-				
-				<div class="heading row">
-					<h4>MQE Evaluation</h4>
-				</div>
-				<div class="heading row">
-					<h5>Errors</h5>
-				</div>
-				<div id="errorFindings">
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="col-md-3">Issue</th>
-								<th class="col-md-1">Code</th>
-								<th class="col-md-1">Severity</th>
-								<th class="col-md-8">Location</th>
-							</tr>
-						</thead>
-						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
-						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'ERROR'}">
-							<td>{{issue.applicationErrorCode.alternateText}}</td>
-							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-							<td>{{issue.severity}}</td>
-							<td><span ng-repeat="location in issue.hl7LocationList">
+      </div>
+      <div id="messageAck" ng-show="messageEvaluation != null">
+        <div class="row">
+          <div class="col-md-12">
+            <pre>{{messageEvaluation.ack}}</pre>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12" ng-show="messageEvaluation.ack != null">
+          <div class="heading row">
+            <h4>MQE Evaluation</h4>
+          </div>
+          <div class="heading row">
+            <h5>Errors</h5>
+          </div>
+          <div id="errorFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-3">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-8">Location</th>
+              </tr>
+              </thead>
+              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tr ng-repeat="issue in rule.issues | filter:{ severity : 'ERROR'}">
+                <td>{{issue.applicationErrorCode.alternateText}}</td>
+                <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                <td>{{issue.severity}}</td>
+                <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
-							</td>
-							<td />
-						</tr>
-					</table>
-				</div>
-				
-				<div class="heading row">
-					<h5>Warnings</h5>
-				</div>
-				<div id="errorFindings">
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="col-md-3">Issue</th>
-								<th class="col-md-1">Code</th>
-								<th class="col-md-1">Severity</th>
-								<th class="col-md-8">Location</th>
-							</tr>
-						</thead>
-						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
-						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'WARN'}">
-							<td>{{issue.applicationErrorCode.alternateText}}</td>
-							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-							<td>{{issue.severity}}</td>
-							<td><span ng-repeat="location in issue.hl7LocationList">
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Warnings</h5>
+          </div>
+          <div id="warnFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-3">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-8">Location</th>
+              </tr>
+              </thead>
+              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tr ng-repeat="issue in rule.issues | filter:{ severity : 'WARN'}">
+                <td>{{issue.applicationErrorCode.alternateText}}</td>
+                <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                <td>{{issue.severity}}</td>
+                <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
-							</td>
-						</tr>
-					</table>
-				</div>
-				
-				<div class="heading row">
-					<h5>Informational</h5>
-				</div>
-				<div id="errorFindings">
-					<table class="table">
-						<thead>
-							<tr>
-								<th class="col-md-3">Issue</th>
-								<th class="col-md-1">Code</th>
-								<th class="col-md-1">Severity</th>
-								<th class="col-md-8">Location</th>
-							</tr>
-						</thead>
-						<tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
-						<tr ng-repeat="issue in rule.issues | filter:{ severity : 'ACCEPT'}">
-							<td>{{issue.applicationErrorCode.alternateText}}</td>
-							<td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-							<td>{{issue.severity}}</td>
-							<td><span ng-repeat="location in issue.hl7LocationList">
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Informational</h5>
+          </div>
+          <div id="infoFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-3">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-8">Location</th>
+              </tr>
+              </thead>
+              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+
+              <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'INFO'}">
+                <td>{{detection.applicationErrorCode.alternateText}}</td>
+                <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
+                <td>{{detection.severity}}</td>
+                <td><span ng-repeat="location in detection.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
-							</td>
-						</tr>
-					</table>
-				</div>
-		</div>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Accept</h5>
+          </div>
+          <div id="acceptFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-3">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-8">Location</th>
+              </tr>
+              </thead>
+              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+
+              <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'ACCEPT'}">
+                <td>{{detection.applicationErrorCode.alternateText}}</td>
+                <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
+                <td>{{detection.severity}}</td>
+                <td><span ng-repeat="location in detection.hl7LocationList">
+									{{location.segmentId}}-{{location.fieldPosition}}
+								</span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

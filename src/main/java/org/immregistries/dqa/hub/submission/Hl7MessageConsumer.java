@@ -44,12 +44,12 @@ public class Hl7MessageConsumer {
 //	  return nistValidator;
 //	}
 
-  public Hl7MessageHubResponse processMessageAndMakeAck(Hl7MessageSubmission messageSubmission) {
+  public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
 
     String sender = messageSubmission.getFacilityCode();
     if (sender == null) {
-      sender = "MQE Unspecified";
+      sender = "MQE";
     }
 
 //        NISTValidator nistValidator = getNISTValidator();
@@ -57,19 +57,23 @@ public class Hl7MessageConsumer {
 
     //force serial processing...
     DqaMessageServiceResponse validationResults = validator.processMessage(message);
-//        Date sentDate = new Date();
-    Date sentDate = validationResults.getMessageObjects().getMessageHeader().getMessageDate();
 
-    this.saveMetricsFromValidationResults(sender, validationResults, sentDate);
-//        String ack = makeAckFromValidationResults(validationResults, nistReportableList);
     String ack = makeAckFromValidationResults(validationResults, new ArrayList<Reportable>());
-    this.saveMessageForSender(message, ack, sender, sentDate);
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
     response.setDqaResponse(validationResults);
     response.setSender(sender);
 
+    return response;
+  }
+
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
+    Hl7MessageHubResponse response = this.processMessage(messageSubmission);
+    DqaMessageServiceResponse dqr = response.getDqaResponse();
+    Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
+    this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
+    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(), response.getSender(), sentDate);
     return response;
   }
 

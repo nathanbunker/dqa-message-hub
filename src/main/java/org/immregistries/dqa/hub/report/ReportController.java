@@ -44,11 +44,11 @@ public class ReportController {
     logger.info("ReportController scoreMessage demo! sender:" + submission.getFacilityCode());
     String submitter = submission.getFacilityCode();
 
-    if (StringUtils.isEmpty(submitter)) {
+    if (StringUtils.isBlank(submitter)) {
       submission.setFacilityCode("DQA");
     }
 
-    msgr.processMessageAndMakeAck(submission);
+    msgr.processMessageAndSaveMetrics(submission);
 
     DqaMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date());
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);

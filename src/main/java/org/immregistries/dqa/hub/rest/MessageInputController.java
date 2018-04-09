@@ -38,7 +38,7 @@ public class MessageInputController {
       throws Exception {
     logger.info("ReportController scoreMessage demo!");
     logger.info("processing this message: [" + submission.getMessage() + "]");
-    Hl7MessageHubResponse ack = msgr.processMessageAndMakeAck(submission);
+    Hl7MessageHubResponse ack = msgr.processMessageAndSaveMetrics(submission);
     return ack;
   }
 
@@ -56,7 +56,7 @@ public class MessageInputController {
     messageSubmission.setPassword(PASSWORD);
     messageSubmission.setFacilityCode(FACILITYID);
 
-    String ack = messageConsumer.processMessageAndMakeAck(messageSubmission).getAck();
+    String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
     return ack;
   }
 
@@ -110,7 +110,36 @@ public class MessageInputController {
     String vxu = submission.getMessage();
 
     if (vxu != null) {
-      Hl7MessageHubResponse response = messageConsumer.processMessageAndMakeAck(submission);
+      Hl7MessageHubResponse response = messageConsumer.processMessageAndSaveMetrics(submission);
+      vxu = vxu.replaceAll("[\\r]+", "\n");
+      response.setVxu(vxu);
+
+      //process the ack to display right on the web:
+      String ack = response.getAck();
+      if (ack != null) {
+        ack = ack.replaceAll("[\\r]+", "\n");
+      }
+      response.setAck(ack);
+      logger.info("ACK: \n" + ack);
+      return response;
+    } else {
+      Hl7MessageHubResponse response = new Hl7MessageHubResponse();
+      response.setSender(submission.getFacilityCode());
+      response.setAck("INVALID REQUEST:  VXU is empty");
+      return response;
+    }
+  }
+
+  @RequestMapping(value = "json/notsaved", method = RequestMethod.POST)
+  public Hl7MessageHubResponse jsonFormPostNotSaved(@RequestBody Hl7MessageSubmission submission) {
+    logger.info("jsonFormPostNotSaved! message: " + submission.getMessage() + " user: "
+        + submission.getUser() + " password: " + submission.getPassword() + " facilityId: "
+        + submission.getFacilityCode());
+
+    String vxu = submission.getMessage();
+
+    if (vxu != null) {
+      Hl7MessageHubResponse response = messageConsumer.processMessage(submission);
       vxu = vxu.replaceAll("[\\r]+", "\n");
       response.setVxu(vxu);
 
@@ -139,7 +168,6 @@ public class MessageInputController {
     example.setMessage(mg.getUniqueMessage());
     example.setUser("regularUser");
     example.setPassword("password123");
-    example.setFacilityCode("MQETestFacility");
     return example;
   }
 

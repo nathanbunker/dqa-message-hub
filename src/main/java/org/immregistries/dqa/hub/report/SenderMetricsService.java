@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.dqa.validator.detection.Detection;
-import org.immregistries.dqa.validator.detection.MessageObject;
+import org.immregistries.dqa.vxu.VxuObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineBucket;
@@ -39,7 +39,7 @@ public class SenderMetricsService {
 
   public DqaMessageMetrics getMetricsFor(String sender, Date dayStart, Date dayEnd) {
 
-    if (StringUtils.isEmpty(sender)) {
+    if (StringUtils.isBlank(sender)) {
       sender = "DQA";
     }
 
@@ -53,12 +53,12 @@ public class SenderMetricsService {
       return out;
     }
 
-    out.getObjectCounts().put(MessageObject.PATIENT, metrics.getPatientCount());
-    out.getObjectCounts().put(MessageObject.MESSAGE_HEADER, metrics.getPatientCount());
-    out.getObjectCounts().put(MessageObject.VACCINATION, metrics.getVaccinationCount());
+    out.getObjectCounts().put(VxuObject.PATIENT, metrics.getPatientCount());
+    out.getObjectCounts().put(VxuObject.MESSAGE_HEADER, metrics.getPatientCount());
+    out.getObjectCounts().put(VxuObject.VACCINATION, metrics.getVaccinationCount());
     Map<Detection, Integer> attrCounts = out.getAttributeCounts();
 
-    for (SenderDetectionMetrics sam : metrics.getAttributes()) {
+    for (SenderDetectionMetrics sam : metrics.getDetectionMetrics()) {
       Detection ma = Detection.getByDqaErrorCodeString(sam.getDqaDetectionCode());
       attrCounts.put(ma, sam.getAttributeCount());
     }
@@ -96,10 +96,10 @@ public class SenderMetricsService {
       metrics.setMetricsDate(day);
     }
 
-    Map<MessageObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
+    Map<VxuObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
     Map<Detection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
 
-    for (MessageObject io : objectCounts.keySet()) {
+    for (VxuObject io : objectCounts.keySet()) {
       Integer count = objectCounts.get(io);
       if (count != null && count > 0) {
         switch (io) {
@@ -117,24 +117,31 @@ public class SenderMetricsService {
       }
     }
 
-    for (Detection attr : detectionCounts.keySet()) {
+    for (Detection detection : detectionCounts.keySet()) {
+      if (detection == null) {
+        continue;
+      }
       //find the right metrics object...
-      List<SenderDetectionMetrics> sams = metrics.getAttributes();
-      Integer count = detectionCounts.get(attr);
-      if (count != null && count > 0) {
+      List<SenderDetectionMetrics> dms = metrics.getDetectionMetrics();
+      Integer count = detectionCounts.get(detection);
+
+      if (count != null) {//It exists!!!!
         SenderDetectionMetrics thisOne = null;
-        for (SenderDetectionMetrics sam : sams) {
-          if (attr.getDqaErrorCode().equals(sam.getDqaDetectionCode())) {
+        for (SenderDetectionMetrics sdm : dms) {
+          if (sdm != null &&
+              detection.getDqaMqeCode().equals(
+                  sdm.getDqaDetectionCode()
+              )) {
             //it's the same attribute!!! use it!
-            thisOne = sam;
+            thisOne = sdm;
           }
         }
         //If you didn't find one, make a new one.
         if (thisOne == null) {
           thisOne = new SenderDetectionMetrics();
-          thisOne.setDqaDetectionCode(attr.getDqaErrorCode());
+          thisOne.setDqaDetectionCode(detection.getDqaMqeCode());
           thisOne.setSenderMetrics(metrics);
-          sams.add(thisOne);
+          dms.add(thisOne);
         }
         int addedCounts = count + thisOne.getAttributeCount();
         thisOne.setAttributeCount(addedCounts);

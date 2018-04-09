@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.immregistries.dqa.hl7util.parser.HL7QuickParser;
 import org.immregistries.dqa.hub.rest.FileUploadData;
 import org.immregistries.dqa.hub.rest.MessageInputController;
 import org.slf4j.Logger;
@@ -31,9 +32,9 @@ public class FileInputController {
 
   @Autowired
   private MessageInputController messageController;
-
-  private Pattern msh7 = Pattern.compile("^MSH\\|\\^~\\\\&\\|(?:\\|[^|]*?){4}([^|]+)\\|");
   private Map<String, FileUploadData> fileQueue = new LinkedHashMap<>();
+
+  private HL7QuickParser quickParser = HL7QuickParser.INSTANCE;
 
   private static final String MSH_REGEX = "^\\s*MSH\\|\\^~\\\\&\\|.*";
   private static final String FHS_BHS_REGEX = "^\\s*(FHS|BHS)\\|.*";
@@ -204,7 +205,7 @@ public class FileInputController {
         ackResult = ackResult.replaceAll("\\r$", "");
         try {
           logger.info("Finding date from message:" + message);
-          String msgDate = msh7.matcher(message).group(1);
+          String msgDate = quickParser.getMsh7MessageDate(message);
           fileUpload.addDateMsg(msgDate);
         } catch (Exception e) {
           logger.error("Error finding date from message: " + message, e);
