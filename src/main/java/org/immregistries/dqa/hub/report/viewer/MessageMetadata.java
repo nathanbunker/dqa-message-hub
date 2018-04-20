@@ -28,7 +28,7 @@ public class MessageMetadata {
   @Lob
   private String response;
 
-  @javax.persistence.Temporal(TemporalType.DATE)
+  @javax.persistence.Temporal(TemporalType.TIMESTAMP)
   private Date inputTime;
 
   @NotNull
