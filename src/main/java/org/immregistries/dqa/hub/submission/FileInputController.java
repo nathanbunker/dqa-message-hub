@@ -198,8 +198,9 @@ public class FileInputController {
             return fileUpload;
           }
         }
+        String sender = quickParser.getMsh4Sender(message);
         String ackResult = messageController
-            .urlEncodedHttpFormPost(message, null, null, fileUpload.getFacilityId());
+            .urlEncodedHttpFormPost(message, null, null, sender);
 
         //If the ack ends with a line break, remove it.
         ackResult = ackResult.replaceAll("\\r$", "");
