@@ -1,7 +1,7 @@
 angular.module('messageHubDemoApp')
 
-.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory', 'Reporter', '$q', 'Coder',
-                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, Reporter,  $q, Coder){
+.controller('MessageListController', ['$scope', '$state','$stateParams', '$uibModal', '$filter','$location', 'googleChartApiConfig', 'MessageCountHistoryFactory', 'MessageListFactory', 'Reporter', '$q', 'Coder', 'VaccineCodes',
+                                     function($scope, $state, $stateParams, $uibModal, $filter, $location, googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory, Reporter,  $q, Coder, VaccineCodes){
 	
 	/**
 	 * On PAGE LOAD: 
@@ -36,13 +36,21 @@ angular.module('messageHubDemoApp')
 			messages:[],
 	};
 	$scope.report = {};
-	$scope.codesMap= {test : [{
+	$scope.codesMap = {test : [{
       "type": "Vaccination Information Source",
       "attribute": "RXA-9",
       "value": "02",
       "count": 1,
       "status": "Valid",
       "label": "Historical information - from other provider"
+    }]};
+	$scope.vaccinationsMap = {test : [{      
+      "vaccinationVisits": 0,
+      "count": 6,
+      "status": "Possible",
+      "vaccine": "HepB",
+      "percent": 0.0,
+      "age": "OTHER"
     }]};
 	
 	$scope.toggleStat = function(id) {
@@ -373,8 +381,18 @@ angular.module('messageHubDemoApp')
 			console.log("getMessageList codes list loaded.");
 //		}).$promise.then(function() {
 		});
-
-
+		VaccineCodes.get({
+			providerKey : $scope.provider.key,
+			dateStart : $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+			dateEnd : $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
+		}, function(data) {
+			
+			$scope.vaccinationsMap = data;
+			//alert(codeTypeArray);
+			console.log("getMessageList vaccines list loaded.");
+//		}).$promise.then(function() {
+		});
+		
 		console.log("getMessageList call started");
 	};
 	

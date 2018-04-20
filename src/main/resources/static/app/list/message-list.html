@@ -258,19 +258,36 @@
             </div>
         </uib-tab>
         <uib-tab index="3" heading="Vaccines">
-            <div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <img src="img/vaccine_groups.png">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <img src="img/vaccines_admin.png">
-                    </div>
-                    <div class="col-md-6">
-                        <img src="img/vaccines_admin_by_type.png">
-                    </div>
+            <div class="heading row">
+                <h4>Vaccines Administered</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <!--<img src="img/vaccine_groups.png">-->
+                    <!--<img src="img/vaccines_admin.png">-->
+                    <!--<img src="img/vaccines_admin_by_type.png">-->
+	                <!--<pre>{{vaccinationsMap|json}}</pre>-->
+                    <div ng-repeat='(vaccinesType, vaccinesArray) in vaccinationsMap.map '>
+	                    <h3>{{vaccinesType}}</h3>
+						<table class="table">
+	                    <thead>
+	                    <tr>
+	                        <th class="col-md-4">Vaccine</th>
+	                        <!--<th class="col-md-2">Status</th>-->
+	                        <th class="col-md-3">Count</th>
+	                        <th class="col-md-3">Percent</th>
+	                    </tr>
+	                    </thead>
+	                    <tbody>
+	                     <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')" ng-style="{ 'color': (vaccines.percent < 7) ? 'red' : 'black' }">
+	                     	<td>{{vaccines.vaccine}}</td>
+	                     	<!--<td>{{vaccines.status}}</td>-->
+	                     	<td>{{vaccines.count}}</td>
+	                     	<td>{{vaccines.percent}}%</td>
+	                     </tr>
+	                     </tbody>
+	                     </table>
+	                </div>
                 </div>
             </div>
         </uib-tab>

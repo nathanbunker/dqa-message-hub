@@ -11,6 +11,14 @@ public enum AgeCategory {
 
   public int ageLow;
   public int ageHigh;
+  
+  public int getAgeLow() {
+	return ageLow;
+}
+
+public int getAgeHigh() {
+	return ageHigh;
+}
 
   AgeCategory(int low, int high) {
     this.ageHigh = high;
