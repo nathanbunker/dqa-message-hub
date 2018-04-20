@@ -2,6 +2,7 @@ package org.immregistries.dqa.hub.report;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -16,6 +17,7 @@ import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineCollection;
+import org.immregistries.dqa.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -113,13 +115,29 @@ public class DatabaseController {
     //map them to age groups.
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
+      VaccineReportGroup vrg = VaccineReportGroup.get(vb.getCode());
       AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
-      List<VaccineBucket> list = vcm.getMap().get(ac);
-      if (list == null) {
-        list = new ArrayList<>();
-        vcm.getMap().put(ac, list);
+      Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
+      if (map == null) {
+    	  map = new HashMap<>();
+    	  vcm.getMap().put(ac, map);
       }
-      list.add(vb);
+      VaccineAdministered va = map.get(vrg);
+      
+      if (va == null) {
+	      va = new VaccineAdministered();
+	      va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
+	      va.setVaccine(vrg);
+	      va.setCount(vb.getCount());
+	      // Placeholder for status
+	      va.setStatus("Placeholder");
+	      map.put(vrg, va);
+      }
+      else {
+    	  va.setCount(va.getCount() + vb.getCount());
+      }
+      va.setPercent(Math.round(100 * (((double) va.getCount()) / ((double) allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT)))));
+      //logger.warn("VA Count: " + va.getCount() + " Metrics: " + allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT) + " Percent: " + va.getPercent());
     }
     return vcm;
   }

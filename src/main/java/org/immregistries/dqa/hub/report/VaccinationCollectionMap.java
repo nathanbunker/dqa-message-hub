@@ -3,17 +3,16 @@ package org.immregistries.dqa.hub.report;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.immregistries.dqa.validator.report.codes.VaccineBucket;
 
 public class VaccinationCollectionMap {
 
-  private Map<AgeCategory, List<VaccineBucket>> map = new HashMap<>();
+  private Map<AgeCategory, Map<VaccineReportGroup, VaccineAdministered>> map = new HashMap<>();
 
-  public Map<AgeCategory, List<VaccineBucket>> getMap() {
+  public Map<AgeCategory, Map<VaccineReportGroup, VaccineAdministered>> getMap() {
     return map;
   }
 
-  public void setMap(Map<AgeCategory, List<VaccineBucket>> map) {
+  public void setMap(Map<AgeCategory, Map<VaccineReportGroup, VaccineAdministered>> map) {
     this.map = map;
   }
 }

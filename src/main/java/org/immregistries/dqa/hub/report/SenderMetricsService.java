@@ -214,6 +214,7 @@ public class SenderMetricsService {
       vc.setAge(bucket.getAge());
       vc.setAdministered(bucket.isAdministered());
       vc.setSenderMetrics(metrics);
+      vc.setCount(1);
       metrics.getVaccineCounts().add(vc);
     }
   }

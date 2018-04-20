@@ -77,4 +77,10 @@ public class VaccineCount {
   public void setAdministered(boolean administered) {
     this.administered = administered;
   }
+
+@Override
+public String toString() {
+	return "VaccineCount [id=" + id + ", age=" + age + ", vaccineCvx=" + vaccineCvx
+			+ ", count=" + count + ", administered=" + administered + "]";
+}
 }
