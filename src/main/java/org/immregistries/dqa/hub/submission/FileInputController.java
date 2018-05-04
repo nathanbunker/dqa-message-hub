@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.dqa.hl7util.parser.HL7QuickParser;
 import org.immregistries.dqa.hub.rest.FileUploadData;
 import org.immregistries.dqa.hub.rest.MessageInputController;
@@ -198,8 +199,12 @@ public class FileInputController {
             return fileUpload;
           }
         }
+        String sender = quickParser.getMsh4Sender(message);
+        if (StringUtils.isBlank(sender)) {
+          sender = "Unspecified";
+        }
         String ackResult = messageController
-            .urlEncodedHttpFormPost(message, null, null, fileUpload.getFacilityId());
+            .urlEncodedHttpFormPost(message, null, null, sender);
 
         //If the ack ends with a line break, remove it.
         ackResult = ackResult.replaceAll("\\r$", "");
