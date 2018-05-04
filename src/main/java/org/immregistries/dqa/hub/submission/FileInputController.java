@@ -200,9 +200,11 @@ public class FileInputController {
           }
         }
         String sender = quickParser.getMsh4Sender(message);
+        
         if (StringUtils.isBlank(sender)) {
           sender = "Unspecified";
         }
+        
         String ackResult = messageController
             .urlEncodedHttpFormPost(message, null, null, sender);
 
