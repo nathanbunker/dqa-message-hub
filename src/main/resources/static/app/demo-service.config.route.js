@@ -83,5 +83,17 @@ angular.module('messageHubDemoApp')
                 }
             })
         ;
+        $stateProvider
+            .state('settings', {
+                url: "/settings",
+                templateUrl: 'app/settings/settings.html',
+                controller: "SettingsController",
+                resolve: {
+                    urlParams: ['$stateParams', function ($stateParams) {
+                        return {};
+                    }]
+                }
+            })
+        ;
 
     });

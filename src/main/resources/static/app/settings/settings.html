@@ -1,0 +1,19 @@
+<div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="heading row">
+					<h4>SETTINGS</h4>
+				</div>
+		        <div class="row">
+		            <div class="form-group col-xs-5">
+					    Smarty Streets Auth ID: <input type="text" id="SmartyStreetsID" class="form-control" ng-trim="false" ng-model="messageIn.message"><br>
+					    Smarty Streets API Key: <input type="text" id="SmartyStreetsID" class="form-control" ng-trim="false" ng-model="smartyStreetsAPIKey"><br>
+		                Enable <input type="radio" id="SmartyStreetsActivation"  value="enable" ng-model="messageIn.message"> Disable <input type="radio" id="SmartyStreetsActivation" value="disable" ng-model="messageIn.message"><br><br>
+		                <!--NIST Tool Location: <input type="file" file-model="myFile"/><br>-->
+		            </div>
+		        </div>
+
+				<button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>
+			</div>
+		</div>
+</div>
