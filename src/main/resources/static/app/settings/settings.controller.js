@@ -20,6 +20,7 @@ angular.module('messageHubDemoApp')
 
         function activate() {
           console.log("SettingsController ACTIVATE");
+          $scope.nistURL = "https://not a good url/";
         }
 
         // submit an address to be cleansed (or find already-mapped address)

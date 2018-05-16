@@ -32,6 +32,10 @@ public enum NistValidatorService {
     return exception;
   }
 
+  public void clearException() {
+    exception = null;
+  }
+
   private NISTValidator getNISTValidator() {
     if (nistValidator == null) {
       nistValidator = new NISTValidator(nistValidatorUrl);

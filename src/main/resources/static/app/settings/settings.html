@@ -2,13 +2,21 @@
 		<div class="row">
 			<div class="col-md-12">
 				<div class="heading row">
-					<h4>SETTINGS</h4>
 				</div>
 		        <div class="row">
 		            <div class="form-group col-xs-5">
-					    Smarty Streets Auth ID: <input type="text" id="AuthID" class="form-control" ng-trim="false" ng-model="smartyStreetsAuthID"><br>
-					    Smarty Streets API Key: <input type="text" id="APIKey" class="form-control" ng-trim="false" ng-model="smartyStreetsAPIKey"><br>
+		                <h4>Smarty Streets</h4>
+					    Auth ID: <input type="text" id="AuthID" class="form-control" ng-trim="false" ng-model="smartyStreetsAuthID"><br>
+					    API Key: <input type="text" id="APIKey" class="form-control" ng-trim="false" ng-model="smartyStreetsAPIKey"><br>
 		                Enable <input type="radio" id="Activation"  value="enable" ng-model="smartyStreetsActivation"> Disable <input type="radio" id="Activation" value="disable" ng-model="smartyStreetsActivation"><br><br>
+
+		                <h4>NIST HL7v2 Validation Service</h4>
+					    URL: <input type="text" id="nistURL" class="form-control" ng-trim="false" ng-model="nistURL"><br>
+					    
+					    Enable <input type="radio" id="nistActivation"  value="enable" ng-model="nistActivation"> 
+					    Disable <input type="radio" id="nistActivation" value="disable" ng-model="nistActivation"><br><br>
+		                
+		                
 		                <!--NIST Tool Location: <input type="file" file-model="myFile"/><br>-->
 		            </div>
 		        </div>
