@@ -134,7 +134,8 @@ angular.module('messageHubDemoApp')
 	    };
 	})
 
-	
-
-
+	.factory('SettingNameGetterAndSetter', function ($resource) {
+    	return $resource('settings/name/:settingName');//posts setting information to database
+    })
+    
 ;

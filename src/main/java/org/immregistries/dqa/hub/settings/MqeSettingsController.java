@@ -27,8 +27,7 @@ public class MqeSettingsController {
   }
   
   @RequestMapping(value = "/name/{settingName}", method = RequestMethod.POST)
-  public MqeSettings settingNameSave(@PathVariable String settingName,
-		  @RequestBody String value) throws Exception {
+  public MqeSettings settingNameSetter(@PathVariable String settingName, @RequestBody String value) throws Exception {
 	  
 	  logger.info("settingNameSave demo! Setting Name: " + settingName);
 	  
