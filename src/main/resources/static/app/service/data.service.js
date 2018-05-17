@@ -135,7 +135,22 @@ angular.module('messageHubDemoApp')
 	})
 
 	.factory('SettingNameGetterAndSetter', function ($resource) {
-    	return $resource('settings/name/:settingName');//posts setting information to database
+    	return $resource('settings/name/:settingName');//gets and posts setting information to database
     })
     
+	.factory('NistUrlGetterAndSetter', function ($resource) {
+    	return $resource('nist/validator/url');//gets and sets nist validator url
+    })
+    
+	.factory('NistConnectionStatusGetter', function ($resource) {
+    	return $resource('nist/validator/connection');//gets the nist validator connection status
+    })
+    
+	.factory('NistExceptionGetter', function ($resource) {
+    	return $resource('nist/validator/exception');//gets the nist validator exception
+    })
+    
+	.factory('NistClearException', function ($resource) {
+    	return $resource('nist/validator/clear-exception');//clears the nist validator exception
+    })
 ;

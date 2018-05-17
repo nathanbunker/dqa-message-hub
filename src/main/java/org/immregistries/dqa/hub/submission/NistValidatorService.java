@@ -2,11 +2,22 @@ package org.immregistries.dqa.hub.submission;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.immregistries.dqa.hl7util.Reportable;
 import org.immregistries.dqa.nist.validator.connector.NISTValidator;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-public enum NistValidatorService {
-                                  INSTANCE;
+@RequestMapping(value = "/nist/validator")
+@RestController
+public class NistValidatorService {
+                                  //INSTANCE;
+	
+  private static final Log logger = LogFactory.getLog(NistValidatorService.class);
 
   private NISTValidator nistValidator = null;
   private String nistValidatorUrl =
@@ -16,22 +27,39 @@ public enum NistValidatorService {
       NistValidatorConnectionStatus.CONFIGURED;
   private Throwable exception = null;
 
+  @RequestMapping(value = "/url", method = RequestMethod.GET)
   public String getNistValidatorUrl() {
-    return nistValidatorUrl;
+    return "{\"url\""+":\""+nistValidatorUrl+"\"}";
   }
 
-  public void setNistValidatorUrl(String nistValidatorUrl) {
+  @RequestMapping(value = "/url", method = RequestMethod.POST)
+  public void setNistValidatorUrl(@RequestBody String nistValidatorUrl) {
+	logger.info("setNistValidatorUrl demo! Setting URL: " + nistValidatorUrl);
     this.nistValidatorUrl = nistValidatorUrl;
   }
 
   public NistValidatorConnectionStatus getNistValidatorConnectionStatus() {
     return nistValidatorConnectionStatus;
   }
+  
+  @RequestMapping(value = "/connection", method = RequestMethod.GET)
+  public String getNistValidatorConnectionStatusString() {
+	    return "{\"status\""+":\""+nistValidatorConnectionStatus.toString()+"\"}";
+  }
 
   public Throwable getException() {
     return exception;
   }
+  
+  @RequestMapping(value = "/exception", method = RequestMethod.GET)
+  public String getExceptionString() {
+	  	if (this.getException() == null) {
+	  		return "{\"exception\""+":\"No exceptions.\"}";
+	  	}
+	    return "{\"exception\""+":\""+this.getException().getMessage()+"\"}";
+  }
 
+  @RequestMapping(value = "/clear-exception", method = RequestMethod.POST)
   public void clearException() {
     exception = null;
   }
