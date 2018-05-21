@@ -1,5 +1,5 @@
 package org.immregistries.dqa.hub.submission;
 
 public enum NistValidatorConnectionStatus {
-  CONFIGURED, CONNECTED, FAILURE1, FAILURE2, DOWN
+  ENABLED, CONNECTED, FIRST_FAILURE, SECOND_FAILURE, DISABLED
 }

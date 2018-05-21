@@ -45,7 +45,9 @@ public class Hl7MessageConsumer {
       sender = "MQE";
     }
     
-    List<Reportable> nistReportableList = nistValidatorService.validate(message);
+    NistValidatorHandler nistValidatorHandler = NistValidatorHandler.INSTANCE;
+    
+    List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
 
     //force serial processing...
     DqaMessageServiceResponse validationResults = validator.processMessage(message);

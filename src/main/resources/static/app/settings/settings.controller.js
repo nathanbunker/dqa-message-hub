@@ -70,7 +70,7 @@ angular.module('messageHubDemoApp')
           SettingNameGetterAndSetter.get({
               settingName : "nistActivation"
           }, function(data) {
-              $scope.nistActivation = data.value;
+              $scope.nistActivation = data.status;
               //console.log($scope.messageEvaluation);
           });
           
