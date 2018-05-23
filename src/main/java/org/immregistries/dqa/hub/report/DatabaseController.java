@@ -17,6 +17,7 @@ import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineCollection;
+import org.immregistries.dqa.vxu.VxuField;
 import org.immregistries.dqa.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -55,7 +56,12 @@ public class DatabaseController {
     Map<String, List<CollectionBucket>> map = new TreeMap<>();
     for (CollectionBucket cb : senderCodes.getCodeCountList()) {
       String s = cb.getType();
-      CodesetType t = CodesetType.getByTypeCode(s);
+      VxuField f = VxuField.getByName(s);
+      CodesetType t = f.getCodesetType();
+      if (t==null) {
+        throw new RuntimeException("well...  this is embarrasing. there's a field with no type: " + f);
+      }
+      cb.setSource(f.getHl7Locator());
       cb.setType(t.getDescription());
       Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
       if (c != null) {
@@ -74,14 +80,17 @@ public class DatabaseController {
       List<CollectionBucket> list = map.get(cb.getType());
 
       if (list == null) {
-        list = new ArrayList<CollectionBucket>();
+        list = new ArrayList<>();
         list.add(cb);
         map.put(cb.getType(), list);
       } else {
         //we want to aggregate, and ignore the attributes, so we have to add them up, since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getType().equals(cb.getType()) && bucket.getValue().equals(cb.getValue())) {
+          if (bucket.getType().equals(cb.getType())
+              && bucket.getValue().equals(cb.getValue())
+              && bucket.getSource().equals(cb.getSource())
+              ) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;
           }

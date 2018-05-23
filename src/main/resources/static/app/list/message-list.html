@@ -239,14 +239,16 @@
 	                    <tr>
 	                        <th class="col-md-2">Code</th>
 	                        <th class="col-md-4">Label</th>
+                          <th class="col-md-2">Source</th>
 	                        <th class="col-md-2">Status</th>
 	                        <th class="col-md-1">Count</th>
 	                    </tr>
 	                    </thead>
 	                    <tbody>
 	                     <tr ng-repeat="code in orderedCodes = (codeArray | orderBy:'-value')">
-	                     	<td>{{code.value}}</td>
+	                     	<td style="font-weight:500;">{{code.value}}</td>
 	                     	<td>{{code.label}}</td>
+                        <td>{{code.source}}</td>
 	                     	<td>{{code.status}}</td>
 	                     	<!--<td>{{code.attribute}}</td>-->
 	                     	<td>{{code.count}}</td>

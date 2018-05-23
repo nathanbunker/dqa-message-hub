@@ -5,7 +5,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.immregistries.dqa.codebase.client.reference.CodesetType;
 import org.immregistries.dqa.validator.detection.Detection;
+import org.immregistries.dqa.vxu.VxuField;
 import org.immregistries.dqa.vxu.VxuObject;
 import org.immregistries.dqa.validator.report.DqaMessageMetrics;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
@@ -172,7 +174,9 @@ public class SenderMetricsService {
       //none of these are in the db yet.
       CodeCount cc = new CodeCount();
       cc.setAttribute(bucket.getAttribute());
-      cc.setCodeType(bucket.getType());
+      VxuField f = VxuField.getByName(bucket.getType());
+      cc.setCodeType(f.toString());
+      cc.setOrigin(f.getHl7Locator());
       cc.setCodeValue(bucket.getValue());
       cc.setCodeCount(bucket.getCount());
       cc.setSenderMetrics(metrics);
