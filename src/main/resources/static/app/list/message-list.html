@@ -133,7 +133,7 @@
                             <tr>
                                 <th class="col-md-3">Message Control ID</th>
                                 <th class="col-md-2">Patient Name</th>
-                                <th class="col-md-4">CVX</th>
+                                <th class="col-md-4">CVX or NDC</th>
                                 <th class="col-md-3">Message Received Date</th>
                                 <th class="col-md-1">Ack Status</th>
                             </tr>
@@ -263,27 +263,20 @@
             </div>
             <div class="row">
                 <div class="col-md-9">
-                    <!--<img src="img/vaccine_groups.png">-->
-                    <!--<img src="img/vaccines_admin.png">-->
-                    <!--<img src="img/vaccines_admin_by_type.png">-->
-	                <!--<pre>{{vaccinationsMap|json}}</pre>-->
+                   <p>Counts of all administered vaccines reported grouped by age groups and vaccine type.</p>
                     <div ng-repeat='(vaccinesType, vaccinesArray) in vaccinationsMap.map '>
 	                    <h3>{{vaccinesType}}</h3>
 						<table class="table">
 	                    <thead>
 	                    <tr>
-	                        <th class="col-md-4">Vaccine</th>
-	                        <!--<th class="col-md-2">Status</th>-->
+	                        <th class="col-md-4">Vaccine Reported</th>
 	                        <th class="col-md-3">Count</th>
-	                        <th class="col-md-3">Percent</th>
 	                    </tr>
 	                    </thead>
 	                    <tbody>
-	                     <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')" ng-style="{ 'color': (vaccines.percent < 7) ? 'red' : 'black' }">
+	                     <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')">
 	                     	<td>{{vaccines.vaccine}}</td>
-	                     	<!--<td>{{vaccines.status}}</td>-->
 	                     	<td>{{vaccines.count}}</td>
-	                     	<td>{{vaccines.percent}}%</td>
 	                     </tr>
 	                     </tbody>
 	                     </table>
