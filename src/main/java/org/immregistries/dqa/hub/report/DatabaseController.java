@@ -112,7 +112,7 @@ public class DatabaseController {
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     //map them to age groups.
-    
+
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
       if (vb.isAdministered()) {
@@ -141,16 +141,8 @@ public class DatabaseController {
       }
     }
     for (Map<VaccineReportGroup, VaccineAdministered> map : vcm.getMap().values()) {
-      int totalCount = 0;
       for (VaccineAdministered va : map.values()) {
-        totalCount += va.getCount();
-      }
-      for (VaccineAdministered va : map.values()) {
-        if (totalCount == 0) {
-          va.setPercent(0);
-        } else {
-          va.setPercent(Math.round(100 * (((double) va.getCount()) / ((double) totalCount))));
-        }
+        va.setPercent(0);
       }
     }
     return vcm;
