@@ -100,6 +100,7 @@ public class SenderMetricsService {
 
     Map<VxuObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
     Map<Detection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
+    Map<Integer, Integer> patientAgeCounts = incomingMetrics.getPatientAgeCounts();
 
     for (VxuObject io : objectCounts.keySet()) {
       Integer count = objectCounts.get(io);

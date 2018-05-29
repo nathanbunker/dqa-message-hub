@@ -110,43 +110,50 @@ public class DatabaseController {
   }
 
 
-  @RequestMapping(method = RequestMethod.GET, value = "/vaccinations/{providerKey}/{dateStart}/{dateEnd}")
+  @RequestMapping(method = RequestMethod.GET,
+      value = "/vaccinations/{providerKey}/{dateStart}/{dateEnd}")
   public VaccinationCollectionMap getVaccinationsFor(
       @PathVariable("providerKey") String providerKey,
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
       @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
-    logger.info(
-        "DatabaseController getVaccinationsFor sender:" + providerKey + " dateStart: " + dateStart
-            + " dateEnd: " + dateEnd);
+    logger.info("DatabaseController getVaccinationsFor sender:" + providerKey + " dateStart: "
+        + dateStart + " dateEnd: " + dateEnd);
     DqaMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     //map them to age groups.
+
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
-      VaccineReportGroup vrg = VaccineReportGroup.get(vb.getCode());
-      AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
-      Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
-      if (map == null) {
-    	  map = new HashMap<>();
-    	  vcm.getMap().put(ac, map);
+      if (vb.isAdministered()) {
+        List<VaccineReportGroup> vrgList = VaccineReportGroup.get(vb.getCode());
+        AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
+        Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
+        if (map == null) {
+          map = new HashMap<>();
+          vcm.getMap().put(ac, map);
+        }
+        for (VaccineReportGroup vrg : vrgList) {
+          VaccineAdministered va = map.get(vrg);
+
+          if (va == null) {
+            va = new VaccineAdministered();
+            va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
+            va.setVaccine(vrg);
+            va.setCount(vb.getCount());
+            // Placeholder for status
+            va.setStatus("Placeholder");
+            map.put(vrg, va);
+          } else {
+            va.setCount(va.getCount() + vb.getCount());
+          }
+        }
       }
-      VaccineAdministered va = map.get(vrg);
-      
-      if (va == null) {
-	      va = new VaccineAdministered();
-	      va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
-	      va.setVaccine(vrg);
-	      va.setCount(vb.getCount());
-	      // Placeholder for status
-	      va.setStatus("Placeholder");
-	      map.put(vrg, va);
+    }
+    for (Map<VaccineReportGroup, VaccineAdministered> map : vcm.getMap().values()) {
+      for (VaccineAdministered va : map.values()) {
+        va.setPercent(0);
       }
-      else {
-    	  va.setCount(va.getCount() + vb.getCount());
-      }
-      va.setPercent(Math.round(100 * (((double) va.getCount()) / ((double) allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT)))));
-      //logger.warn("VA Count: " + va.getCount() + " Metrics: " + allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT) + " Percent: " + va.getPercent());
     }
     return vcm;
   }
