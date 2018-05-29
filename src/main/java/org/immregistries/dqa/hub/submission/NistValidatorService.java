@@ -53,7 +53,7 @@ public class NistValidatorService {
   @RequestMapping(value = "/exception", method = RequestMethod.GET)
   public String getExceptionString() {
     if (this.getException() == null) {
-      return "{\"exception\"" + ":\"No exceptions.\"}";
+      return null;
     }
     return "{\"exception\"" + ":\"" + this.getException().getMessage() + "\"}";
   }

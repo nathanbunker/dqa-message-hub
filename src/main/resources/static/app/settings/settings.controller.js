@@ -19,7 +19,11 @@ angular.module('messageHubDemoApp')
         $scope.nistConnectionStatus = "";
         $scope.nistException = "";
 
-        //$scope.messageEvaluation = {};
+        $scope.messageEvaluation = {
+        			authid:"",
+        			api:"",
+        			activation:""
+        };
 
         activate();
 
@@ -47,16 +51,16 @@ angular.module('messageHubDemoApp')
               //console.log($scope.messageEvaluation);
           });
           
-//          SettingNameGetterAndSetter.get({
-//              settingName : "nistURL"
-//          }, function(data) {
-//              $scope.nistURL = data.value;
-//          });
-          
-          NistUrlGetterAndSetter.get(function (data) {
-              $scope.nistURL = data.url;
-              //console.log(data.url);
+          SettingNameGetterAndSetter.get({
+              settingName : "nistURL"
+          }, function(data) {
+              $scope.nistURL = data.value;
           });
+          
+//          NistUrlGetterAndSetter.get(function (data) {
+//              $scope.nistURL = data.url;
+//              //console.log(data.url);
+//          });
           
           NistConnectionStatusGetter.get(function (data) {
               $scope.nistConnectionStatus = data.status;
@@ -70,8 +74,14 @@ angular.module('messageHubDemoApp')
           SettingNameGetterAndSetter.get({
               settingName : "nistActivation"
           }, function(data) {
-              $scope.nistActivation = data.status;
-              //console.log($scope.messageEvaluation);
+          	  if (data.value == null) {
+          	  	$scope.nistActivation = "DISABLED";
+          	  } else if (data.value == "DISABLED") {
+          	  	$scope.nistActivation = data.value;
+          	  } else {
+          	  	$scope.nistActivation = "ENABLED";
+          	  }
+              //console.log(data);
           });
           
           
@@ -81,59 +91,79 @@ angular.module('messageHubDemoApp')
         $scope.ok = function () {
           console.log("Submitted");
           //console.log($scope.smartyStreetsActivation);
-			
-          SettingNameGetterAndSetter.save({settingName : "smartyStreetsAuthID"}, $scope.smartyStreetsAuthID, function (data) {
-            if (data != null) {
-              //$scope.messageEvaluation = data;
-              $scope.error = false;
-              //console.log($scope.messageEvaluation);
-            } else {
-              $scope.errorMessage = "An unknown error occurred saving the Auth ID.";
-              $scope.error = true;
-            }
-          }, function (error) {
-            $scope.error = true;
-            $scope.errorMessage = error.statusText + " - " + error.data;
+          
+          SettingNameGetterAndSetter.get({
+              settingName : "smartyStreetsAuthID"
+          }, function(data) {
+              if ($scope.smartyStreetsAuthID == data.value) {
+		          SettingNameGetterAndSetter.save({settingName : "smartyStreetsAuthID"}, $scope.smartyStreetsAuthID, function (data) {
+		            if (data != null) {
+		              $scope.error = false;
+		              $scope.messageEvaluation.authid = "Auth ID saved.";
+		            } else {
+		              $scope.errorMessage = "An unknown error occurred saving the Auth ID.";
+		              $scope.error = true;
+		            }
+		          }, function (error) {
+		            $scope.error = true;
+		            $scope.errorMessage = error.statusText + " - " + error.data;
+		          });
+	          } else {
+	          		$scope.messageEvaluation.authid = "Auth ID not saved.";
+	          }
           });
           
-          SettingNameGetterAndSetter.save({settingName : "smartyStreetsAPIKey"}, $scope.smartyStreetsAPIKey, function (data) {
-            if (data != null) {
-              //$scope.messageEvaluation = data;
-              $scope.error = false;
-            } else {
-              $scope.errorMessage = "An unknown error occurred saving the API key.";
-              $scope.error = true;
-            }
-          }, function (error) {
-            $scope.error = true;
-            $scope.errorMessage = error.statusText + " - " + error.data;
+          SettingNameGetterAndSetter.get({
+              settingName : "smartyStreetsAPIKey"
+          }, function(data) {
+          	  if ($scope.smartyStreetsAPIKey == data.value) {
+		          SettingNameGetterAndSetter.save({settingName : "smartyStreetsAPIKey"}, $scope.smartyStreetsAPIKey, function (data) {
+		            if (data != null) {
+		              $scope.error = false;
+		              $scope.messageEvaluation.api = "API Key saved.";
+		            } else {
+		              $scope.errorMessage = "An unknown error occurred saving the API key.";
+		              $scope.error = true;
+		            }
+		          }, function (error) {
+		            $scope.error = true;
+		            $scope.errorMessage = error.statusText + " - " + error.data;
+		          });
+	          } else {
+	          		$scope.messageEvaluation.api = "API Key not saved.";
+	          }
           });
           
-//          SettingNameGetterAndSetter.save({settingName : "nistURL"}, $scope.nistURL, function (data) {
-//            if (data != null) {
-//              $scope.error = false;
-//            } else {
-//              $scope.errorMessage = "An unknown error occurred saving the NIST URL value.";
-//              $scope.error = true;
-//            }
-//          }, function (error) {
-//            $scope.error = true;
-//            $scope.errorMessage = error.statusText + " - " + error.data;
-//          });
+          SettingNameGetterAndSetter.get({
+              settingName : "smartyStreetsActivation"
+          }, function(data) {
+              if ($scope.smartyStreetsActivation != data.value) {
+              	  
+              	  if ($scope.nistURL == null) {
+              	  	$scope.smartyStreetsActivation = "DISABLED";
+              	  }
+              	  
+		          SettingNameGetterAndSetter.save({settingName : "smartyStreetsActivation"}, $scope.smartyStreetsActivation, function (data) {
+		            if (data != null) {
+		              $scope.error = false;
+		              $scope.messageEvaluation.activation = "Smarty Streets " + $scope.smartyStreetsActivation + ".";
+		            } else {
+		              $scope.errorMessage = "An unknown error occurred saving the API key.";
+		              $scope.error = true;
+		            }
+		          }, function (error) {
+		            $scope.error = true;
+		            $scope.errorMessage = error.statusText + " - " + error.data;
+		          });
+              } else {
+              		$scope.messageEvaluation.activation = "Could not " + $scope.smartyStreetsActivation + "Smarty Streets.";
+              }
+          });
           
-          NistUrlGetterAndSetter.save($scope.nistURL, function (data) {
+          SettingNameGetterAndSetter.save({
+              settingName : "nistURL"
+          }, $scope.nistURL, function (data) {
             if (data != null) {
-              NistClearException.save(function (data) {
-	            if (data == null) {
-	              $scope.error = false;
-	            } else {
-	              $scope.errorMessage = "An unknown error occurred clearing the exception.";
-	              $scope.error = true;
-	            }
-	          }, function (error) {
-	            $scope.error = true;
-	            $scope.errorMessage = error.statusText + " - " + error.data;
-	          });
               $scope.error = false;
             } else {
               $scope.errorMessage = "An unknown error occurred saving the NIST URL value.";
@@ -143,6 +173,29 @@ angular.module('messageHubDemoApp')
             $scope.error = true;
             $scope.errorMessage = error.statusText + " - " + error.data;
           });
+          
+//          NistUrlGetterAndSetter.save($scope.nistURL, function (data) {
+//            if (data != null) {
+//              NistClearException.save(function (data) {
+//	            if (data == null) {
+//	              $scope.error = false;
+//	            } else {
+//	              $scope.errorMessage = "An unknown error occurred clearing the exception.";
+//	              $scope.error = true;
+//	            }
+//	          }, function (error) {
+//	            $scope.error = true;
+//	            $scope.errorMessage = error.statusText + " - " + error.data;
+//	          });
+//              $scope.error = false;
+//            } else {
+//              $scope.errorMessage = "An unknown error occurred saving the NIST URL value.";
+//              $scope.error = true;
+//            }
+//          }, function (error) {
+//            $scope.error = true;
+//            $scope.errorMessage = error.statusText + " - " + error.data;
+//          });
           
           SettingNameGetterAndSetter.save({settingName : "nistActivation"}, $scope.nistActivation, function (data) {
             if (data != null) {
