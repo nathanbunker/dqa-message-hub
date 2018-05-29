@@ -70,6 +70,17 @@ angular.module('messageHubDemoApp')
                 }]
             }
         })
+        
+        .state('settings', {
+            url: "/settings",
+            templateUrl: 'app/settings/settings.html',
+            controller: "SettingsController",
+            resolve: {
+                urlParams: ['$stateParams', function ($stateParams) {
+                    return {};
+                }]
+            }
+        })
         ;
         $stateProvider
             .state('file-input', {
@@ -83,5 +94,4 @@ angular.module('messageHubDemoApp')
                 }
             })
         ;
-
     });

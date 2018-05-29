@@ -28,21 +28,14 @@ import org.springframework.stereotype.Service;
 public class Hl7MessageConsumer {
 
   private DqaMessageService validator = DqaMessageService.INSTANCE;
-  //	private NISTValidator nistValidator = null;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
   private SenderMetricsService metricsSvc;
   @Autowired
   private MessageMetadataJpaRepository metaRepo;
-//
-//	private NISTValidator getNISTValidator()
-//	{
-//	  if (nistValidator == null)
-//	  {
-//	    nistValidator = new NISTValidator();
-//	  }
-//	  return nistValidator;
-//	}
+  @Autowired
+  NistValidatorHandler nistValidatorHandler;
+
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
@@ -51,14 +44,14 @@ public class Hl7MessageConsumer {
     if (sender == null) {
       sender = "MQE";
     }
-
-//        NISTValidator nistValidator = getNISTValidator();
-//        List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
+    
+    
+    List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
 
     //force serial processing...
     DqaMessageServiceResponse validationResults = validator.processMessage(message);
 
-    String ack = makeAckFromValidationResults(validationResults, new ArrayList<Reportable>());
+    String ack = makeAckFromValidationResults(validationResults, nistReportableList);
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
@@ -68,35 +61,36 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(
+      Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
     DqaMessageServiceResponse dqr = response.getDqaResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
-    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(), response.getSender(), sentDate);
+    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
+        response.getSender(), sentDate);
     return response;
   }
 
-  int daysSpread = 60;
+//  int daysSpread = 60;
+//  Date getRandomDate() {
+//    DateTime dt = new DateTime();
+//    int randomDays = (int) Math.floor(Math.random() * daysSpread);
+//    DateTime thisDate = dt.minusDays(randomDays);
+//    if (thisDate.getDayOfWeek() >= 6) {
+//      int randomWeekDay = (int) Math.floor(Math.random() * 5) + 1;
+//      int day = thisDate.getDayOfWeek();
+//      if (day == 7) {
+//        randomWeekDay = randomWeekDay - 1;
+//      }
+//      thisDate = thisDate.minusDays(randomWeekDay);
+//    }
+//
+//    Date sentDate = thisDate.toDate();
+//    return sentDate;
+//  }
 
-  Date getRandomDate() {
-    DateTime dt = new DateTime();
-    int randomDays = (int) Math.floor(Math.random() * daysSpread);
-    DateTime thisDate = dt.minusDays(randomDays);
-    if (thisDate.getDayOfWeek() >= 6) {
-      int randomWeekDay = (int) Math.floor(Math.random() * 5) + 1;
-      int day = thisDate.getDayOfWeek();
-      if (day == 7) {
-        randomWeekDay = randomWeekDay - 1;
-      }
-      thisDate = thisDate.minusDays(randomWeekDay);
-    }
-
-    Date sentDate = thisDate.toDate();
-    return sentDate;
-  }
-
-  public void saveMessageForSender(String message, String ack, String sender, Date sentDate) {
+  private void saveMessageForSender(String message, String ack, String sender, Date sentDate) {
     MessageMetadata mm = new MessageMetadata();
     //for demo day, let's make a random date in the last month.
     mm.setInputTime(sentDate);
@@ -107,18 +101,18 @@ public class Hl7MessageConsumer {
     metaRepo.save(mm);
   }
 
-  public void saveMetricsFromValidationResults(String sender,
+  private void saveMetricsFromValidationResults(String sender,
       DqaMessageServiceResponse validationResults, Date metricsDate) {
     DqaMessageMetrics metrics = scorer.getDqaMetricsFor(validationResults);
     metricsSvc.addToSenderMetrics(sender, metricsDate, metrics);
   }
 
-  public String makeAckFromValidationResults(DqaMessageServiceResponse validationResults,
+  private String makeAckFromValidationResults(DqaMessageServiceResponse validationResults,
       List<Reportable> nistReportablesList) {
 
     List<ValidationRuleResult> resultList = validationResults.getValidationResults();
-    List<Reportable> reportables = new ArrayList<Reportable>(nistReportablesList);
-    //This code needs to get put somewhere better.
+    List<Reportable> reportables = new ArrayList<>(nistReportablesList);
+    /* This code needs to get put somewhere better. */
     for (ValidationRuleResult result : resultList) {
       reportables.addAll(result.getValidationDetections());
     }
@@ -139,7 +133,6 @@ public class Hl7MessageConsumer {
     data.setResponseType("?");
     data.setReportables(reportables);
 
-    String ack = ackBuilder.buildAckFrom(data);
-    return ack;
+    return ackBuilder.buildAckFrom(data);
   }
 }

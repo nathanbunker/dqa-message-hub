@@ -76,23 +76,23 @@ public class MessageRetrieverService {
     HL7MessageMap map = parser.getMessagePartMap(mv.getMessage());
     HL7MessageMap ackMap = parser.getMessagePartMap(mv.getResponse());
 
-    String messageControlId = map.get("MSH-10");
+    String messageControlId = map.getValue("MSH-10");
     item.setMessageControlId(messageControlId);
 
 //		item.setId(mq.getMessageQueueId());
-    item.setAckStatus(ackMap.get("MSA-1"));
+    item.setAckStatus(ackMap.getValue("MSA-1"));
     item.setCvxList(generateCVXListString(map));
     item.setReceived(mv.getInputTime());
 //		item.setReceivedDateDisplay(mq.getDateCreated().toString());
 
-    String patientFirst = map.get("PID-5-2");
-    String patientLast = map.get("PID-5-1");
+    String patientFirst = map.getValue("PID-5-2");
+    String patientLast = map.getValue("PID-5-1");
     item.setPatientName(patientLast + ", " + patientFirst);
 
     return item;
   }
 
-  String generateCVXListString(HL7MessageMap map) {
+  private String generateCVXListString(HL7MessageMap map) {
     LOGGER.info("generateCVXListString");
     StringBuilder list = new StringBuilder();
 
@@ -103,8 +103,8 @@ public class MessageRetrieverService {
       switch (segName) {
         case "RXA":
 //					LOGGER.info("Getting cvx info for segment : " + i);
-          String cvx = map.getFromAbsIndex("RXA-5-2", i, 1);
-          String cvxCd = map.getFromAbsIndex("RXA-5-1", i, 1);
+          String cvx = map.getValue("RXA-5-2", i, 1);
+          String cvxCd = map.getValue("RXA-5-1", i, 1);
           if (cnt >= 1) {
             list.append(", " + "\n");
           }
@@ -115,5 +115,4 @@ public class MessageRetrieverService {
 
     return list.toString();
   }
-
 }
