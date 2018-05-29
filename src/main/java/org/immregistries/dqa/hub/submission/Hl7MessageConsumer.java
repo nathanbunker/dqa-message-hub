@@ -27,22 +27,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class Hl7MessageConsumer {
 
+  @Autowired
+  private NistValidatorService nistValidatorService;
   private DqaMessageService validator = DqaMessageService.INSTANCE;
-  //	private NISTValidator nistValidator = null;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
   private SenderMetricsService metricsSvc;
   @Autowired
   private MessageMetadataJpaRepository metaRepo;
-//
-//	private NISTValidator getNISTValidator()
-//	{
-//	  if (nistValidator == null)
-//	  {
-//	    nistValidator = new NISTValidator();
-//	  }
-//	  return nistValidator;
-//	}
+
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
@@ -51,14 +44,15 @@ public class Hl7MessageConsumer {
     if (sender == null) {
       sender = "MQE";
     }
-
-//        NISTValidator nistValidator = getNISTValidator();
-//        List<Reportable> nistReportableList = nistValidator.validateAndReport(message);
+    
+    NistValidatorHandler nistValidatorHandler = NistValidatorHandler.INSTANCE;
+    
+    List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
 
     //force serial processing...
     DqaMessageServiceResponse validationResults = validator.processMessage(message);
 
-    String ack = makeAckFromValidationResults(validationResults, new ArrayList<Reportable>());
+    String ack = makeAckFromValidationResults(validationResults, nistReportableList);
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
@@ -68,12 +62,14 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(
+      Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
     DqaMessageServiceResponse dqr = response.getDqaResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
-    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(), response.getSender(), sentDate);
+    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
+        response.getSender(), sentDate);
     return response;
   }
 
