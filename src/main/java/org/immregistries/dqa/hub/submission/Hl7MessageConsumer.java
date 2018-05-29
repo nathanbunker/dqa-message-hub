@@ -27,14 +27,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class Hl7MessageConsumer {
 
-  @Autowired
-  private NistValidatorService nistValidatorService;
   private DqaMessageService validator = DqaMessageService.INSTANCE;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
   private SenderMetricsService metricsSvc;
   @Autowired
   private MessageMetadataJpaRepository metaRepo;
+  @Autowired
+  NistValidatorHandler nistValidatorHandler;
 
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
@@ -45,7 +45,6 @@ public class Hl7MessageConsumer {
       sender = "MQE";
     }
     
-    NistValidatorHandler nistValidatorHandler = NistValidatorHandler.INSTANCE;
     
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
 

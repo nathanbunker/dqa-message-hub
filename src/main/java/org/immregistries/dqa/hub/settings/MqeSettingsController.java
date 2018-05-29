@@ -2,6 +2,9 @@ package org.immregistries.dqa.hub.settings;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.dqa.hub.cfg.MqeMessageHubApplicationProperties;
+import org.immregistries.dqa.hub.submission.NistValidatorHandler;
+import org.immregistries.dqa.hub.submission.NistValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +20,17 @@ public class MqeSettingsController {
 
   @Autowired
   private MqeSettingsJpaRepository settingsRepo;
+  
+  @Autowired
+  private MqeMessageHubApplicationProperties props;
 
+  
+  @RequestMapping(value = "/reset", method = RequestMethod.GET)
+  public void reset() throws Exception {
+    logger.info("resetting properties from database");
+    props.postInit();
+  }
+  
   @RequestMapping(value = "/name/{settingName}", method = RequestMethod.GET)
   public MqeSettings settingNameGetter(@PathVariable String settingName) throws Exception {
 

@@ -2,6 +2,8 @@ package org.immregistries.dqa.hub.submission;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.dqa.hub.cfg.MqeMessageHubApplicationProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -13,18 +15,22 @@ public class NistValidatorService {
   //INSTANCE;
 
   private static final Log logger = LogFactory.getLog(NistValidatorService.class);
+  
+  @Autowired 
+  MqeMessageHubApplicationProperties props;
+  
+  @Autowired
+  NistValidatorHandler settings;
 
   @RequestMapping(value = "/url", method = RequestMethod.GET)
   public String getNistValidatorUrl() {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
-    return "{\"url\"" + ":\"" + settings.getNistValidatorUrl() + "\"}";
+    return "{\"url\"" + ":\"" + props.getNistValidatorUrl() + "\"}";
   }
 
   @RequestMapping(value = "/status", method = RequestMethod.GET)
   public String getStatus()
   {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
-    return settings.getNistValidatorConnectionStatus() == NistValidatorConnectionStatus.DISABLED ? "disable" : "enable"; 
+    return props.getNistValidatorConnectionStatus() == NistValidatorConnectionStatus.DISABLED ? "disable" : "enable"; 
   }
 
   
@@ -35,18 +41,15 @@ public class NistValidatorService {
   }
 
   public NistValidatorConnectionStatus getNistValidatorConnectionStatus() {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
-    return settings.getNistValidatorConnectionStatus();
+    return props.getNistValidatorConnectionStatus();
   }
 
   @RequestMapping(value = "/connection", method = RequestMethod.GET)
   public String getNistValidatorConnectionStatusString() {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
-    return "{\"status\"" + ":\"" + settings.getNistValidatorConnectionStatus().toString() + "\"}";
+    return "{\"status\"" + ":\"" + props.getNistValidatorConnectionStatus().toString() + "\"}";
   }
 
   public Throwable getException() {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
     return settings.getException();
   }
 
@@ -60,7 +63,6 @@ public class NistValidatorService {
 
   @RequestMapping(value = "/clear-exception", method = RequestMethod.POST)
   public void clearException() {
-    NistValidatorHandler settings = NistValidatorHandler.INSTANCE;
     settings.setException(null);
   }
 

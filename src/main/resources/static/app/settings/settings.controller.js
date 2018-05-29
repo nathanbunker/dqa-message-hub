@@ -1,8 +1,8 @@
 angular.module('messageHubDemoApp')
 
 .controller('SettingsController',
-    ['$scope', 'SettingNameGetterAndSetter', 'NistUrlGetterAndSetter', 'NistConnectionStatusGetter', 'NistExceptionGetter', 'NistClearException',
-      function ($scope, SettingNameGetterAndSetter, NistUrlGetterAndSetter, NistConnectionStatusGetter, NistExceptionGetter, NistClearException) {
+    ['$scope', 'SettingNameGetterAndSetter', 'NistUrlGetterAndSetter', 'NistConnectionStatusGetter', 'NistExceptionGetter', 'NistClearException', 'ResetProperties',
+      function ($scope, SettingNameGetterAndSetter, NistUrlGetterAndSetter, NistConnectionStatusGetter, NistExceptionGetter, NistClearException, ResetProperties) {
 
 //        $scope.messageIn = {
 //    				user:""
@@ -25,6 +25,10 @@ angular.module('messageHubDemoApp')
         			activation:""
         };
 
+        $scope.refresh = function() {
+        	activate();
+        }
+        
         activate();
 
         function activate() {
@@ -139,7 +143,7 @@ angular.module('messageHubDemoApp')
           }, function(data) {
               if ($scope.smartyStreetsActivation != data.value) {
               	  
-              	  if ($scope.nistURL == null) {
+              	  if ($scope.smartyStreetsActivation == null) {
               	  	$scope.smartyStreetsActivation = "DISABLED";
               	  }
               	  
@@ -155,9 +159,7 @@ angular.module('messageHubDemoApp')
 		            $scope.error = true;
 		            $scope.errorMessage = error.statusText + " - " + error.data;
 		          });
-              } else {
-              		$scope.messageEvaluation.activation = "Could not " + $scope.smartyStreetsActivation + "Smarty Streets.";
-              }
+              } 
           });
           
           SettingNameGetterAndSetter.save({
@@ -218,5 +220,8 @@ angular.module('messageHubDemoApp')
           
           
           }
+          
+          ResetProperties.get();
+          activate();
         };
       }]);

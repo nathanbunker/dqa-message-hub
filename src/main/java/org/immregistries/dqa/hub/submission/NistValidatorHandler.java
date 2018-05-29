@@ -3,21 +3,22 @@ package org.immregistries.dqa.hub.submission;
 import java.util.ArrayList;
 import java.util.List;
 import org.immregistries.dqa.hl7util.Reportable;
+import org.immregistries.dqa.hub.cfg.MqeMessageHubApplicationProperties;
 import org.immregistries.dqa.nist.validator.connector.NISTValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public enum NistValidatorHandler {
-                                   INSTANCE;
+@Component
+public class NistValidatorHandler {
   private NISTValidator nistValidator = null;
-  private String nistValidatorUrl =
-      "http://localhost:8080/hl7v2ws//services/soap/MessageValidationV2";
-  // private String nistValidatorUrl = "https://hl7v2.ws.nist.gov/hl7v2ws//services/soap/MessageValidationV2";
-  private NistValidatorConnectionStatus nistValidatorConnectionStatus =
-      NistValidatorConnectionStatus.ENABLED;
   private Throwable exception = null;
+
+  @Autowired
+  private MqeMessageHubApplicationProperties props;
 
   public NISTValidator getNISTValidator() {
     if (nistValidator == null) {
-      nistValidator = new NISTValidator(nistValidatorUrl);
+      nistValidator = new NISTValidator(props.getNistValidatorUrl());
     }
     return nistValidator;
   }
@@ -30,24 +31,8 @@ public enum NistValidatorHandler {
     this.nistValidator = nistValidator;
   }
 
-  public String getNistValidatorUrl() {
-    return nistValidatorUrl;
-  }
-
-  public void setNistValidatorUrl(String nistValidatorUrl) {
-    if (!this.nistValidatorUrl.equals(nistValidatorUrl)) {
-      nistValidator = null;
-    }
-    this.nistValidatorUrl = nistValidatorUrl;
-  }
-
-  public NistValidatorConnectionStatus getNistValidatorConnectionStatus() {
-    return nistValidatorConnectionStatus;
-  }
-
-  public void setNistValidatorConnectionStatus(
-      NistValidatorConnectionStatus nistValidatorConnectionStatus) {
-    this.nistValidatorConnectionStatus = nistValidatorConnectionStatus;
+  public void resetNistValidator() {
+    nistValidator = null;
   }
 
   public Throwable getException() {
@@ -60,23 +45,27 @@ public enum NistValidatorHandler {
 
   public List<Reportable> validate(String message) {
     List<Reportable> nistReportableList = null;
+    NistValidatorConnectionStatus nistValidatorConnectionStatus =
+        props.getNistValidatorConnectionStatus();
     if (nistValidatorConnectionStatus != NistValidatorConnectionStatus.DISABLED) {
       try {
         NISTValidator nistValidator = getNISTValidator();
         nistReportableList = nistValidator.validateAndReport(message);
-        nistValidatorConnectionStatus = NistValidatorConnectionStatus.CONNECTED;
+        if (nistValidatorConnectionStatus != NistValidatorConnectionStatus.CONNECTED) {
+          props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.CONNECTED);
+        }
       } catch (Exception e) {
         this.exception = e;
         switch (nistValidatorConnectionStatus) {
           case ENABLED:
           case CONNECTED:
-            nistValidatorConnectionStatus = NistValidatorConnectionStatus.FIRST_FAILURE;
+            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.FIRST_FAILURE);
           case FIRST_FAILURE:
-            nistValidatorConnectionStatus = NistValidatorConnectionStatus.SECOND_FAILURE;
+            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.SECOND_FAILURE);
             break;
           case DISABLED:
           case SECOND_FAILURE:
-            nistValidatorConnectionStatus = NistValidatorConnectionStatus.DISABLED;
+            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.DISABLED);
             break;
         }
       }
