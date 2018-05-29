@@ -30,7 +30,11 @@ public class CodeCount {
 
   @Column(name = "CODE_TYPE")
   private String codeType;
+
+  private String origin;
+
   private String attribute;
+
   @Column(name = "CODE_VALUE")
   private String codeValue;
   private int codeCount;
@@ -81,6 +85,14 @@ public class CodeCount {
 
   public void setSenderMetrics(SenderMetrics senderMetrics) {
     this.senderMetrics = senderMetrics;
+  }
+
+  public String getOrigin() {
+    return origin;
+  }
+
+  public void setOrigin(String origin) {
+    this.origin = origin;
   }
 
   @Override
