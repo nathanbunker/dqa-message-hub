@@ -27,6 +27,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class Hl7MessageConsumer {
 
+  @Autowired
+  private NistValidatorService nistValidatorService;
   private DqaMessageService validator = DqaMessageService.INSTANCE;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
