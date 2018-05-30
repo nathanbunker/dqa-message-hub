@@ -17,6 +17,7 @@ import org.immregistries.dqa.validator.report.codes.CodeCollection;
 import org.immregistries.dqa.validator.report.codes.CollectionBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineBucket;
 import org.immregistries.dqa.validator.report.codes.VaccineCollection;
+import org.immregistries.dqa.vxu.VxuField;
 import org.immregistries.dqa.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -55,7 +56,12 @@ public class DatabaseController {
     Map<String, List<CollectionBucket>> map = new TreeMap<>();
     for (CollectionBucket cb : senderCodes.getCodeCountList()) {
       String s = cb.getType();
-      CodesetType t = CodesetType.getByTypeCode(s);
+      VxuField f = VxuField.getByName(s);
+      CodesetType t = f.getCodesetType();
+      if (t==null) {
+        throw new RuntimeException("well...  this is embarrasing. there's a field with no type: " + f);
+      }
+      cb.setSource(f.getHl7Locator());
       cb.setType(t.getDescription());
       Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
       if (c != null) {
@@ -74,14 +80,17 @@ public class DatabaseController {
       List<CollectionBucket> list = map.get(cb.getType());
 
       if (list == null) {
-        list = new ArrayList<CollectionBucket>();
+        list = new ArrayList<>();
         list.add(cb);
         map.put(cb.getType(), list);
       } else {
         //we want to aggregate, and ignore the attributes, so we have to add them up, since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getType().equals(cb.getType()) && bucket.getValue().equals(cb.getValue())) {
+          if (bucket.getType().equals(cb.getType())
+              && bucket.getValue().equals(cb.getValue())
+              && bucket.getSource().equals(cb.getSource())
+              ) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;
           }
@@ -101,43 +110,50 @@ public class DatabaseController {
   }
 
 
-  @RequestMapping(method = RequestMethod.GET, value = "/vaccinations/{providerKey}/{dateStart}/{dateEnd}")
+  @RequestMapping(method = RequestMethod.GET,
+      value = "/vaccinations/{providerKey}/{dateStart}/{dateEnd}")
   public VaccinationCollectionMap getVaccinationsFor(
       @PathVariable("providerKey") String providerKey,
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
       @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
-    logger.info(
-        "DatabaseController getVaccinationsFor sender:" + providerKey + " dateStart: " + dateStart
-            + " dateEnd: " + dateEnd);
+    logger.info("DatabaseController getVaccinationsFor sender:" + providerKey + " dateStart: "
+        + dateStart + " dateEnd: " + dateEnd);
     DqaMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     //map them to age groups.
+
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
-      VaccineReportGroup vrg = VaccineReportGroup.get(vb.getCode());
-      AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
-      Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
-      if (map == null) {
-    	  map = new HashMap<>();
-    	  vcm.getMap().put(ac, map);
+      if (vb.isAdministered()) {
+        List<VaccineReportGroup> vrgList = VaccineReportGroup.get(vb.getCode());
+        AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
+        Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
+        if (map == null) {
+          map = new HashMap<>();
+          vcm.getMap().put(ac, map);
+        }
+        for (VaccineReportGroup vrg : vrgList) {
+          VaccineAdministered va = map.get(vrg);
+
+          if (va == null) {
+            va = new VaccineAdministered();
+            va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
+            va.setVaccine(vrg);
+            va.setCount(vb.getCount());
+            // Placeholder for status
+            va.setStatus("Placeholder");
+            map.put(vrg, va);
+          } else {
+            va.setCount(va.getCount() + vb.getCount());
+          }
+        }
       }
-      VaccineAdministered va = map.get(vrg);
-      
-      if (va == null) {
-	      va = new VaccineAdministered();
-	      va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
-	      va.setVaccine(vrg);
-	      va.setCount(vb.getCount());
-	      // Placeholder for status
-	      va.setStatus("Placeholder");
-	      map.put(vrg, va);
+    }
+    for (Map<VaccineReportGroup, VaccineAdministered> map : vcm.getMap().values()) {
+      for (VaccineAdministered va : map.values()) {
+        va.setPercent(0);
       }
-      else {
-    	  va.setCount(va.getCount() + vb.getCount());
-      }
-      va.setPercent(Math.round(100 * (((double) va.getCount()) / ((double) allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT)))));
-      //logger.warn("VA Count: " + va.getCount() + " Metrics: " + allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT) + " Percent: " + va.getPercent());
     }
     return vcm;
   }

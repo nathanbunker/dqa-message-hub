@@ -92,7 +92,7 @@ public class MessageRetrieverService {
     return item;
   }
 
-  String generateCVXListString(HL7MessageMap map) {
+  private String generateCVXListString(HL7MessageMap map) {
     LOGGER.info("generateCVXListString");
     StringBuilder list = new StringBuilder();
 
@@ -115,5 +115,4 @@ public class MessageRetrieverService {
 
     return list.toString();
   }
-
 }
