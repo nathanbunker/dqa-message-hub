@@ -1,10 +1,9 @@
 package org.immregistries.dqa.hub.settings;
 
+import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.dqa.hub.cfg.MqeMessageHubApplicationProperties;
-import org.immregistries.dqa.hub.submission.NistValidatorHandler;
-import org.immregistries.dqa.hub.submission.NistValidatorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "/settings")
+@RequestMapping(value = "settings")
 @RestController
 public class MqeSettingsController {
 
@@ -57,4 +56,35 @@ public class MqeSettingsController {
 	  return settingsNameValue;
   }
 
+
+  @RequestMapping(value = "", method = RequestMethod.POST)
+  public String settingsSetter(@RequestBody SettingsContainer settings) throws Exception {
+
+    logger.info("settingsSetter: " + settings);
+
+    for (MqeSettings setting : settings.getSettings()) {
+      MqeSettings s = settingsRepo.findByName(setting.getName());
+
+      if (s != null && s.getValue() != null && setting.getValue() != null
+          && s.getValue().equals(setting.getValue())) {
+        //do nothing!
+        continue;
+      } else if (s == null) {
+        s = new MqeSettings();
+      }
+
+      s.setValue(setting.getValue());
+      s.setName(setting.getName());
+      settingsRepo.save(s);
+    }
+    return "Complete!";
+  }
+
+  @RequestMapping(value = "", method = RequestMethod.GET)
+  public SettingsContainer settingsSetterempty() throws Exception {
+    List<MqeSettings> s = settingsRepo.findAll();
+    SettingsContainer c = new SettingsContainer();
+    c.setSettings(s);
+    return c;
+  }
 }
