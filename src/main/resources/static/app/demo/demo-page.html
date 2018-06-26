@@ -51,7 +51,7 @@
                 <th class="col-md-8">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
               <tr ng-repeat="issue in rule.issues | filter:{ severity : 'ERROR'}">
                 <td>{{issue.applicationErrorCode.alternateText}}</td>
                 <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
@@ -76,7 +76,7 @@
                 <th class="col-md-8">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
               <tr ng-repeat="issue in rule.issues | filter:{ severity : 'WARN'}">
                 <td>{{issue.applicationErrorCode.alternateText}}</td>
                 <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
@@ -101,7 +101,7 @@
                 <th class="col-md-8">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
 
               <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'INFO'}">
                 <td>{{detection.applicationErrorCode.alternateText}}</td>
@@ -127,7 +127,7 @@
                 <th class="col-md-8">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.dqaResponse.validationResults">
+              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
 
               <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'ACCEPT'}">
                 <td>{{detection.applicationErrorCode.alternateText}}</td>

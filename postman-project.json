@@ -1,7 +1,7 @@
 {
 	"variables": [],
 	"info": {
-		"name": "dqa-hub-testing",
+		"name": "mqe-hub-testing",
 		"_postman_id": "ee5286e2-ffb3-c7ca-f907-7b79e5da0be5",
 		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
@@ -86,7 +86,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"message\": \"This is a cool message\",\n  \"user\": \"regularUser\",\n  \"password\": \"password123\",\n  \"facilityCode\": \"DQATestFacility\"\n}"
+					"raw": "{\n  \"message\": \"This is a cool message\",\n  \"user\": \"regularUser\",\n  \"password\": \"password123\",\n  \"facilityCode\": \"MQETestFacility\"\n}"
 				},
 				"description": ""
 			},
