@@ -51,6 +51,7 @@
     <dependency>
       <groupId>org.immregistries</groupId>
       <artifactId>mqe-hl7-utility</artifactId>
+      <version>${mqe.version}</version>
     </dependency>
 
     <dependency>
