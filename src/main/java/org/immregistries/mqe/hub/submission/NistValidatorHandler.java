@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hub.cfg.MqeMessageHubApplicationProperties;
-import org.immregistries.mqe.nist.validator.connector.NISTValidator;
+import org.immregistries.nist.validator.connector.NISTValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
