@@ -11,6 +11,10 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportGroup;
 import org.immregistries.mqe.validator.engine.codes.CodeRepository;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.codes.CodeCollection;
@@ -123,11 +127,13 @@ public class DatabaseController {
     senderVaccines = senderVaccines.reduce();
     //map them to age groups.
 
+    VaccineReportConfig vaccineReportConfig = VaccineReportBuilder
+        .INSTANCE.getDefaultVaccineReportConfig();
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
       if (vb.isAdministered()) {
-        List<VaccineReportGroup> vrgList = VaccineReportGroup.get(vb.getCode());
-        AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
+        List<VaccineReportGroup> vrgList = vaccineReportConfig.getVacineReportGroupList(vb.getCode());
+        AgeCategory ac = vaccineReportConfig.getCategoryForAge(vb.getAge());
         Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
         if (map == null) {
           map = new HashMap<>();
@@ -138,7 +144,7 @@ public class DatabaseController {
 
           if (va == null) {
             va = new VaccineAdministered();
-            va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
+            va.setAge(vaccineReportConfig.getCategoryForAge(vb.getAge()));
             va.setVaccine(vrg);
             va.setCount(vb.getCount());
             // Placeholder for status
@@ -158,4 +164,5 @@ public class DatabaseController {
     return vcm;
   }
 
+  
 }
