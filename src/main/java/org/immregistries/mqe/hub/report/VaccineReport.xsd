@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:element name="vaccinesAdministeredExpectation" type="vaccinesAdministeredExpectationType"/>
+  <xs:complexType name="ageCategoryType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="xs:byte" name="ageMin"/>
+      <xs:element type="xs:short" name="ageMax"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ageCategoriesType">
+    <xs:sequence>
+      <xs:element type="ageCategoryType" name="ageCategory" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="vaccineReportGroupType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="xs:short" name="cvx" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="vaccinesAdministeredExpectationType">
+    <xs:sequence>
+      <xs:element type="ageCategoriesType" name="ageCategories"/>
+      <xs:element type="vaccineReportGroupType" name="vaccineReportGroup" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

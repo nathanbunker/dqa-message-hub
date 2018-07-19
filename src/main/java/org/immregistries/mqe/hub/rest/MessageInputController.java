@@ -159,13 +159,11 @@ public class MessageInputController {
     }
   }
 
-  MessageGenerator mg = new MessageGenerator();
-
   @RequestMapping(value = "json/example", method = RequestMethod.GET)
   public Hl7MessageSubmission getExampleJsonFormPost() {
     logger.info("Getting example!");
     Hl7MessageSubmission example = new Hl7MessageSubmission();
-    example.setMessage(mg.getUniqueMessage());
+    example.setMessage(MessageGenerator.INSTANCE.getUniqueMessage());
     example.setUser("regularUser");
     example.setPassword("password123");
     return example;
