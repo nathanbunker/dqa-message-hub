@@ -4,7 +4,7 @@
   <xs:complexType name="ageCategoryType">
     <xs:sequence>
       <xs:element type="xs:string" name="label"/>
-      <xs:element type="xs:byte" name="ageMin"/>
+      <xs:element type="xs:short" name="ageMin"/>
       <xs:element type="xs:short" name="ageMax"/>
     </xs:sequence>
   </xs:complexType>
@@ -13,10 +13,17 @@
       <xs:element type="ageCategoryType" name="ageCategory" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="ageCategoryStatusType">
+    <xs:sequence>
+      <xs:element type="xs:string" name="label"/>
+      <xs:element type="xs:string" name="status"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="vaccineReportGroupType">
     <xs:sequence>
       <xs:element type="xs:string" name="label"/>
       <xs:element type="xs:short" name="cvx" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element type="ageCategoryStatusType" name="ageCategoryStatus" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="vaccinesAdministeredExpectationType">

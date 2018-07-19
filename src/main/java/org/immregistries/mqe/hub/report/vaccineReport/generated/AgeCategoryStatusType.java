@@ -15,18 +15,17 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for ageCategoryType complex type.
+ * <p>Java class for ageCategoryStatusType complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType name="ageCategoryType">
+ * &lt;complexType name="ageCategoryStatusType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;element name="label" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="ageMin" type="{http://www.w3.org/2001/XMLSchema}short"/>
- *         &lt;element name="ageMax" type="{http://www.w3.org/2001/XMLSchema}short"/>
+ *         &lt;element name="status" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -36,17 +35,16 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "ageCategoryType", propOrder = {
+@XmlType(name = "ageCategoryStatusType", propOrder = {
     "label",
-    "ageMin",
-    "ageMax"
+    "status"
 })
-public class AgeCategoryType {
+public class AgeCategoryStatusType {
 
     @XmlElement(required = true)
     protected String label;
-    protected short ageMin;
-    protected short ageMax;
+    @XmlElement(required = true)
+    protected String status;
 
     /**
      * Gets the value of the label property.
@@ -73,35 +71,27 @@ public class AgeCategoryType {
     }
 
     /**
-     * Gets the value of the ageMin property.
+     * Gets the value of the status property.
      * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
      */
-    public short getAgeMin() {
-        return ageMin;
+    public String getStatus() {
+        return status;
     }
 
     /**
-     * Sets the value of the ageMin property.
+     * Sets the value of the status property.
      * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
      */
-    public void setAgeMin(short value) {
-        this.ageMin = value;
-    }
-
-    /**
-     * Gets the value of the ageMax property.
-     * 
-     */
-    public short getAgeMax() {
-        return ageMax;
-    }
-
-    /**
-     * Sets the value of the ageMax property.
-     * 
-     */
-    public void setAgeMax(short value) {
-        this.ageMax = value;
+    public void setStatus(String value) {
+        this.status = value;
     }
 
 }
