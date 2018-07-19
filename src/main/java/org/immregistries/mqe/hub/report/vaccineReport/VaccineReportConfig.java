@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.immregistries.mqe.hub.report.vaccineReport.generated.AgeCategoryStatusType;
 import org.immregistries.mqe.hub.report.vaccineReport.generated.AgeCategoryType;
 import org.immregistries.mqe.hub.report.vaccineReport.generated.VaccineReportGroupType;
 import org.immregistries.mqe.hub.report.vaccineReport.generated.VaccinesAdministeredExpectationType;
@@ -60,6 +61,14 @@ public class VaccineReportConfig {
               map.put(cvx, vaccineReportGroupList);
             }
             vaccineReportGroupList.add(vrg);
+          }
+          for (AgeCategoryStatusType acst : vrgt.getAgeCategoryStatus()) {
+            AgeCategory ageCategory = ageCategoryMap.get(acst.getLabel());
+            VaccineReportStatus vaccineReportStatus =
+                VaccineReportStatus.getVaccineReportStatus(acst.getStatus());
+            if (ageCategory != null && vaccineReportStatus != null) {
+              vrg.getVaccineReportStatusMap().put(ageCategory, vaccineReportStatus);
+            }
           }
 
         }

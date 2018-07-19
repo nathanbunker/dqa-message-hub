@@ -271,12 +271,14 @@
 	                    <tr>
 	                        <th class="col-md-4">Vaccine Reported</th>
 	                        <th class="col-md-3">Count</th>
+	                        <th class="col-md-3">Status</th>
 	                    </tr>
 	                    </thead>
 	                    <tbody>
 	                     <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')">
 	                     	<td>{{vaccines.vaccine}}</td>
 	                     	<td>{{vaccines.count}}</td>
+	                     	<td>{{vaccines.status}}</td>
 	                     </tr>
 	                     </tbody>
 	                     </table>
