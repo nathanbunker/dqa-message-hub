@@ -9,7 +9,7 @@
     <div class="row" ng-repeat='(fileId, fileUpload) in fileUploads'
          style="border:2px dotted grey; padding:10px;margin:10px;">
         <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
-            <span style="padding:5px">{{fileUpload.fileName}}</span>
+            <span class="upload-file-name">{{fileUpload.fileName}}</span>
         </div>
         <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;">
             {{fileUpload.numberOfMessages}} messages
