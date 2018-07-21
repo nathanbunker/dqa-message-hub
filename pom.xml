@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,16 +8,17 @@
     <version>1.3.3.RELEASE</version>
   </parent>
   <groupId>org.immregistries</groupId>
-  <version>2018.4-BETA</version>
+  <version>2018.6-BETA</version>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>dqa-message-hub</artifactId>
+  <artifactId>mqe-message-hub</artifactId>
   <packaging>war</packaging>
-  <name>dqa-message-hub</name>
+  <name>mqe-message-hub</name>
   <properties>
     <java.version>1.7</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+    <mqe.version>2018.6-BETA</mqe.version>
   </properties>
 
   <dependencies>
@@ -42,14 +44,14 @@
 
     <dependency>
       <groupId>org.immregistries</groupId>
-      <artifactId>dqa-validator</artifactId>
-      <version>2018.4-BETA</version>
+      <artifactId>mqe-validator</artifactId>
+      <version>${mqe.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.immregistries</groupId>
-      <artifactId>dqa-hl7-utility</artifactId>
-      <version>2018.4</version>
+      <artifactId>mqe-hl7-utility</artifactId>
+      <version>${mqe.version}</version>
     </dependency>
 
     <dependency>
@@ -118,7 +120,7 @@
 
     <dependency>
       <groupId>org.immregistries</groupId>
-      <artifactId>dqa-nist-validator-connector</artifactId>
+      <artifactId>nist-validator-connector</artifactId>
       <version>0.1</version>
     </dependency>
   </dependencies>
@@ -137,6 +139,4 @@
       </plugin>
     </plugins>
   </build>
-
-
 </project>
