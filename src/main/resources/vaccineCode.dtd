@@ -1,0 +1,54 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT vaccineCodesReport (ageCategory+,vaccineGroup+)>
+<!ATTLIST vaccineCodesReport
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT ageCategory (ageCategoryId,label,displayOrder,minAge,maxAge)>
+<!ATTLIST ageCategory
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT vaccineGroup (vaccineGroupId,label,displayOrder,
+                        expectedThreshold,cvx,expectation+)>
+<!ATTLIST vaccineGroup
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT minAge (#PCDATA)>
+<!ATTLIST minAge
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT maxAge (#PCDATA)>
+<!ATTLIST maxAge
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT vaccineGroupId (#PCDATA)>
+<!ATTLIST vaccineGroupId
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT expectedThreshold (#PCDATA)>
+<!ATTLIST expectedThreshold
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT cvx (#PCDATA)>
+<!ATTLIST cvx
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT expectation (ageCategoryId,includeStatus)>
+<!ATTLIST expectation
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT includeStatus (#PCDATA)>
+<!ATTLIST includeStatus
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT ageCategoryId (#PCDATA)>
+<!ATTLIST ageCategoryId
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT label (#PCDATA)>
+<!ATTLIST label
+  xmlns CDATA #FIXED ''>
+
+<!ELEMENT displayOrder (#PCDATA)>
+<!ATTLIST displayOrder
+  xmlns CDATA #FIXED ''>

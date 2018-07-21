@@ -1,5 +1,8 @@
 package org.immregistries.mqe.hub.report;
 
+import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportGroup;
+
 public class VaccineAdministered {
 
 	// Total Number of Vaccination Visits

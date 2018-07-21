@@ -11,6 +11,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportGroup;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportStatus;
 import org.immregistries.mqe.validator.engine.codes.CodeRepository;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.codes.CodeCollection;
@@ -58,8 +63,9 @@ public class DatabaseController {
       String s = cb.getType();
       VxuField f = VxuField.getByName(s);
       CodesetType t = f.getCodesetType();
-      if (t==null) {
-        throw new RuntimeException("well...  this is embarrasing. there's a field with no type: " + f);
+      if (t == null) {
+        throw new RuntimeException(
+            "well...  this is embarrasing. there's a field with no type: " + f);
       }
       cb.setSource(f.getHl7Locator());
       cb.setType(t.getDescription());
@@ -87,10 +93,8 @@ public class DatabaseController {
         //we want to aggregate, and ignore the attributes, so we have to add them up, since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getType().equals(cb.getType())
-              && bucket.getValue().equals(cb.getValue())
-              && bucket.getSource().equals(cb.getSource())
-              ) {
+          if (bucket.getType().equals(cb.getType()) && bucket.getValue().equals(cb.getValue())
+              && bucket.getSource().equals(cb.getSource())) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;
           }
@@ -123,11 +127,14 @@ public class DatabaseController {
     senderVaccines = senderVaccines.reduce();
     //map them to age groups.
 
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
     VaccinationCollectionMap vcm = new VaccinationCollectionMap();
     for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
       if (vb.isAdministered()) {
-        List<VaccineReportGroup> vrgList = VaccineReportGroup.get(vb.getCode());
-        AgeCategory ac = AgeCategory.getCategoryForAge(vb.getAge());
+        List<VaccineReportGroup> vrgList =
+            vaccineReportConfig.getVacineReportGroupList(vb.getCode());
+        AgeCategory ac = vaccineReportConfig.getCategoryForAge(vb.getAge());
         Map<VaccineReportGroup, VaccineAdministered> map = vcm.getMap().get(ac);
         if (map == null) {
           map = new HashMap<>();
@@ -138,11 +145,16 @@ public class DatabaseController {
 
           if (va == null) {
             va = new VaccineAdministered();
-            va.setAge(AgeCategory.getCategoryForAge(vb.getAge()));
+            AgeCategory age = vaccineReportConfig.getCategoryForAge(vb.getAge());
+            va.setAge(age);
             va.setVaccine(vrg);
             va.setCount(vb.getCount());
-            // Placeholder for status
-            va.setStatus("Placeholder");
+            VaccineReportStatus vaccineReportStatus = vrg.getVaccineReportStatusMap().get(age);
+            if (vaccineReportStatus == null) {
+              va.setStatus("");
+            } else {
+              va.setStatus(vaccineReportStatus.getLabel());
+            }
             map.put(vrg, va);
           } else {
             va.setCount(va.getCount() + vb.getCount());
@@ -157,5 +169,6 @@ public class DatabaseController {
     }
     return vcm;
   }
+
 
 }
