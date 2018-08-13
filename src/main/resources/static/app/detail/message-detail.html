@@ -132,8 +132,8 @@
                 <div class="row" ng-repeat="segment in segmentList">
                     <div class="col-xs-12">
                         <button class="btn btn-default resultsBtn"
-                                ng-click="toggleTab($index);"
-                                ng-class="{active: $index===current.segment}">
+                                ng-click="toggleTab($index+1);"
+                                ng-class="{active: $index===current.segment-1}">
                             {{::segment.name}}
                         </button>
                     </div>
