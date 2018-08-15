@@ -37,7 +37,7 @@ public class MqeSettingsController {
 
     return settingsRepo.findByName(settingName);
   }
-  
+
   @RequestMapping(value = "/name/{settingName}", method = RequestMethod.POST)
   public MqeSettings settingNameSetter(@PathVariable String settingName, @RequestBody String value) throws Exception {
 	  
@@ -52,6 +52,8 @@ public class MqeSettingsController {
 	  
 	  settingsNameValue.setValue(value);
 	  settingsRepo.save(settingsNameValue);
+
+    props.postInit();
 	  
 	  return settingsNameValue;
   }

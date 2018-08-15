@@ -30,7 +30,7 @@ public class NistValidatorService {
   @RequestMapping(value = "/status", method = RequestMethod.GET)
   public String getStatus()
   {
-    return props.getNistValidatorConnectionStatus() == NistValidatorConnectionStatus.DISABLED ? "disable" : "enable"; 
+    return props.getNistValidatorConnectionStatus() == MqeServiceConnectionStatus.DISABLED ? "disable" : "enable";
   }
 
   
@@ -40,7 +40,7 @@ public class NistValidatorService {
     this.setNistValidatorUrl(nistValidatorUrl);
   }
 
-  public NistValidatorConnectionStatus getNistValidatorConnectionStatus() {
+  public MqeServiceConnectionStatus getNistValidatorConnectionStatus() {
     return props.getNistValidatorConnectionStatus();
   }
 

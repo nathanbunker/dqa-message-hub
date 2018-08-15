@@ -1,33 +1,46 @@
 <div>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="heading row">
-				</div>
-		        <div class="row">
-		            <div class="form-group col-xs-5">
-		                <h4>Smarty Streets</h4>
-					    <p>Auth ID: <input type="text" id="AuthID" class="form-control" ng-trim="false" ng-model="smartyStreetsAuthID"></p>
-					    <p>API Key: <input type="text" id="APIKey" class="form-control" ng-trim="false" ng-model="smartyStreetsAPIKey"></p>
-		                <p>Enable <input type="radio" id="Activation"  value="ENABLED" ng-model="smartyStreetsActivation"> Disable <input type="radio" id="Activation" value="DISABLED" ng-model="smartyStreetsActivation"></p><br>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="heading row">
+      </div>
+      <div class="row">
+        <div class="form-group col-xs-5">
+          <h4>Smarty Streets</h4>
+          <p><label for="AuthID">Auth ID: </label><input type="text" id="AuthID"
+                                                         class="form-control" ng-trim="false"
+                                                         ng-model="smartyStreetsAuthID"></p>
+          <p><label for="APIKey">API Key: </label>
+            <input type="text" id="APIKey" class="form-control" ng-trim="false"
+                   ng-model="smartyStreetsAPIKey"></p>
+          <p><label for="Activation">Enable</label>
+            <input type="radio" id="Activation" value="ENABLED"
+                   ng-model="smartyStreetsActivation"> Disable <input type="radio"
+                                                                      value="DISABLED"
+                                                                      ng-model="smartyStreetsActivation">
+          </p><br>
 
-		                <h4>NIST HL7v2 Validation Service</h4>
-					    <p>URL: <input type="text" id="nistURL" class="form-control" ng-trim="false" ng-model="nistURL"></p>
-					    <p>Enable <input type="radio" id="nistActivation"  value="ENABLED" ng-model="nistActivation"> 
-					    Disable <input type="radio" id="nistActivation" value="DISABLED" ng-model="nistActivation"></p>
-					    <p>Status: {{nistConnectionStatus}}</p>
-					    <div ng-if="nistException != null ? true:false">
-							<p>Exception: {{nistException}}</p><br>
-						</div>
-						
-		                <!--NIST Tool Location: <input type="file" file-model="myFile"/><br>-->
-		            </div>
-		        </div>
+          <h4>NIST HL7v2 Validation Service</h4>
+          <p>URL: <input type="text" id="nistURL" class="form-control" ng-trim="false"
+                         ng-model="nistURL"></p>
+          <p>Enable <input type="radio" id="nistActivation" value="ENABLED"
+                           ng-model="nistActivation">
+            Disable <input type="radio" id="nistActivation" value="DISABLED"
+                           ng-model="nistActivation"></p>
+          <div ng-if="nistException != null ? true:false">
+            <p>Exception: {{nistException}}</p><br>
+          </div>
 
-				<button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>
-			</div>
-			
-			<p>{{messageEvaluation.authid}}</p>
-			<p>{{messageEvaluation.api}}</p>
-			<p>{{messageEvaluation.activation}}</p>
-		</div>
+          <!--NIST Tool Location: <input type="file" file-model="myFile"/><br>-->
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>
+    </div>
+
+    <p>{{messageEvaluation.authid}}</p>
+    <p>{{messageEvaluation.api}}</p>
+    <p>{{messageEvaluation.activation}}</p>
+    <p>{{messageEvaluation.nistActivation}}</p>
+    <p>{{messageEvaluation.nistUrl}}</p>
+  </div>
 </div>
