@@ -10,7 +10,7 @@
                                                          class="form-control" ng-trim="false"
                                                          ng-model="smartyStreetsAuthID"></p>
           <p><label for="APIKey">API Key: </label>
-            <input type="text" id="APIKey" class="form-control" ng-trim="false"
+            <input type="password" id="APIKey" class="form-control" ng-trim="false"
                    ng-model="smartyStreetsAPIKey"></p>
           <p><label for="Activation">Enable</label>
             <input type="radio" id="Activation" value="ENABLED"
@@ -22,9 +22,9 @@
           <h4>NIST HL7v2 Validation Service</h4>
           <p>URL: <input type="text" id="nistURL" class="form-control" ng-trim="false"
                          ng-model="nistURL"></p>
-          <p>Enable <input type="radio" id="nistActivation" value="ENABLED"
+          <p>Enable <input type="radio" name="nistActivation" value="ENABLED"
                            ng-model="nistActivation">
-            Disable <input type="radio" id="nistActivation" value="DISABLED"
+            Disable <input type="radio" name="nistActivation" value="DISABLED"
                            ng-model="nistActivation"></p>
           <div ng-if="nistException != null ? true:false">
             <p>Exception: {{nistException}}</p><br>
