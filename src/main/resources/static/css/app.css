@@ -38,12 +38,14 @@ body {
     background-color: #c3c3c3;
     bottom: 0;
     color: white;
-    height: 60px; /* fixed height of footer */
+    height: 40px; /* fixed height of footer */
     padding-top: 10px;
     padding-bottom: 10px;
     position: absolute;
     width: 100%;
 }
+
+
 
 span.h7h { /* #h7h stands for HL7 Highlight */
     background-color: #cae3ea;
@@ -205,4 +207,8 @@ input[type="file"], .upload-file-name {
 
 input[type="file"] {
     width:100%;   
+}
+
+input[type="password"] {
+    font-size:20px;
 }

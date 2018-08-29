@@ -45,27 +45,30 @@ public class NistValidatorHandler {
 
   public List<Reportable> validate(String message) {
     List<Reportable> nistReportableList = null;
-    NistValidatorConnectionStatus nistValidatorConnectionStatus =
+
+    MqeServiceConnectionStatus nistValidatorConnectionStatus =
         props.getNistValidatorConnectionStatus();
-    if (nistValidatorConnectionStatus != NistValidatorConnectionStatus.DISABLED) {
+
+    if (nistValidatorConnectionStatus != MqeServiceConnectionStatus.DISABLED) {
       try {
         NISTValidator nistValidator = getNISTValidator();
         nistReportableList = nistValidator.validateAndReport(message);
-        if (nistValidatorConnectionStatus != NistValidatorConnectionStatus.CONNECTED) {
-          props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.CONNECTED);
+        if (nistValidatorConnectionStatus != MqeServiceConnectionStatus.CONNECTED) {
+          props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.CONNECTED);
         }
       } catch (Exception e) {
         this.exception = e;
         switch (nistValidatorConnectionStatus) {
           case ENABLED:
           case CONNECTED:
-            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.FIRST_FAILURE);
-          case FIRST_FAILURE:
-            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.SECOND_FAILURE);
+            props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.FIRST_FAILURE);
             break;
-          case DISABLED:
+          case FIRST_FAILURE:
+            props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.SECOND_FAILURE);
+            break;
           case SECOND_FAILURE:
-            props.setNistValidatorConnectionStatus(NistValidatorConnectionStatus.DISABLED);
+          case DISABLED:
+            props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.DISABLED);
             break;
         }
       }

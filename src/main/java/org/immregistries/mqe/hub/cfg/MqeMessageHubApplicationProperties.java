@@ -4,8 +4,9 @@ import javax.annotation.PostConstruct;
 import org.immregistries.mqe.hub.settings.MqeSettings;
 import org.immregistries.mqe.hub.settings.MqeSettingsJpaRepository;
 import org.immregistries.mqe.hub.settings.MqeSettingsName;
-import org.immregistries.mqe.hub.submission.NistValidatorConnectionStatus;
+import org.immregistries.mqe.hub.submission.MqeServiceConnectionStatus;
 import org.immregistries.mqe.hub.submission.NistValidatorHandler;
+import org.immregistries.mqe.validator.ValidatorProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,34 +20,29 @@ public class MqeMessageHubApplicationProperties {
   private static final Logger logger =
       LoggerFactory.getLogger(MqeMessageHubApplicationProperties.class);
 
-  private String testName;
-  private int interestingProperty;
   @Autowired
   NistValidatorHandler nistValidatorHandler;
-
 
   @Autowired
   private MqeSettingsJpaRepository settingsRepo;
 
-  private String nistValidatorUrl =
-      "http://localhost:8080/hl7v2ws//services/soap/MessageValidationV2";
+  private MqeServiceConnectionStatus nistValidatorConnectionStatus = MqeServiceConnectionStatus.ENABLED;
+  private String nistValidatorUrl = "http://localhost:8080/hl7v2ws//services/soap/MessageValidationV2";
+  private String ssApiKey;
+  private String ssAuthId;
+  private String ssActivationStatus;
 
   public String getNistValidatorUrl() {
     return nistValidatorUrl;
   }
 
-  public void setNistValidatorUrl(String nistValidatorUrl) {
-    saveProperty(MqeSettingsName.NIST_URL, nistValidatorUrl);
-    this.nistValidatorUrl = nistValidatorUrl;
-  }
-
   public void setNistValidatorConnectionStatus(
-      NistValidatorConnectionStatus nistValidatorConnectionStatus) {
+      MqeServiceConnectionStatus nistValidatorConnectionStatus) {
     saveProperty(MqeSettingsName.NIST_ACTIVATION, nistValidatorConnectionStatus.toString());
     this.nistValidatorConnectionStatus = nistValidatorConnectionStatus;
   }
 
-  public NistValidatorConnectionStatus getNistValidatorConnectionStatus() {
+  public MqeServiceConnectionStatus getNistValidatorConnectionStatus() {
     return nistValidatorConnectionStatus;
   }
 
@@ -59,10 +55,6 @@ public class MqeMessageHubApplicationProperties {
     s.setValue(value);
     settingsRepo.save(s);
   }
-
-  private NistValidatorConnectionStatus nistValidatorConnectionStatus =
-      NistValidatorConnectionStatus.ENABLED;
-
 
   @PostConstruct
   public void postInit() {
@@ -83,26 +75,35 @@ public class MqeMessageHubApplicationProperties {
       if (s == null) {
         saveProperty(MqeSettingsName.NIST_ACTIVATION, nistValidatorConnectionStatus.toString());
       } else {
-        nistValidatorConnectionStatus = NistValidatorConnectionStatus.valueOf(s.getValue());
+        nistValidatorConnectionStatus = MqeServiceConnectionStatus.valueOf(s.getValue());
       }
     }
     nistValidatorHandler.resetNistValidator();
-  }
 
-  public String getTestName() {
-    return testName;
-  }
+    ValidatorProperties vp = ValidatorProperties.INSTANCE;
+    MqeSettings s = settingsRepo.findByName(MqeSettingsName.SS_ACTIVATION.name);
+    if (s == null) {
+      this.ssActivationStatus = vp.isAddressCleanserEnabled() ? MqeServiceConnectionStatus.ENABLED.toString() : MqeServiceConnectionStatus.ENABLED.toString();
+    } else {
+      this.ssActivationStatus = MqeServiceConnectionStatus.valueOf(s.getValue()).toString();
+      vp.setAddressCleanserEnabled(MqeServiceConnectionStatus.ENABLED.toString().equals(s.getValue()));
+    }
 
-  public void setTestName(String testName) {
-    this.testName = testName;
-  }
+    MqeSettings ssApiKey = settingsRepo.findByName(MqeSettingsName.SS_API_KEY.name);
+    if (ssApiKey == null) {
+      this.ssApiKey = vp.getSsApiAuthToken();
+    } else {
+      this.ssApiKey = ssApiKey.getValue();
+      vp.setSsApiAuthToken(this.ssApiKey);
+    }
+    MqeSettings ssAuthId = settingsRepo.findByName(MqeSettingsName.SS_AUTH_ID.name);
+    if (ssApiKey == null) {
+      this.ssAuthId = vp.getSsApiAuthId();
+    } else {
+      this.ssAuthId = ssAuthId.getValue();
+      vp.setSsApiAuthId(this.ssAuthId);
+    }
 
-  public int getInterestingProperty() {
-    return interestingProperty;
-  }
-
-  public void setInterestingProperty(int interestingProperty) {
-    this.interestingProperty = interestingProperty;
   }
 
 }

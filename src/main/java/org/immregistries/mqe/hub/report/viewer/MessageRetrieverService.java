@@ -103,8 +103,8 @@ public class MessageRetrieverService {
       switch (segName) {
         case "RXA":
 //					LOGGER.info("Getting cvx info for segment : " + i);
-          String cvx = map.getValue("RXA-5-2", i, 1);
-          String cvxCd = map.getValue("RXA-5-1", i, 1);
+          String cvx = map.getValue("RXA-5-2", i+1, 1);
+          String cvxCd = map.getValue("RXA-5-1", i+1, 1);
           if (cnt >= 1) {
             list.append(", " + "\n");
           }
