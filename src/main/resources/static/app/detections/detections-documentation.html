@@ -1,0 +1,38 @@
+<style>
+table, th, td {
+    border: 1px solid black;
+    text-align : center;
+}
+</style>
+<h3>Detections Documentation</h3>
+<a class="btn btn-primary" type="submit" target="_blank" href="documentation/pdf">Download Documentation as PDF</a>
+<div ng-controller="DetectionsDocumentationController" style="width : 100%;">
+
+    <script type="text/ng-template" id="tree_node">
+        <tr tt-node is-branch="node.children && node.children.length > 0">
+            <td><span ng-bind="node.object"></span></td>
+            <td ng-bind="node.field"></td>
+            <td ng-bind="node.severity"></td>
+			<td ng-bind="node.code"></td>
+			<td ng-bind="node.description"></td>
+			<td ng-bind="node.status"></td>
+        </tr>
+    </script>
+
+    
+
+    <table tt-table tt-params="expanded_params" style="width : 100%; border-collapse: collapse; margin-top : 20px;" >
+        <thead>
+            <tr>
+                <th>Target Object</th>
+                <th>Target Field</th>
+                <th>Severity</th>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Active</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</div>

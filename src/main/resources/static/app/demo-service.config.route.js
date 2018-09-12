@@ -16,6 +16,17 @@ angular.module('messageHubDemoApp')
                 }
             })
         
+        .state('detections', {
+        	url: "/detections",
+		      templateUrl : 'app/detections/detections-documentation.html',
+		      controller:"DetectionsDocumentationController",
+		      resolve:{
+		    	  urlParams:['$stateParams', function($stateParams) {
+						return {};
+					}]
+		      }
+        })
+        
 		.state('landing-page', {
 		      url: "/messages",
 		      templateUrl : 'app/home/landing-page.html',
