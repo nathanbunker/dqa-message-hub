@@ -27,7 +27,7 @@ public class MqeMessageHubApplicationProperties {
   private MqeSettingsJpaRepository settingsRepo;
 
   private MqeServiceConnectionStatus nistValidatorConnectionStatus = MqeServiceConnectionStatus.ENABLED;
-  private String nistValidatorUrl = "http://localhost:8080/hl7v2ws//services/soap/MessageValidationV2";
+  private String nistValidatorUrl = "http://localhost:8756/hl7v2ws//services/soap/MessageValidationV2";
   private String ssApiKey;
   private String ssAuthId;
   private String ssActivationStatus;

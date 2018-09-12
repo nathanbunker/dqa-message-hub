@@ -185,6 +185,8 @@ public class FileInputController {
       return fileUpload;
     }
 
+    fileUpload.setStartTimeMs(new Date().getTime());
+    
     fileUpload.setStatus("started");
 
     try {

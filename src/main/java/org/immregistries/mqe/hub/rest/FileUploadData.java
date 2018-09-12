@@ -2,6 +2,7 @@ package org.immregistries.mqe.hub.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,9 @@ public class FileUploadData {
   private String facilityId;
   private String fileName;
   private String fileId;
+  private long startTimeMs;
 
-  private int messagesSize;
+private int messagesSize;
   private int processed;
 
   private Map<String, Integer> messageDates = new HashMap<>();
@@ -113,5 +115,24 @@ public class FileUploadData {
     }
     return (int) (getNumberProcessed() * 100) / this.getNumberOfMessages();
   }
+  
+  public int getAverageElapsed() {
+    if (getNumberProcessed() == 0) {
+        return 0;
+      }
+      return (int) (getElapsedTimeMs() / getNumberProcessed());
+  }
+  
+  public long getElapsedTimeMs() {
+	return new Date().getTime() - startTimeMs;
+}
+  
+  public long getStartTimeMs() {
+		return startTimeMs;
+	}
+
+	public void setStartTimeMs(long startTimeMs) {
+		this.startTimeMs = startTimeMs;
+	}
 
 }
