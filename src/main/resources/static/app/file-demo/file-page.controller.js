@@ -101,7 +101,7 @@ angular.module('messageHubDemoApp')
                                     //repeat the lookup at the time interval below.
                                     setTimeout(function () {
                                         //if the process is still going.
-                                        if (data.status === 'started') {
+                                        if (data.status === 'started' || data.status === 'reading') {
                                             //Call again to get an update.  this is recursion. w00t!
                                             watchFileProcess(fileId);
                                         }

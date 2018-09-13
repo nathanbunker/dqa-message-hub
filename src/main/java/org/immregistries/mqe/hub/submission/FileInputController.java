@@ -1,6 +1,8 @@
 package org.immregistries.mqe.hub.submission;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,31 +50,15 @@ public class FileInputController {
 
     String fileId = "file" + String.valueOf(new Date().getTime());
     FileUploadData fileUpload = new FileUploadData(facilityId, file.getOriginalFilename(), fileId);
+    ByteArrayOutputStream result = new ByteArrayOutputStream();
+    byte[] buffer = new byte[1024];
+    int length;
+    while ((length = inputStream.read(buffer)) != -1) {
+      result.write(buffer, 0, length);
+    }
+    fileUpload.setData(result);
 
     this.fileQueue.put(fileId, fileUpload);
-
-    //These are to check if it's a zip file, and to use it yes:
-    ZipInputStream zis = new ZipInputStream(inputStream);
-    ZipEntry entry = zis.getNextEntry();
-
-    if (entry == null) {
-      //it's not a zip file.  process as text file.
-      logger.info("Not a zip file!");
-      fileUpload.getHl7Messages().addAll(this.getMessagesFromInputStream(file.getInputStream()));
-    } else {
-      //Process the first one.
-      fileUpload.getHl7Messages().addAll(getMessagesFromInputStream(zis));
-      //Then the rest.
-      while ((entry = zis.getNextEntry()) != null) {
-        if (!entry.isDirectory()) {
-          fileUpload.getHl7Messages().addAll(getMessagesFromInputStream(zis));
-        }
-      }
-    }
-
-    logger.info(
-        "\nFilename: " + fileUpload.getFileName() + "\n" + "Number of messages: " + fileUpload
-            .getNumberOfMessages() + "\n" + "Reported under: " + fileUpload);
 
     return fileUpload;
   }
@@ -85,7 +71,10 @@ public class FileInputController {
     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 
     while ((line = bufferedReader.readLine()) != null) {
-      logger.info("Line: " + line);
+
+      if (logger.isDebugEnabled()) {
+        logger.debug("Line: " + line);
+      }
 
       if (!line.matches(FHS_BHS_REGEX)) {
         if (line.matches(MSH_REGEX)) {
@@ -166,6 +155,9 @@ public class FileInputController {
     FileUploadData fud = this.fileQueue.get(fileId);
     if (fud != null) {
       fud.setStatus("Stop");
+      if (fud.getNumberUnProcessed() <= 0) {
+        fud.setStatus("finished");
+      }
     }
   }
 
@@ -184,6 +176,33 @@ public class FileInputController {
     if ("started".equals(fileUpload.getStatus())) {
       return fileUpload;
     }
+
+    fileUpload.setStatus("reading");
+    byte[] bytes = fileUpload.getData().toByteArray();
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
+    //These are to check if it's a zip file, and to use it yes:
+    ZipInputStream zis = new ZipInputStream(inputStream);
+
+    ZipEntry entry = zis.getNextEntry();
+
+    if (entry == null) {
+      //it's not a zip file.  process as text file.
+      logger.info("Not a zip file!");
+      fileUpload.getHl7Messages().addAll(this.getMessagesFromInputStream(new ByteArrayInputStream(bytes)));
+    } else {
+      //Process the first one.
+      fileUpload.getHl7Messages().addAll(getMessagesFromInputStream(zis));
+      //Then the rest.
+      while ((entry = zis.getNextEntry()) != null) {
+        if (!entry.isDirectory()) {
+          fileUpload.getHl7Messages().addAll(getMessagesFromInputStream(zis));
+        }
+      }
+    }
+
+    logger.info(
+        "\nFilename: " + fileUpload.getFileName() + "\n" + "Number of messages: " + fileUpload
+            .getNumberOfMessages() + "\n" + "Reported under: " + fileUpload);
 
     fileUpload.setStartTimeMs(new Date().getTime());
     
@@ -205,9 +224,10 @@ public class FileInputController {
         if (StringUtils.isBlank(sender)) {
           sender = "Unspecified";
         }
-        
-        String ackResult = messageController
-            .urlEncodedHttpFormPost(message, null, null, sender);
+
+
+        String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, sender);
+
 
         //If the ack ends with a line break, remove it.
         ackResult = ackResult.replaceAll("\\r$", "");
@@ -221,6 +241,7 @@ public class FileInputController {
         fileUpload.addAckMessage(ackResult);
       }
       fileUpload.setStatus("finished");
+      fileUpload.setEndTimeMs(new Date().getTime());
     } catch (Exception e) {
       logger.error("Exception processing messages: " + e.getMessage());
       e.printStackTrace();
