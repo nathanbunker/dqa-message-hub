@@ -32,7 +32,7 @@ public class SenderMetricsService {
   public void saveMetrics(SenderMetrics metrics) {
     logger.info("Metrics: " + metrics);
     senderRepo.save(metrics);
-    senderRepo.flush();
+    //senderRepo.flush();
   }
 
   public MqeMessageMetrics getMetricsFor(String sender, Date day) {
@@ -189,7 +189,7 @@ public class SenderMetricsService {
     saveMetrics(metrics);
     logger.info("Metrics: " + metrics);
     senderRepo.save(metrics);
-    senderRepo.flush();
+    //senderRepo.flush();
 
     return metrics;
   }

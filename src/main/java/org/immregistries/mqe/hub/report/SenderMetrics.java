@@ -9,13 +9,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "SENDER_METRICS")
+@Table(name = "SENDER_METRICS", indexes = { @Index(name = "IDX_SENDER_METRICS_X1", columnList = "SENDER, metricsDate") })
 public class SenderMetrics {
 
   @Id

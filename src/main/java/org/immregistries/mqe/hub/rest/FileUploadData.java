@@ -1,10 +1,14 @@
 package org.immregistries.mqe.hub.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,17 +21,31 @@ public class FileUploadData {
   private String facilityId;
   private String fileName;
   private String fileId;
+  private long startTimeMs = 1;
+  private long endTimeMs = 0;
 
-  private int messagesSize;
-  private int processed;
-
+  @JsonIgnore
   private Map<String, Integer> messageDates = new HashMap<>();
+
+  @JsonIgnore
+  private ByteArrayOutputStream data;
+
+  @JsonIgnore
+  private ZipInputStream zipData;
 
   @JsonIgnore
   private List<String> hl7Messages = new ArrayList<>();
 
   @JsonIgnore
   private List<String> ackMessages = new ArrayList<>();
+
+  public ByteArrayOutputStream getData() {
+    return data;
+  }
+
+  public void setData(ByteArrayOutputStream input) {
+    this.data = input;
+  }
 
   public FileUploadData() {
   }
@@ -113,5 +131,41 @@ public class FileUploadData {
     }
     return (int) (getNumberProcessed() * 100) / this.getNumberOfMessages();
   }
+  
+  public int getAverageElapsed() {
+    if (getNumberProcessed() == 0) {
+        return 0;
+      }
+      return (int) (getElapsedTimeMs() / getNumberProcessed());
+  }
+  
+  public long getElapsedTimeMs() {
+    return (endTimeMs == 0 ? new Date().getTime()
+        : endTimeMs)
+        - startTimeMs;
+}
+  
+  public long getStartTimeMs() {
+		return startTimeMs;
+	}
 
+	public void setStartTimeMs(long startTimeMs) {
+		this.startTimeMs = startTimeMs;
+	}
+
+  public ZipInputStream getZipData() {
+    return zipData;
+  }
+
+  public void setZipData(ZipInputStream zipData) {
+    this.zipData = zipData;
+  }
+
+  public long getEndTimeMs() {
+    return endTimeMs;
+  }
+
+  public void setEndTimeMs(long endTimeMs) {
+    this.endTimeMs = endTimeMs;
+  }
 }

@@ -9,13 +9,31 @@
     <div class="row" ng-repeat='(fileId, fileUpload) in fileUploads'
          style="border:2px dotted grey; padding:10px;margin:10px;">
         <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
-            <span class="upload-file-name">{{fileUpload.fileName}}</span>
+            <span class="upload-file-name"><strong>{{fileUpload.fileName}}</strong></span>
         </div>
-        <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;">
-            {{fileUpload.numberOfMessages}} messages
+        <div class="col-md-2" ng-if="fileUpload.status == 'reading'">
+            reading file ...
+          <br /><span ng-if="fileUpload.numberOfMessages > 0">{{fileUpload.numberOfMessages}} loaded</span>
+        </div>
+        <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;" ng-if="fileUpload.status == 'started'">
+          {{fileUpload.numberProcessed}} of {{fileUpload.numberOfMessages}}<br />
+            ({{fileUpload.averageElapsed}} ms avg)
+        </div>
+        <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;" ng-if="fileUpload.status == 'finished'">
+        {{fileUpload.numberProcessed}} messages<br />
+        ({{fileUpload.averageElapsed}} ms avg)<br />
+        Elapsed - {{fileUpload.elapsedTimeMs | duration}}<br />
+        </div>
+        <div class="col-md-2" style="padding-top:5px;padding-bottom:5px;" ng-if="fileUpload.status == 'deleting'">
+        {{fileUpload.numberProcessed}} messages<br />
+        ({{fileUpload.averageElapsed}} ms avg)<br />
+        Deleting...<br />
         </div>
         <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
-            <uib-progressbar type="{{fileUpload.deleteRequested === true ? 'warning' : 'success'}}" style="margin-bottom:0px;"ng-class="{'active progress-striped' : fileUpload.percentage < 100 }" max="fileUpload.numberOfMessages" value="fileUpload.numberProcessed"><span style="color:white; white-space:nowrap;">{{fileUpload.percentage}} %</span></uib-progressbar>
+        <uib-progressbar type="{{fileUpload.deleteRequested === true ? 'warning' : 'success'}}" style="margin-bottom:0px;"ng-class="{'active progress-striped' : fileUpload.percentage < 100 }" max="fileUpload.numberOfMessages" value="fileUpload.numberProcessed"><span style="color:white; white-space:nowrap;">{{fileUpload.percentage}} %</span></uib-progressbar>
+          <div ng-if="fileUpload.status == 'started'">
+            ({{fileUpload.numberUnProcessed * fileUpload.averageElapsed | duration}} estimated remaining)
+          </div>
         </div>
         <div class="col-md-1">
             <button class="btn btn-default" type="submit" ng-click="downloadAcks(fileId)" ng-disabled="fileUpload.percentage < 100"><i class="glyphicon glyphicon-download-alt" aria-hidden="true"></i> Acks</button>
