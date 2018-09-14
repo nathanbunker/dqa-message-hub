@@ -1,12 +1,17 @@
 package org.immregistries.mqe.hub.report.viewer;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
@@ -33,6 +38,18 @@ public class MessageMetadata {
 
   @NotNull
   private String provider;
+
+  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
+  public List<MessageDetection> detections = new ArrayList<>();
+
+  public List<MessageDetection> getDetections() {
+    return detections;
+  }
+
+  public void setDetections(
+      List<MessageDetection> detections) {
+    this.detections = detections;
+  }
 
   public Date getInputTime() {
     return inputTime;

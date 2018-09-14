@@ -13,6 +13,13 @@ textarea {
     text-transform: uppercase;
 }
 
+.panel-danger>.panel-heading {
+    background-color: white;
+}
+
+.detection-warn {
+    color:#828282;
+}
 .loading span {
     font-size: larger;
 }

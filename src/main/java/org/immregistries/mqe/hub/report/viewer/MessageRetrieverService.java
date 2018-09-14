@@ -22,7 +22,8 @@ public class MessageRetrieverService {
       .getLogger(MessageRetrieverService.class);
 
   @Autowired
-  MessageMetadataJpaRepository mmRepo;
+  MessagesViewJpaRepository mvRepo;
+
   private final MessageParser parser = new MessageParserHL7();
 
   public MessageListContainer getMessages(String providerKey, Date dateCreated,
@@ -34,8 +35,18 @@ public class MessageRetrieverService {
 
     Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "inputTime");
 
-    LOGGER.info("getMessages NO FILTER");
-    mvpage = mmRepo.findByProviderAndDatePaged(providerKey, dateCreated, pager);
+    if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
+      mvpage = mvRepo
+          .findByProviderAndDateAndMessageText(providerKey, dateCreated, filters.getMessageText(),
+              pager);
+    } else if (!filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
+      mvpage = mvRepo.findByDetectionId(providerKey, dateCreated, filters.getDetectionId(), pager);
+    } else if (filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
+      mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateCreated, filters.getDetectionId(), filters.getMessageText(), pager);
+    } else {
+      LOGGER.info("getMessages NO FILTER");
+      mvpage = mvRepo.findByProviderAndDate(providerKey, dateCreated, pager);
+    }
 
     long totalElements = 0;
     int totalPages = 0;

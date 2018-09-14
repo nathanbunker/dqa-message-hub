@@ -1,5 +1,6 @@
 package org.immregistries.mqe.hub.report.viewer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MessageDetailItem {
@@ -9,6 +10,16 @@ public class MessageDetailItem {
   private String providerKey;
   private String messageReceived;
   private String messageResponse;
+  private List<DetectionDetail> detections = new ArrayList<>();
+
+  public List<DetectionDetail> getDetections() {
+    return detections;
+  }
+
+  public void setDetections(
+      List<DetectionDetail> detections) {
+    this.detections = detections;
+  }
 
   /**
    * @return the messageMetaData

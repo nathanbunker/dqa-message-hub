@@ -13,6 +13,21 @@ angular.module('messageHubDemoApp')
   return $resource('messages/:id');
 })
 
+// .factory("FacilityDetail", function($resource, $stateParams) {
+//   return {
+//     getFacility: function(urlParts) {
+//       console.log(urlParts);
+//       return $resource('facilities/pin/:pin').get({pin: urlParts.pin})
+//       .$promise.then(function(data) {
+//         var returnData = {'urlParts':urlParts ,'facility':data};
+//         console.log("about to return some great data: ");
+//         console.log(returnData);
+//         return returnData;
+//       });
+//     }
+//   }
+// })
+
 .factory('FacilityList', function ($resource) {
   return $resource('facilities/');
 })

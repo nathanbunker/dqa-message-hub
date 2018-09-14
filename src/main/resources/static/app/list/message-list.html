@@ -1,371 +1,396 @@
 <style>
-.vertical-align {
+  .vertical-align {
     display: flex;
     align-items: center;
-}
+  }
 </style>
-<span class="glyphicon glyphicon-chevron-left text-primary"></span> <a ui-sref="landing-page" ng-click="console.clear()" >Select Provider</a>
+<span class="glyphicon glyphicon-chevron-left text-primary"></span> <a ui-sref="landing-page"
+                                                                       ng-click="console.clear()">Select
+  Provider</a>
 <div class="container">
-<!-- <div class="container"> -->
-<div class="row" style="padding-top:40px;">
-	  <div class="col-md-8">
-	  	<h2 class="messageList-header">{{::provider.key}} </h2>
-	  </div>
-	  <div class="col-md-4">
-	  	<div class="row vertical-align">
-	  		<div class="col-md-2">
-		  		<div><button type="button" class="btn btn-default btn-sm pull-right" ng-click="incrementDate(-1)"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
-		  		</div>
-		  	</div>
-		  	<div class="col-md-8 text-center" style="font-size:2em;font-weight:bold;">
-				{{searchOptions.date | date : 'MM · dd · yyyy'}}
-			</div>
-			<div class="col-md-2 ">
-				<button type="button" class="btn btn-default btn-sm pull-left" ng-click="incrementDate(1)"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
-			</div>
-	  	</div>
-  		<div class="col-md-6 col-md-offset-3">
-  			<p style="color:grey;">received date</p>
-  		</div>
-	  </div>
-</div>
+  <!-- <div class="container"> -->
+  <div class="row" style="padding-top:40px;">
+    <div class="col-md-8">
+      <h2 class="messageList-header">{{::provider.key}} </h2>
+    </div>
+    <div class="col-md-4">
+      <div class="row vertical-align">
+        <div class="col-md-2">
+          <div>
+            <button type="button" class="btn btn-default btn-sm pull-right"
+                    ng-click="incrementDate(-1)"><i class="fa fa-chevron-left"
+                                                    aria-hidden="true"></i></button>
+          </div>
+        </div>
+        <div class="col-md-8 text-center" style="font-size:2em;font-weight:bold;">
+          {{searchOptions.date | date : 'MM · dd · yyyy'}}
+        </div>
+        <div class="col-md-2 ">
+          <button type="button" class="btn btn-default btn-sm pull-left"
+                  ng-click="incrementDate(1)"><i class="fa fa-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-6 col-md-offset-3">
+        <p style="color:grey;">received date</p>
+      </div>
+    </div>
+  </div>
 
 
-<!--<div class="row">-->
-   <!--<div class="col-md-4">-->
-		<!--<button type="button" class="btn btn-primary btn-sm" ng-click="openModal()"><i class="fa fa-filter" aria-hidden="true"></i> Filter</button>-->
-   <!--</div>-->
-<!--</div>-->
+  <div class="row">
+    <div class="col-md-4">
+      <button type="button" class="btn btn-primary btn-sm" ng-click="openModal()"><i
+          class="fa fa-filter" aria-hidden="true"></i> Filter
+      </button>
+    </div>
+  </div>
 
-<!--<div class="row" ng-if="searchOptions.filters.messageSearchText">-->
-   <!--<div class="col-md-12">-->
-   		<!--<span class="col-md-2 h5" style="color:grey;">-->
-	    	<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('messageSearchText')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
-				<!--Message Search:-->
-		<!--</span>-->
-		<!--<span class="col-md-8 h4">{{::searchOptions.filters.messageSearchText}}</span>-->
-   <!--</div>-->
-<!--</div>-->
-<!--<div class="row" ng-if="searchOptions.filters.ackStatus">-->
-   <!--<div class="col-md-12">-->
-   		<!--<span class="col-md-2 h5" style="color:grey;">-->
-			<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('ackStatus')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
-			<!--Ack Status:-->
-		<!--</span>-->
-		<!--<span class="col-md-8 h4">-->
-			<!--{{searchOptions.filters.ackStatus}}-->
-		<!--</span> -->
-   <!--</div>-->
-<!--</div>-->
-<!--<div class="row" ng-if="searchOptions.filters.statisticId" >-->
-   <!--<div class="col-md-12">-->
-		<!--<span class="col-md-2 h5" style="color:grey;">-->
-			<!--<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('statisticId')"> <i class="fa fa-times" aria-hidden="true"></i> </button>-->
-			<!--ESSR Statistic:-->
-		<!--</span>-->
-		<!--<span class="col-md-8 h4">{{filterStatName}}</span>-->
-   <!--</div>-->
-<!--</div>-->
+  <div class="row" ng-if="searchOptions.filters.messageSearchText">
+    <div class="col-md-12">
+   		<span class="col-md-2 h5" style="color:grey;">
+	    	<button type="button" class="btn btn-default btn-xs"
+                ng-click="clearFilter('messageSearchText')"> <i class="fa fa-times"
+                                                                aria-hidden="true"></i> </button>
+				Message Search:
+		</span>
+      <span class="col-md-8 h4">{{::searchOptions.filters.messageSearchText}}</span>
+    </div>
+  </div>
+  <div class="row" ng-if="searchOptions.filters.detectionId">
+    <div class="col-md-12">
+		<span class="col-md-2 h5" style="color:grey;">
+			<button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('detectionId')"> <i
+          class="fa fa-times" aria-hidden="true"></i> </button>
+			MQE Detection:
+		</span>
+      <span class="col-md-6 h4"> {{::filterDetectionName}} ({{::searchOptions.filters.detectionId}})</span>
+    </div>
+  </div>
 
-<div class="row"  >
-	<div class="col-md-12"  >
+  <div class="row">
+    <div class="col-md-12">
 		
-			<span ng-if="!calendarPopulated" style="position:absolute;z-index:2;margin-top:114px;margin-left:541px;">
+			<span ng-if="!calendarPopulated"
+            style="position:absolute;z-index:2;margin-top:114px;margin-left:541px;">
 				<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
 				<span class="sr-only">Chart Populating...</span>
 			</span>
-		
-		<div >
-				<div style="height:240px;" 
-					agc-on-select="handleChartClick(selectedItem)"
-					google-chart	
-					chart="myChartObject"
-					agc-on-ready="readyHandler(chartWrapper)">
-				</div>
-		</div>
-	</div>
-</div>
 
-<div class="row">
-	<div class="col-md-1" style="margin-left: -75px;
+      <div>
+        <div style="height:240px;"
+             agc-on-select="handleChartClick(selectedItem)"
+             google-chart
+             chart="myChartObject"
+             agc-on-ready="readyHandler(chartWrapper)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-1" style="margin-left: -75px;
 		    margin-top: -175px;">
-		<div style="height:73px">
-			<button ng-show="calendarDisplayYear < currentYear" 
-			style="
+      <div style="height:73px">
+        <button ng-show="calendarDisplayYear < currentYear"
+                style="
 		    font-size: 3em;
 		    border: none;
 		    color: #D3D3D3;"
-		    type="button" class="btn btn-default btn-sm" ng-click="nextYear();"><i class="fa fa-chevron-right" aria-hidden="true"></i></button>
-	    </div>
-	    <div style="height:73px"> 
-			<button  ng-show="calendarDisplayYear > 2010" 
-			style="
+                type="button" class="btn btn-default btn-sm" ng-click="nextYear();"><i
+            class="fa fa-chevron-right" aria-hidden="true"></i></button>
+      </div>
+      <div style="height:73px">
+        <button ng-show="calendarDisplayYear > 2010"
+                style="
 		    font-size: 3em;
 		    border: none;
-		    color: #D3D3D3;" type="button" class="btn btn-default btn-sm" ng-click="prevYear();"><i class="fa fa-chevron-left" aria-hidden="true"></i></button>
-		</div>
+		    color: #D3D3D3;" type="button" class="btn btn-default btn-sm" ng-click="prevYear();"><i
+            class="fa fa-chevron-left" aria-hidden="true"></i></button>
+      </div>
     </div>
-</div>
+  </div>
 
-<!--REPORT SECTION: -->
-    <uib-tabset active="activeJustified">
-        <uib-tab index="0" heading="Messages">
-            <div class="row">
-                <div class="col-md-4">
-                    <h4>Messages
-                        <span ng-if="resultsMetaData.totalElements">({{resultsMetaData.totalElements}})</span>
-                    </h4>
-                </div>
+  <!--REPORT SECTION: -->
+  <uib-tabset active="activeJustified">
+    <uib-tab index="0" heading="Messages">
+      <div class="row">
+        <div class="col-md-4">
+          <h4>Messages
+            <span ng-if="resultsMetaData.totalElements">({{resultsMetaData.totalElements}})</span>
+          </h4>
+        </div>
 
-            </div>
+      </div>
 
 
-            <div class="row">
-                <div class="col-md-12">
-                    <!-- ng-if="!listloaded" -->
-                    <span ng-if="!listloaded" class="col-md-12" style="position:absolute;z-index:2;margin-top:64px;text-align:center;">
+      <div class="row">
+        <div class="col-md-12">
+          <!-- ng-if="!listloaded" -->
+          <span ng-if="!listloaded" class="col-md-12"
+                style="position:absolute;z-index:2;margin-top:64px;text-align:center;">
 				<i class="fa fa-cog fa-spin fa-3x fa-fw"></i>
 				<span class="sr-only">Chart Populating...</span>
 		</span>
-                    <div ng-class="{'text-muted':listloaded != true}">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th class="col-md-3">Message Control ID</th>
-                                <th class="col-md-2">Patient Name</th>
-                                <th class="col-md-4">CVX or NDC</th>
-                                <th class="col-md-3">Message Received Date</th>
-                                <th class="col-md-1">Ack Status</th>
-                            </tr>
-                            </thead>
-                            <!-- 			 ng-click="setSelected();" -->
-                            <!--  -->
-                            <tr ng-repeat="message in resultsMetaData.messages" >
-                                <td>
-                                    <a ui-sref="message-detail({id: message.id})" ng-click="console.clear();">{{message.messageControlId}}</a>
-                                    <!-- <a href="#/messages/{{message.id}}" >{{message.messageControlId}}</a> -->
-                                </td>
-                                <td>{{::message.patientName}}</td>
-                                <td>{{::message.cvxList}}</td>
-                                <td>{{::message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
-                                <td >
-                                    <button class="btn btn-xs btn-success"
-                                            ng-class="{'btn-warning':message.ackStatus == 'AE', 'btn-danger':message.ackStatus == 'AR'} "
-                                            style="cursor:default;"
-                                    >{{::message.ackStatus}}</button>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <uib-pagination total-items="resultsMetaData.totalElements"
-                                    ng-model="resultsMetaData.page"
-                                    ng-change="pagingClicked()"
-                                    boundary-link-numbers="true"
-                                    rotate="false"
-                                    items-per-page="resultsMetaData.elementsPerPage"
-                                    boundary-links="false"
-                                    force-ellipses="false"
-                                    max-size="resultsMetaData.maxSize"
-                                    previous-text="Prev"
-                    >
-                    </uib-pagination>
-                </div>
-            </div>
-        </uib-tab>
+          <div ng-class="{'text-muted':listloaded != true}">
+            <table class="table table-striped">
+              <thead>
+              <tr>
+                <th class="col-md-3">Message Control ID</th>
+                <th class="col-md-2">Patient Name</th>
+                <th class="col-md-4">CVX or NDC</th>
+                <th class="col-md-3">Message Received Date</th>
+                <th class="col-md-1">Ack Status</th>
+              </tr>
+              </thead>
+              <!-- 			 ng-click="setSelected();" -->
+              <!--  -->
+              <tr ng-repeat="message in resultsMetaData.messages">
+                <td>
+                  <a ui-sref="message-detail({id: message.id})" ng-click="console.clear();">{{message.messageControlId}}</a>
+                  <!-- <a href="#/messages/{{message.id}}" >{{message.messageControlId}}</a> -->
+                </td>
+                <td>{{::message.patientName}}</td>
+                <td>{{::message.cvxList}}</td>
+                <td>{{::message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                <td>
+                  <button class="btn btn-xs btn-success"
+                          ng-class="{'btn-warning':message.ackStatus == 'AE', 'btn-danger':message.ackStatus == 'AR'} "
+                          style="cursor:default;"
+                  >{{::message.ackStatus}}
+                  </button>
+                </td>
+              </tr>
+            </table>
+          </div>
+          <uib-pagination total-items="resultsMetaData.totalElements"
+                          ng-model="resultsMetaData.page"
+                          ng-change="pagingClicked()"
+                          boundary-link-numbers="true"
+                          rotate="false"
+                          items-per-page="resultsMetaData.elementsPerPage"
+                          boundary-links="false"
+                          force-ellipses="false"
+                          max-size="resultsMetaData.maxSize"
+                          previous-text="Prev"
+          >
+          </uib-pagination>
+        </div>
+      </div>
+    </uib-tab>
 
-        <uib-tab index="1" heading="Errors/Warnings">
-            <div class="heading row">
-                <h4>Detections</h4>
-            </div>
-            <div><h4>Errors</h4>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th class="col-md-1">Count</th>
-                        <th class="col-md-3">Issue</th>
-                        <th class="col-md-1">Code</th>
-                        <th class="col-md-8">Location</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'ERROR'}">
-                        <td>{{issue.count}}</td>
-                        <td>{{issue.applicationErrorCode.alternateText}}</td>
-                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                        <td><span ng-repeat="location in issue.hl7LocationList">
+    <uib-tab index="1" heading="Errors/Warnings">
+      <div class="heading row">
+        <h4>Detections</h4>
+      </div>
+      <div><h4>Errors</h4>
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="col-md-1">Count</th>
+            <th class="col-md-4">Issue</th>
+            <th class="col-md-1">Code</th>
+            <th class="col-md-1">Location</th>
+            <th class="col-md-1">filter</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'ERROR'}">
+            <td>{{issue.count}}</td>
+            <td>{{issue.applicationErrorCode.alternateText}}</td>
+            <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+            <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 						</span>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div><h4>Warnings</h4>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th class="col-md-1">Count</th>
-                        <th class="col-md-3">Issue</th>
-                        <th class="col-md-1">Code</th>
-                        <th class="col-md-8">Location</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
-                        <td>{{issue.count}}</td>
-                        <td>{{issue.applicationErrorCode.alternateText}}</td>
-                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                        <td><span ng-repeat="location in issue.hl7LocationList">
+            </td>
+            <td>
+              <button type="button"
+                      ng-class="(issue.applicationErrorCode.alternateIdentifier == searchOptions.filters.detectionId) ? 'btn-success' : 'btn-default'"
+                      class="btn btn-xs"
+                      ng-click="toggleDetection(issue.applicationErrorCode.alternateIdentifier);">
+                <i class="fa fa-filter" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div><h4>Warnings</h4>
+        <table class="table">
+          <thead>
+          <tr>
+            <th class="col-md-1">Count</th>
+            <th class="col-md-4">Issue</th>
+            <th class="col-md-1">Code</th>
+            <th class="col-md-1">Location</th>
+            <th class="col-md-1">filter</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat="issue in report.detectionCounts | filter:{ severity : 'WARN'}">
+            <td>{{issue.count}}</td>
+            <td>{{issue.applicationErrorCode.alternateText}}</td>
+            <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+            <td><span ng-repeat="location in issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 						</span>
-                        </td>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </uib-tab>
+    <uib-tab index="2" heading="Codes">
+      <div class="heading row">
+        <h4>Codes Received</h4>
+      </div>
+      <div class="row">
+        <div class="col-md-9">
+          <!--<img src="img/codes_received.png">-->
+          <!--<pre>{{codesMap|json}}</pre>-->
+          <div ng-repeat='(ct, codeArray) in codesMap.map '>
+            <h3>{{ct}}</h3>
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-2">Code</th>
+                <th class="col-md-4">Label</th>
+                <th class="col-md-2">Status</th>
+                <th class="col-md-1">Count</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="code in orderedCodes = (codeArray | orderBy:'-value')">
+                <td>{{code.value}}</td>
+                <td>{{code.label}}</td>
+                <td>{{code.status}}</td>
+                <!--<td>{{code.attribute}}</td>-->
+                <td>{{code.count}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </uib-tab>
+    <uib-tab index="3" heading="Vaccines">
+      <div class="heading row">
+        <h4>Vaccines Administered</h4>
+      </div>
+      <div class="row">
+        <div class="col-md-9">
+          <p>Counts of all administered vaccines reported grouped by age groups and vaccine
+            type.</p>
+          <div ng-repeat='(vaccinesType, vaccinesArray) in vaccinationsMap.map '>
+            <h3>{{vaccinesType}}</h3>
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-4">Vaccine Reported</th>
+                <th class="col-md-3">Count</th>
+                <th class="col-md-3">Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')">
+                <td>{{vaccines.vaccine}}</td>
+                <td>{{vaccines.count}}</td>
+                <td>{{vaccines.status}}</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </uib-tab>
+    <uib-tab index="4" heading="Report">
+      <div>
+        <div class="row">
+          <div class="col-md-12">
+            <div class="heading row">
+              <h4>Report - Score: <span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span>
+              </h4>
+            </div>
+          </div>
+        </div>
+        <!--END ISSUE LISTING-->
+        <div class="row">
+          <!--ng-if="loaded" ng-show="!showReport">-->
+          <div class="col-md-12">
+            <div class="heading row">
+              <h4>Completeness</h4>
+            </div>
+            <div id="completeness">
+              <div class="row">
+                <div class="col-md-12">
+                  <p class="dottedbox"> Completeness measures how many required, expected and
+                    recommended fields have been received and also indicates if expected
+                    vaccinations have been reported. </p>
+                  <h3>Score</h3>
+                  <table>
+                    <tr>
+                      <th align="center">Completeness Score</th>
+                      <th align="center">Description</th>
                     </tr>
-                    </tbody>
-                </table>
-            </div>
-        </uib-tab>
-        <uib-tab index="2" heading="Codes">
-            <div class="heading row">
-                <h4>Codes Received</h4>
-            </div>
-            <div class="row">
-                <div class="col-md-9">
-                    <!--<img src="img/codes_received.png">-->
-	                <!--<pre>{{codesMap|json}}</pre>-->
-                    <div ng-repeat='(codeType, codeArray) in codesMap.map '>
-	                    <h3>{{codeType}}</h3>
-						<table class="table">
-	                    <thead>
-	                    <tr>
-	                        <th class="col-md-2">Code</th>
-	                        <th class="col-md-4">Label</th>
-	                        <th class="col-md-2">Status</th>
-	                        <th class="col-md-1">Count</th>
-	                    </tr>
-	                    </thead>
-	                    <tbody>
-	                     <tr ng-repeat="code in orderedCodes = (codeArray | orderBy:'-value')">
-	                     	<td>{{code.value}}</td>
-	                     	<td>{{code.label}}</td>
-	                     	<td>{{code.status}}</td>
-	                     	<!--<td>{{code.attribute}}</td>-->
-	                     	<td>{{code.count}}</td>
-	                     </tr>
-	                     </tbody>
-	                     </table>
-	                </div>
+                    <tr>
+                      <td align="center"><span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span>
+                      </th>
+                      <td align="center"><span class="score"><span class="good">Good</span></span>
+                      </th>
+                    </tr>
+                  </table>
                 </div>
-            </div>
-        </uib-tab>
-        <uib-tab index="3" heading="Vaccines">
-            <div class="heading row">
-                <h4>Vaccines Administered</h4>
-            </div>
-            <div class="row">
-                <div class="col-md-9">
-                   <p>Counts of all administered vaccines reported grouped by age groups and vaccine type.</p>
-                    <div ng-repeat='(vaccinesType, vaccinesArray) in vaccinationsMap.map '>
-	                    <h3>{{vaccinesType}}</h3>
-						<table class="table">
-	                    <thead>
-	                    <tr>
-	                        <th class="col-md-4">Vaccine Reported</th>
-	                        <th class="col-md-3">Count</th>
-	                        <th class="col-md-3">Status</th>
-	                    </tr>
-	                    </thead>
-	                    <tbody>
-	                     <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')">
-	                     	<td>{{vaccines.vaccine}}</td>
-	                     	<td>{{vaccines.count}}</td>
-	                     	<td>{{vaccines.status}}</td>
-	                     </tr>
-	                     </tbody>
-	                     </table>
-	                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <div ng-repeat="section in report.scoreGroups">
+                    <h3>{{section.label}}</h3>
+                    <table>
+                      <tr>
+                        <th align="left">Patient Fields</th>
+                        <th align="left">HL7 Field</th>
+                        <th>Score</th>
+                        <th>Value Present</th>
+                        <!-- <th>Score Percent</th> -->
+                        <!-- <th>Evaluation</th> -->
+                      </tr>
+                      <tr>
+                        <td class="highlight">Overall</td>
+                        <td class="highlight"></td>
+                        <td class="highlight" align="center">
+                          {{section.sectionScore.scored}}/{{section.sectionScore.potential}}
+                        </td>
+                        <td class="highlight" align="center">&nbsp</td>
+                        <!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
+                        <!-- 						            <td class="highlight" align="center"><span class="good">Excellent</span></td> -->
+                      </tr>
+                      <tr ng-repeat-start="field in section.scores">
+                        <td align="left">{{field.reportFieldDefinition.label}}</td>
+                        <td align="center">{{field.reportFieldDefinition.field.hl7Field}}</td>
+                        <td align="center">{{field.fieldScore.scored}} /
+                          {{field.fieldScore.potential}}
+                        </td>
+                        <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
+                        <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
+                        <!-- <td align="center"><span class="excellent">Excellent</span></td> -->
+                      </tr>
+                      <tr ng-repeat="issue in field.issueScores" ng-repeat-end>
+                        <td style="text-align:right;">{{issue.detectionType}}</td>
+                        <td></td>
+                        <td style="text-align:center;">-{{issue.issueDemerit}}</td>
+                        <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
+              </div>
             </div>
-        </uib-tab>
-        <uib-tab index="4" heading="Report">
-            <div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="heading row">
-                            <h4>Report - Score: <span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></h4>
-                        </div>
-                    </div>
-                </div>
-                <!--END ISSUE LISTING-->
-                <div class="row" >
-                    <!--ng-if="loaded" ng-show="!showReport">-->
-                    <div class="col-md-12">
-                        <div class="heading row">
-                            <h4>Completeness</h4>
-                        </div>
-                        <div id="completeness">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <p class="dottedbox"> Completeness measures how many required, expected and recommended fields have been received and also indicates if expected vaccinations have been reported. </p>
-                                    <h3>Score</h3>
-                                    <table>
-                                        <tr>
-                                            <th align="center">Completeness Score</th>
-                                            <th align="center">Description</th>
-                                        </tr>
-                                        <tr>
-                                            <td align="center"><span class="score">{{report.reportScore.scored}}/{{report.reportScore.potential}}</span></th>
-                                            <td align="center"><span class="score"><span class="good">Good</span></span>
-                                            </th>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div ng-repeat="section in report.scoreGroups">
-                                        <h3>{{section.label}}</h3>
-                                        <table>
-                                            <tr>
-                                                <th align="left">Patient Fields</th>
-                                                <th align="left">HL7 Field</th>
-                                                <th>Score</th>
-                                                <th>Value Present</th>
-                                                <!-- <th>Score Percent</th> -->
-                                                <!-- <th>Evaluation</th> -->
-                                            </tr>
-                                            <tr>
-                                                <td class="highlight">Overall</td>
-                                                <td class="highlight"></td>
-                                                <td class="highlight" align="center">{{section.sectionScore.scored}}/{{section.sectionScore.potential}}</td>
-                                                <td class="highlight" align="center">&nbsp</td>
-                                                <!-- <td class="highlight">{{section.sectionScore.scored/section.sectionScore.potential * 100}}%</td> -->
-                                                <!-- 						            <td class="highlight" align="center"><span class="good">Excellent</span></td> -->
-                                            </tr>
-                                            <tr ng-repeat-start="field in section.scores">
-                                                <td align="left">{{field.reportFieldDefinition.label}}</td>
-                                                <td align="center">{{field.reportFieldDefinition.field.hl7Field}}</td>
-                                                <td align="center">{{field.fieldScore.scored}} / {{field.fieldScore.potential}}</td>
-                                                <td align="center">{{field.presentCount}} / {{field.expectedCount}}</td>
-                                                <!-- <td align="center">{{field.fieldScore.scored/field.fieldScore.potential * 100}}%</td> -->
-                                                <!-- <td align="center"><span class="excellent">Excellent</span></td> -->
-                                            </tr>
-                                            <tr  ng-repeat="issue in field.issueScores" ng-repeat-end>
-                                                <td style="text-align:right;">{{issue.detectionType}}</td>
-                                                <td></td>
-                                                <td style="text-align:center;">-{{issue.issueDemerit}}</td>
-                                                <td align="center">{{issue.issueCount}} / {{field.expectedCount}}</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
+        </div>
+      </div>
 
-        </uib-tab>
-    </uib-tabset>
+    </uib-tab>
+  </uib-tabset>
 
 
 
