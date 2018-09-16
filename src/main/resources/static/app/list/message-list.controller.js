@@ -79,7 +79,10 @@ angular.module('messageHubDemoApp')
           $scope.searchOptions.filters.detectionId = detectionId;
           $scope.filterDetectionName = lookupDetectionName(detectionId);
           // populateCalendar();
-          $scope.reloadPageData();
+          // $scope.reloadPageData();
+          populateURL();
+          loadMessages();
+          $scope.activeJustified = 0;
           // $scope.showStats = false;
         };
 
@@ -394,7 +397,7 @@ angular.module('messageHubDemoApp')
 //	            }
         };
 
-        function getMessageList() {
+        function loadMessages() {
           console.log("getMessageList");
           $scope.listloaded = false;
 //		$scope.resultsMetaData.messages = {};
@@ -404,8 +407,7 @@ angular.module('messageHubDemoApp')
             date: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
             messages: $scope.resultsMetaData.elementsPerPage,
             page: $scope.resultsMetaData.page - 1,
-            filters: $filter('filterObjectToQueryString')(
-                $scope.searchOptions.filters)
+            filters: $filter('filterObjectToQueryString')($scope.searchOptions.filters)
           }, function (data) {
             $scope.resultsMetaData.messages = data.messageList;
             $scope.resultsMetaData.totalElements = data.totalMessages;
@@ -413,6 +415,9 @@ angular.module('messageHubDemoApp')
             console.log("getMessageList message list loaded.");
 //		}).$promise.then(function() {
           });
+        }
+
+        function getReport() {
           console.log("Reporter.get");
           $scope.report = {};
           Reporter.get({
@@ -420,9 +425,14 @@ angular.module('messageHubDemoApp')
             date: $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
           }, function (data) {
             $scope.report = data;
-            console.log("getMessageList message list loaded.");
+            console.log("looking up filter detection name for " + $scope.searchOptions.filters.detectionId);
+            $scope.filterDetectionName = lookupDetectionName($scope.searchOptions.filters.detectionId);
+            console.log("report data loaded.");
 //		}).$promise.then(function() {
           });
+        }
+
+        function getCodes() {
           Coder.get({
             providerKey: $scope.provider.key,
             dateStart: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
@@ -434,6 +444,9 @@ angular.module('messageHubDemoApp')
             console.log("getMessageList codes list loaded.");
 //		}).$promise.then(function() {
           });
+        }
+
+        function getVaccines() {
           VaccineCodes.get({
             providerKey: $scope.provider.key,
             dateStart: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
@@ -445,7 +458,14 @@ angular.module('messageHubDemoApp')
             console.log("getMessageList vaccines list loaded.");
 //		}).$promise.then(function() {
           });
+        }
 
+
+        function getMessageList() {
+          loadMessages();
+          getReport();
+          getCodes();
+          getVaccines();
           console.log("getMessageList call started");
         }
 
@@ -512,8 +532,6 @@ angular.module('messageHubDemoApp')
             $scope.resultsMetaData.page = 1;
           }
           $scope.provider.key = pageData.providerKey;
-
-          $scope.filterDetectionName = lookupDetectionName(filters.detectionId);
 
           console.log("activate - About to get Messages");
           getMessageList();
