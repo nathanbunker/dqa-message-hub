@@ -8,8 +8,17 @@ public class VaccineReportGroup {
 
 
   private String label;
+  private int displayPriority;
   private String[] cvxList;
   private Map<AgeCategory, VaccineReportStatus> vaccineReportStatusMap = new HashMap<>();
+
+  public int getDisplayPriority() {
+    return displayPriority;
+  }
+  
+  public void setDisplayPriority(int displayPriority) {
+    this.displayPriority = displayPriority;
+  }
 
   public Map<AgeCategory, VaccineReportStatus> getVaccineReportStatusMap() {
     return vaccineReportStatusMap;

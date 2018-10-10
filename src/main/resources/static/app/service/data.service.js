@@ -127,6 +127,14 @@ angular.module('messageHubDemoApp')
   return $resource('codes/vaccinations/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
 })
 
+.factory('VaccineCodesExpected', function ($resource) {
+  return $resource('codes/vaccinationsExpected/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
+})
+
+.factory('VaccineCodesNotExpected', function ($resource) {
+  return $resource('codes/vaccinationsNotExpected/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
+})
+
 .directive('fileModel', ['$parse', function ($parse) {
   return {
     restrict: 'A',

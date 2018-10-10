@@ -293,12 +293,11 @@
     </uib-tab>
     <uib-tab index="3" heading="Vaccines">
       <div class="heading row">
-        <h4>Vaccines Administered</h4>
+        <h4>Vaccine Types Expected</h4>
       </div>
+
       <div class="row">
         <div class="col-md-9">
-          <p>Counts of all administered vaccines reported grouped by age groups and vaccine
-            type.</p>
           <div ng-repeat='(vaccinesType, vaccinesArray) in vaccinationsMap.map '>
             <h3>{{vaccinesType}}</h3>
             <table class="table">
@@ -310,7 +309,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-age')">
+              <tr ng-repeat="vaccines in orderedVaccines = (vaccinesArray | orderBy:'-ageOrder')">
                 <td>{{vaccines.vaccine}}</td>
                 <td>{{vaccines.count}}</td>
                 <td>{{vaccines.status}}</td>
@@ -320,6 +319,73 @@
           </div>
         </div>
       </div>
+      
+      <div class="row">
+        <div class="col-md-9">
+        <h4>New Expectation Table (For Discussion Only, Data is Not Correct)</h4>
+          <p>This section is not yet complete, but included to assist in discussion about how to make it work
+          correctly and be displayed correctly. The idea is to show the same information, as above, in a 
+          more compact and fast-to-read format. </p>
+          <table class="vaccineTypeTable" width="500">
+            <caption>Vaccines Expected</caption>
+            <thead>
+              <tr>
+              <th width="20%">&nbsp;</th>
+              <!-- TODO These need to be read in -->
+              <th width="20%">Baby</th>
+              <th width="20%">Child</th>
+              <th width="20%">Adolescent</th>
+              <th width="20%">Adult</th>
+              <th width="20%">Senior</th>
+              </tr>
+            </thead>
+              <tr ng-repeat='(vaccineReportGroup, vaccinesArrayExpected) in vaccinationsExpectedMap.map '>
+                <th>{{vaccineReportGroup}}</th>
+                <td class="{{vaccines.reportStyleClass}}" ng-repeat="vaccines in orderedVaccines = (vaccinesArrayExpected | orderBy:'-ageOrder')">{{vaccines.count}}</td>
+              </tr>
+          </table>
+        
+        
+        
+          <h5>How To Read Vaccine Types Expected Table</h5>
+          <p>The Vaccine Types Expected table shown above is designed for rapid evaluation of which administered vaccinations
+          where submitted for this selection of test messages. The counts in the table represent the number of administered vaccinations 
+          (excluding historical or otherwise not administered) grouped into vaccine type and age of patient when administered. The cells
+          are colored based on the expectations for Present / Not Present for each vaccine type and age group. </p>
+          <table class="vaccineTypeTable">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Present</th>
+                <th>Not Present</th>
+              </tr>
+              <tr>
+                <td>Expected</td>
+                <td class="vaccineTypePresentExpected">OK</td>
+                <td class="vaccineTypeNotPresentExpected">PROBLEM</td>
+              </tr>
+            </thead>
+              <tr>
+                <td>Possible</td>
+                <td class="vaccineTypePresentPossible">OK</td>
+                <td class="vaccineTypeNotPresentPossible">OK</td>
+              </tr>
+              <tr>
+                <td>Not Expected</td>
+                <td class="vaccineTypePresentNotExpected">REVIEW</td>
+                <td class="vaccineTypeNotPresentNotExpected">OK</td>
+              </tr>
+              <tr>
+                <td>Not Possible</td>
+                <td class="vaccineTypePresentNotPossible">PROBLEM</td>
+                <td class="vaccineTypeNotPresentNotPossible">OK</td>
+              </tr>
+          </table>
+        </div>
+      </div>      
+      
+      
+
     </uib-tab>
     <uib-tab index="4" heading="Report">
       <div>

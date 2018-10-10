@@ -1,5 +1,7 @@
 package org.immregistries.mqe.hub.report.vaccineReport;
 
+import java.math.BigInteger;
+
 public class AgeCategory {
 
   private String label;

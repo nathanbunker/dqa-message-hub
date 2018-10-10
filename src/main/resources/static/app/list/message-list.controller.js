@@ -3,10 +3,11 @@ angular.module('messageHubDemoApp')
 .controller('MessageListController',
     ['$scope', '$state', '$uibModal', '$filter', '$location', 'pageData',
       'googleChartApiConfig', 'MessageCountHistoryFactory',
-      'MessageListFactory', 'Reporter', '$q', 'Coder', 'VaccineCodes',
+      'MessageListFactory', 'Reporter', '$q', 'Coder', 'VaccineCodes', 
+      'VaccineCodesExpected', 'VaccineCodesNotExpected',
       function ($scope, $state, $uibModal, $filter, $location, pageData,
           googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory,
-          Reporter, $q, Coder, VaccineCodes) {
+          Reporter, $q, Coder, VaccineCodes, VaccineCodesExpected, VaccineCodesNotExpected) {
 
         /**
          * On PAGE LOAD:
@@ -61,6 +62,26 @@ angular.module('messageHubDemoApp')
             "age": "OTHER"
           }]
         };
+        $scope.vaccinationsExpectedMap = {
+                test: [{
+                  "vaccinationVisits": 0,
+                  "count": 6,
+                  "status": "Possible",
+                  "vaccine": "HepB",
+                  "percent": 0.0,
+                  "age": "Adolescent"
+                }]
+              };
+        $scope.vaccinationsNotExpectedMap = {
+                test: [{
+                  "vaccinationVisits": 0,
+                  "count": 6,
+                  "status": "Possible",
+                  "vaccine": "HepB",
+                  "percent": 0.0,
+                  "age": "Adolescent"
+                }]
+              };
 
         function lookupDetectionName(detectionId) {
           var dList = $scope.report.detectionCounts;
@@ -461,11 +482,42 @@ angular.module('messageHubDemoApp')
         }
 
 
+        function getVaccinesExpected() {
+            VaccineCodesExpected.get({
+              providerKey: $scope.provider.key,
+              dateStart: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+              dateEnd: $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
+            }, function (data) {
+
+              $scope.vaccinationsExpectedMap = data;
+              //alert(codeTypeArray);
+              console.log("getMessageList vaccines expected list loaded.");
+//  		}).$promise.then(function() {
+            });
+          }
+
+          function getVaccinesNotExpected() {
+              VaccineCodesNotExpected.get({
+                providerKey: $scope.provider.key,
+                dateStart: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
+                dateEnd: $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
+              }, function (data) {
+
+                $scope.vaccinationsExpectedMap = data;
+                //alert(codeTypeArray);
+                console.log("getMessageList vaccines not expected list loaded.");
+//    		}).$promise.then(function() {
+              });
+            }
+
+
         function getMessageList() {
           loadMessages();
           getReport();
           getCodes();
           getVaccines();
+          getVaccinesExpected();
+          getVaccinesNotExpected();
           console.log("getMessageList call started");
         }
 
