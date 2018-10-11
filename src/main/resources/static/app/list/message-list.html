@@ -115,6 +115,17 @@
         </div>
       </div>
 
+      <div class="row" ng-if="searchOptions.filters.codeValue">
+        <div class="col-md-12">
+		      <span class="col-md-2 h5" style="color:grey;">
+			      <button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('codeValue')"> <i
+                class="fa fa-times" aria-hidden="true"></i> </button>
+			        Code Filter:
+		      </span>
+          <span class="col-md-8 h4"> "{{searchOptions.filters.codeValue}}" - <span class="h6">{{searchOptions.filters.codeType}}</span></span>
+        </div>
+      </div>
+
       <div class="row" ng-if="searchOptions.filters.detectionId || searchOptions.filters.messageSearchText">
         <div class="col-md-12">
           <br />
@@ -145,11 +156,12 @@
             <table class="table table-striped">
               <thead>
               <tr>
-                <th class="col-md-3">Message Control ID</th>
+                <th class="col-md-2">Message Control ID</th>
                 <th class="col-md-2">Patient Name</th>
                 <th class="col-md-4">CVX or NDC</th>
-                <th class="col-md-3">Message Received Date</th>
-                <th class="col-md-1">Ack Status</th>
+                <th class="col-md-2">Message Received Date</th>
+                <!--<th class="col-md-1">Ack</th>-->
+                <th class="col-md-1">Warnings/Errors</th>
               </tr>
               </thead>
               <!-- 			 ng-click="setSelected();" -->
@@ -162,12 +174,26 @@
                 <td>{{::message.patientName}}</td>
                 <td>{{::message.cvxList}}</td>
                 <td>{{::message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                <!--<td>-->
+                  <!--<button class="btn btn-xs btn-success"-->
+                          <!--ng-class="{'btn-warning':message.ackStatus == 'AE', 'btn-danger':message.ackStatus == 'AR'} "-->
+                          <!--style="cursor:default;"-->
+                  <!--&gt;{{::message.ackStatus}}-->
+                  <!--</button>-->
+                <!--</td>-->
                 <td>
-                  <button class="btn btn-xs btn-success"
-                          ng-class="{'btn-warning':message.ackStatus == 'AE', 'btn-danger':message.ackStatus == 'AR'} "
-                          style="cursor:default;"
-                  >{{::message.ackStatus}}
+                  <span style="min-width: 22px;float: right;">
+                  <button ng-if="message.errorsCount > 0" class="btn btn-xs btn-danger"
+                          style="width:20px;cursor:default;"
+                  >{{::message.errorsCount}}
                   </button>
+                  </span>
+                  <span style="width: 27px;float: right;">
+                  <button ng-if="message.warningsCount > 0" class="btn btn-xs btn-warning"
+                          style="min-width: 22px;cursor:default;"
+                  >{{::message.warningsCount}}
+                  </button>
+                  </span>
                 </td>
               </tr>
             </table>
@@ -275,6 +301,7 @@
                 <th class="col-md-4">Label</th>
                 <th class="col-md-2">Status</th>
                 <th class="col-md-1">Count</th>
+                <th class="col-md-1">filter</th>
               </tr>
               </thead>
               <tbody>
@@ -284,6 +311,14 @@
                 <td>{{code.status}}</td>
                 <!--<td>{{code.attribute}}</td>-->
                 <td>{{code.count}}</td>
+                <td>
+                  <button type="button"
+                          ng-class="(code.value == searchOptions.filters.codeValue && code.typeCode == searchOptions.filters.codeType) ? 'btn-success' : 'btn-default'"
+                          class="btn btn-xs"
+                          ng-click="toggleCodeFilter(code.value, code.typeCode);">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                  </button>
+                </td>
               </tr>
               </tbody>
             </table>

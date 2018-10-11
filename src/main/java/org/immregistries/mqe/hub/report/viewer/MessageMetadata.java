@@ -42,6 +42,17 @@ public class MessageMetadata {
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageDetection> detections = new ArrayList<>();
 
+  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
+  public List<MessageCode> codes = new ArrayList<>();
+
+  public List<MessageCode> getCodes() {
+    return codes;
+  }
+
+  public void setCodes(List<MessageCode> codes) {
+    this.codes = codes;
+  }
+
   public List<MessageDetection> getDetections() {
     return detections;
   }

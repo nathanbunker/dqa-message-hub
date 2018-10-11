@@ -3,9 +3,11 @@ package org.immregistries.mqe.hub.report.viewer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.parser.HL7MessageMap;
 import org.immregistries.mqe.hl7util.parser.MessageParser;
 import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
+import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,7 @@ public class MessageRetrieverService {
     List<MessageMetadata> messages = new ArrayList<>();
     Page<MessageMetadata> mvpage = null;
 
-    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "inputTime");
+    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "id");
 
     if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
       mvpage = mvRepo
@@ -43,6 +45,8 @@ public class MessageRetrieverService {
       mvpage = mvRepo.findByDetectionId(providerKey, dateCreated, filters.getDetectionId(), pager);
     } else if (filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
       mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateCreated, filters.getDetectionId(), filters.getMessageText(), pager);
+    } else if (filters.isCodeTypeFilter() && filters.isCodeValueFilter()) {
+      mvpage = mvRepo.findByCodeValue(providerKey, dateCreated, filters.getCodeValue(), filters.getCodeType(), pager);
     } else {
       LOGGER.info("getMessages NO FILTER");
       mvpage = mvRepo.findByProviderAndDate(providerKey, dateCreated, pager);
@@ -99,6 +103,16 @@ public class MessageRetrieverService {
     String patientFirst = map.getValue("PID-5-2");
     String patientLast = map.getValue("PID-5-1");
     item.setPatientName(patientLast + ", " + patientFirst);
+
+    for (MessageDetection d : mv.getDetections()) {
+      Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
+      SeverityLevel sl = dt.getSeverity();
+      if (sl == SeverityLevel.ERROR) {
+        item.setErrorsCount(item.getErrorsCount() + 1);
+      } else if (sl == SeverityLevel.WARN) {
+        item.setWarningsCount(item.getWarningsCount() + 1);
+      }
+    }
 
     return item;
   }

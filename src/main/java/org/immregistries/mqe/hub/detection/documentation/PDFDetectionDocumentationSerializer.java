@@ -1,28 +1,5 @@
 package org.immregistries.mqe.hub.detection.documentation;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.validator.detection.DetectionDocumentation;
-import org.immregistries.mqe.validator.detection.DetectionDocumentation.DetectionDocumentationPayload;
-import org.immregistries.mqe.vxu.VxuField;
-import org.immregistries.mqe.vxu.VxuObject;
-import org.springframework.stereotype.Service;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorkerHelper;
 import com.hp.gagawa.java.elements.Body;
 import com.hp.gagawa.java.elements.H2;
 import com.hp.gagawa.java.elements.H3;
@@ -37,6 +14,21 @@ import com.hp.gagawa.java.elements.Text;
 import com.hp.gagawa.java.elements.Th;
 import com.hp.gagawa.java.elements.Thead;
 import com.hp.gagawa.java.elements.Tr;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.immregistries.mqe.validator.detection.DetectionDocumentation;
+import org.immregistries.mqe.validator.detection.DetectionDocumentation.DetectionDocumentationPayload;
+import org.immregistries.mqe.vxu.VxuObject;
+import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 @Service
 public class PDFDetectionDocumentationSerializer implements DetectionDocumentationSerializer<byte[]> {

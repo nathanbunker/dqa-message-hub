@@ -43,7 +43,7 @@ public class MessageInputController {
     return ack;
   }
 
-  @Transactional
+//  @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
   public String urlEncodedHttpFormPost(
       String MESSAGEDATA, String USERID, String PASSWORD, String FACILITYID) throws Exception {

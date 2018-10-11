@@ -107,6 +107,17 @@ angular.module('messageHubDemoApp')
           // $scope.showStats = false;
         };
 
+        $scope.toggleCodeFilter = function (codeValue, codeType) {
+          $scope.searchOptions.filters.codeValue = codeValue;
+          $scope.searchOptions.filters.codeType = codeType;
+          // populateCalendar();
+          // $scope.reloadPageData();
+          populateURL();
+          loadMessages();
+          $scope.activeJustified = 0;
+          // $scope.showStats = false;
+        };
+
         $scope.readyHandler = function (chartWrapper) {
           console.log("Message list Controller.  READY HANDLER");
           $scope.calendarChartWrapper = chartWrapper;
@@ -529,6 +540,9 @@ angular.module('messageHubDemoApp')
             $scope.searchOptions.filters.ackStatus = null;
           } else if (name === 'detectionId') {
             $scope.searchOptions.filters.detectionId = null;
+          } else if (name === 'codeValue') {
+            $scope.searchOptions.filters.codeValue = null;
+            $scope.searchOptions.filters.codeType = null;
           }
           // populateCalendar();
           $scope.reloadPageData();

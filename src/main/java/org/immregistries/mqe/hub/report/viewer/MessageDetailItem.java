@@ -11,6 +11,15 @@ public class MessageDetailItem {
   private String messageReceived;
   private String messageResponse;
   private List<DetectionDetail> detections = new ArrayList<>();
+  private List<CodeDetail> codes = new ArrayList<>();
+
+  public List<CodeDetail> getCodes() {
+    return codes;
+  }
+
+  public void setCodes(List<CodeDetail> codes) {
+    this.codes = codes;
+  }
 
   public List<DetectionDetail> getDetections() {
     return detections;

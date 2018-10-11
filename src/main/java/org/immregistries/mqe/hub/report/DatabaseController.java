@@ -59,7 +59,7 @@ public class DatabaseController {
     CodeCollection senderCodes = allDaysMetrics.getCodes();
     Map<String, List<CollectionBucket>> map = new TreeMap<>();
     for (CollectionBucket cb : senderCodes.getCodeCountList()) {
-      String s = cb.getType();
+      String s = cb.getTypeCode();
       VxuField f = VxuField.getByName(s);
       CodesetType t = f.getCodesetType();
       if (t == null) {
@@ -67,7 +67,7 @@ public class DatabaseController {
             "well...  this is embarrasing. there's a field with no type: " + f);
       }
       cb.setSource(f.getHl7Locator());
-      cb.setType(t.getDescription());
+      cb.setTypeName(t.getDescription());
       Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
       if (c != null) {
         if (c.getCodeStatus() != null && StringUtils.isNotBlank(c.getCodeStatus().getStatus())) {
@@ -82,18 +82,18 @@ public class DatabaseController {
         cb.setStatus("Unrecognized");
       }
 
-      List<CollectionBucket> list = map.get(cb.getType());
+      List<CollectionBucket> list = map.get(cb.getTypeName());
 
       if (list == null) {
         list = new ArrayList<>();
         list.add(cb);
-        map.put(cb.getType(), list);
+        map.put(cb.getTypeName(), list);
       } else {
         // we want to aggregate, and ignore the attributes, so we have to add them up,
         // since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getType().equals(cb.getType()) && bucket.getValue().equals(cb.getValue())
+          if (bucket.getTypeName().equals(cb.getTypeName()) && bucket.getValue().equals(cb.getValue())
               && bucket.getSource().equals(cb.getSource())) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;

@@ -9,6 +9,7 @@ import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.hub.report.SenderMetricsService;
+import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadata;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
@@ -21,6 +22,8 @@ import org.immregistries.mqe.validator.detection.ValidationReport;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
+import org.immregistries.mqe.validator.report.codes.CodeCollection;
+import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -126,15 +129,27 @@ public class Hl7MessageConsumer {
       }
     }
 
+    MqeMessageMetrics metrics = scorer.getMqeMetricsFor(response.getMqeResponse());
+    CodeCollection c = metrics.getCodes();
+    for (CollectionBucket cb : c.getCodeCountList()) {
+      MessageCode mc = new MessageCode();
+      mc.setCodeCount(cb.getCount());
+      mc.setCodeType(cb.getTypeCode());
+      mc.setCodeValue(cb.getValue());
+      mc.setCodeStatus(cb.getStatus());
+      mc.setMessageMetadata(mm);
+      mm.getCodes().add(mc);
+    }
     metaRepo.save(mm);
 
     return mm;
   }
 
-  private void saveMetricsFromValidationResults(String sender,
+  private MqeMessageMetrics saveMetricsFromValidationResults(String sender,
       MqeMessageServiceResponse validationResults, Date metricsDate) {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
     metricsSvc.addToSenderMetrics(sender, metricsDate, metrics);
+    return metrics;
   }
 
   private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults,

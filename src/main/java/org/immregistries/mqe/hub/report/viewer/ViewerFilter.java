@@ -13,9 +13,13 @@ public class ViewerFilter {
 
   private String messageText;
   private String detectionId;
+  private String codeValue;
+  private String codeType;
 
   private boolean messageTextFilter;
   private boolean detectionIdFilter;
+  private boolean codeValueFilter;
+  private boolean codeTypeFilter;
 
   public ViewerFilter(String rawAjaxFilterText) {
     if (StringUtils.isNotBlank(rawAjaxFilterText)) {
@@ -27,6 +31,18 @@ public class ViewerFilter {
     Map<String, String> filterMap = filterTextToMap(ajaxString);
     setMessageTextFilterFromString(filterMap.get("messageSearchText"));
     setDetectionIdFilterFromString(filterMap.get("detectionId"));
+    setCodeValueFilterFromString(filterMap.get("codeValue"));
+    setCodeTypeFilterFromString(filterMap.get("codeType"));
+  }
+
+  void setCodeValueFilterFromString(String codeValue) {
+    this.codeValue = codeValue;
+    this.codeValueFilter = StringUtils.isNotBlank(codeValue);
+  }
+
+  void setCodeTypeFilterFromString(String codeType) {
+      this.codeType = codeType;
+    this.codeTypeFilter = StringUtils.isNotBlank(codeType);
   }
 
   void setMessageTextFilterFromString(String messageTextSearch) {
@@ -85,4 +101,33 @@ public class ViewerFilter {
   public void setDetectionIdFilter(boolean detectionIdFilter) {
     this.detectionIdFilter = detectionIdFilter;
   }
+
+  public String getCodeValue() {
+    return codeValue;
+  }
+
+  public void setCodeValue(String codeValue) {
+    this.codeValue = codeValue;
+  }
+
+  public String getCodeType() {
+    return codeType;
+  }
+
+  public void setCodeType(String codeType) {
+    this.codeType = codeType;
+  }
+
+  public void setMessageTextFilter(boolean messageTextFilter) {
+    this.messageTextFilter = messageTextFilter;
+  }
+
+  public boolean isCodeValueFilter() {
+    return codeValueFilter;
+  }
+
+  public boolean isCodeTypeFilter() {
+    return codeTypeFilter;
+  }
+
 }

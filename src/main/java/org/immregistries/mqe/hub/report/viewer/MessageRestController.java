@@ -49,10 +49,12 @@ public class MessageRestController {
       @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
       @PathVariable("page") int pageNumber, @PathVariable("messages") int itemsCount,
       String filters) {
+
     LOGGER.info("jsonMessagesGetter - calling for messages.  ");
+
     ViewerFilter vf = new ViewerFilter(filters);
-    MessageListContainer container = messageRetreiver
-        .getMessages(providerKey, date, vf, pageNumber, itemsCount);
+
+    MessageListContainer container = messageRetreiver.getMessages(providerKey, date, vf, pageNumber, itemsCount);
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
             .getTotalPages() + " current page: " + container.getPageNumber());
@@ -75,6 +77,14 @@ public class MessageRestController {
     mdi.setVxuParts(vxuLocs);
     mdi.setMessageMetaData(mli);
     mdi.setProviderKey(mq.getProvider());
+    for (MessageCode mc : mq.getCodes()) {
+      CodeDetail cd = new CodeDetail();
+      cd.setCodeCount(mc.getCodeCount());
+      cd.setCodeStatus(mc.getCodeStatus());
+      cd.setCodeType(mc.getCodeType());
+      cd.setCodeValue(mc.getCodeValue());
+      mdi.getCodes().add(cd);
+    }
 
     List<MessageDetection> mdList = mq.getDetections();
     for (MessageDetection mdt : mdList) {

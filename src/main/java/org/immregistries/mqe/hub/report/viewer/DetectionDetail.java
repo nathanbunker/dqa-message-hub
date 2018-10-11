@@ -1,7 +1,5 @@
 package org.immregistries.mqe.hub.report.viewer;
 
-import org.immregistries.mqe.validator.detection.Detection;
-
 public class DetectionDetail {
   private String description;
   private String name;
