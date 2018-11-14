@@ -189,4 +189,13 @@ angular.module('messageHubDemoApp')
   return $resource('nist/validator/clear-exception');//clears the nist validator exception
 })
 
+.factory('CodeFactory', function($resource) {
+  return $resource('codes/:codesetType');
+})
+
+
+.factory('CodeTypeFactory', function($resource) {
+  return $resource('codes/');
+})
+
 ;

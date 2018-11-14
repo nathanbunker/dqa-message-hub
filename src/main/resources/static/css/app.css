@@ -55,11 +55,12 @@ body {
 
 
 span.h7h { /* #h7h stands for HL7 Highlight */
-    background-color: #cae3ea;
+    background-color: #5eb5c9;
     font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
     /* font-weight:bold; */
     font-size: 1em;
     font-weight: bold;
+    color:white;
     border-radius: .25em;
 }
 

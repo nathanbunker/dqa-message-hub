@@ -106,6 +106,13 @@ angular.module('messageHubDemoApp')
     }
   })
 
+  .state('code-page', {
+    url: "/codes",
+    templateUrl : 'app/codes/code-list.html',
+    controller:"CodeListController",
+    resolve:{}
+  })
+
   .state('settings', {
     url: "/settings",
     templateUrl: 'app/settings/settings.html',
