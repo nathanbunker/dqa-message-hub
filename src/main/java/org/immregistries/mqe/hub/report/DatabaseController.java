@@ -1,6 +1,8 @@
 package org.immregistries.mqe.hub.report;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +95,8 @@ public class DatabaseController {
         // since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getTypeName().equals(cb.getTypeName()) && bucket.getValue().equals(cb.getValue())
+          if (bucket.getTypeName().equals(cb.getTypeName())
+              && bucket.getValue().equals(cb.getValue())
               && bucket.getSource().equals(cb.getSource())) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;
@@ -168,6 +171,35 @@ public class DatabaseController {
     }
     return vcm;
   }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/vaccineReportGroupList/{providerKey}")
+  public List<VaccineReportGroup> getVaccineReportGroupList(
+      @PathVariable("providerKey") String providerKey) {
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    List<VaccineReportGroup> vrg = new ArrayList<>(vaccineReportConfig.getVaccineReportGroupList());
+    Collections.sort(vrg, new Comparator<VaccineReportGroup>() {
+      @Override
+      public int compare(VaccineReportGroup v1, VaccineReportGroup v2) {
+        if (v1.getDisplayPriority() < v2.getDisplayPriority()) {
+          return -1;
+        }
+        if (v1.getDisplayPriority() > v2.getDisplayPriority()) {
+          return 1;
+        }
+        return 0;
+      }
+    });
+    return vrg;
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/ageCategoryList/{providerKey}")
+  public List<AgeCategory> getAgeCategoryList(@PathVariable("providerKey") String providerKey) {
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    return vaccineReportConfig.getAgeCategoryList();
+  }
+
 
   @RequestMapping(method = RequestMethod.GET,
       value = "/vaccinationsExpected/{providerKey}/{dateStart}/{dateEnd}")
@@ -328,18 +360,18 @@ public class DatabaseController {
             break;
           case NOT_EXPECTED:
             reportStyleClass =
-            va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_EXPECTED
-                : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_EXPECTED;
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_EXPECTED
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_EXPECTED;
             break;
           case NOT_POSSIBLE:
             reportStyleClass =
-            va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_POSSIBLE
-                : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_POSSIBLE;
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_POSSIBLE
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_POSSIBLE;
             break;
           case POSSIBLE:
             reportStyleClass =
-            va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_POSSIBLE
-                : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_POSSIBLE;
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_POSSIBLE
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_POSSIBLE;
             break;
           default:
 

@@ -4,10 +4,11 @@ angular.module('messageHubDemoApp')
     ['$scope', '$state', '$uibModal', '$filter', '$location', 'pageData',
       'googleChartApiConfig', 'MessageCountHistoryFactory',
       'MessageListFactory', 'Reporter', '$q', 'Coder', 'VaccineCodes', 
-      'VaccineCodesExpected', 'VaccineCodesNotExpected',
+      'VaccineCodesExpected', 'VaccineCodesNotExpected', 'VaccineReportGroupList', 'AgeCategoryList',
       function ($scope, $state, $uibModal, $filter, $location, pageData,
           googleChartApiConfig, MessageCountHistoryFactory, MessageListFactory,
-          Reporter, $q, Coder, VaccineCodes, VaccineCodesExpected, VaccineCodesNotExpected) {
+          Reporter, $q, Coder, VaccineCodes, VaccineCodesExpected, VaccineCodesNotExpected,
+          VaccineReportGroupList, AgeCategoryList) {
 
         /**
          * On PAGE LOAD:
@@ -486,12 +487,30 @@ angular.module('messageHubDemoApp')
           }, function (data) {
 
             $scope.vaccinationsMap = data;
+            $scope.vaccinationsAge = Object.keys(data.map);
             //alert(codeTypeArray);
             console.log("getMessageList vaccines list loaded.");
 //		}).$promise.then(function() {
           });
         }
 
+        function getVaccineReportGroupList() {
+            VaccineReportGroupList.query({
+              providerKey: $scope.provider.key
+            }, function (data) {
+              $scope.vaccineReportGroupList = data;
+              console.log("getVaccineReportGroupList vaccine group list added.");
+            });
+          }
+        
+        function getAgeCategoryList() {
+        	AgeCategoryList.query({
+              providerKey: $scope.provider.key
+            }, function (data) {
+              $scope.ageCategoryList = data;
+              console.log("getAgeCategoryList age category list added.");
+            });
+          }
 
         function getVaccinesExpected() {
             VaccineCodesExpected.get({
@@ -529,6 +548,9 @@ angular.module('messageHubDemoApp')
           getVaccines();
           getVaccinesExpected();
           getVaccinesNotExpected();
+          getVaccineReportGroupList();
+          getAgeCategoryList();
+         
           console.log("getMessageList call started");
         }
 

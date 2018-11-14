@@ -1,8 +1,6 @@
 package org.immregistries.mqe.hub.report.vaccineReport;
 
-import java.math.BigInteger;
-
-public class AgeCategory {
+public class AgeCategory implements Comparable<AgeCategory> {
 
   private String label;
   private int ageLow;
@@ -44,5 +42,16 @@ public class AgeCategory {
 
   public boolean isInCategory(int age) {
     return age >= ageLow && age < ageHigh;
+  }
+
+  @Override
+  public int compareTo(AgeCategory ac) {
+    if (this.order < ac.order) {
+      return -1;
+    }
+    if (this.order > ac.order) {
+      return 1;
+    }
+    return 0;
   }
 }

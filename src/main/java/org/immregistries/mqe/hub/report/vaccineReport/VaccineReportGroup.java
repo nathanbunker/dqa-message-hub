@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class VaccineReportGroup {
+public class VaccineReportGroup implements Comparable<VaccineReportGroup> {
 
 
   private String label;
@@ -38,6 +38,19 @@ public class VaccineReportGroup {
   public VaccineReportGroup(String label, String... cvx) {
     this.label = label;
     this.cvxList = cvx;
+  }
+
+  @Override
+  public int compareTo(VaccineReportGroup other) {
+    if (this.displayPriority < other.displayPriority)
+    {
+      return -1;
+    }
+    if (this.displayPriority > other.displayPriority)
+    {
+      return -1;
+    }
+    return 0;
   }
 
 

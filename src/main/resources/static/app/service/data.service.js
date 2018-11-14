@@ -128,12 +128,24 @@ angular.module('messageHubDemoApp')
 })
 
 .factory('VaccineCodesExpected', function ($resource) {
-  return $resource('codes/vaccinationsExpected/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
+  return $resource('codes/vaccinationsExpected/:providerKey/:dateStart/:dateEnd');
 })
 
 .factory('VaccineCodesNotExpected', function ($resource) {
-  return $resource('codes/vaccinationsNotExpected/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
+  return $resource('codes/vaccinationsNotExpected/:providerKey/:dateStart/:dateEnd');
 })
+
+.factory('VaccineReportGroupList', function ($resource) {
+  return $resource('codes/vaccineReportGroupList/:providerKey');
+})
+
+.factory('AgeCategoryList', function ($resource) {
+  return $resource('codes/ageCategoryList/:providerKey');
+})
+
+
+
+
 
 .directive('fileModel', ['$parse', function ($parse) {
   return {
