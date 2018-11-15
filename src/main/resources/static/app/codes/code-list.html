@@ -1,29 +1,37 @@
 <h1>Codebase Codes</h1>
-Choose Code:
-<select name="repeatSelect" id="repeatSelect"
-        ng-options="item as item.description for item in codeOptions"
-        ng-model="codeTypeOption"
-        ng-change="loadCode()"
->
-</select>
-<div ng-if="codeTypeOption.description">
-  <h3>{{codeTypeOption.description}} Codes </h3>
+<div class="form-group typeahead">
+  Choose Code:
+  <select name="repeatSelect" id="repeatSelect"
+          ng-options="item as item.description for item in codeOptions"
+          ng-model="codeTypeOption"
+          ng-change="loadCode()"
+  >
+  </select>
+</div>
 
+
+<div ng-if="codeTypeOption.description">
   <div class="row"  ng-if="codeSet.length && codeSet.length > 0">
     <div class="col-md-6 ">
+      <h3>{{codeTypeOption.description}} Codes </h3>
       <h5>{{codeSet.length ? codeSet.length : 0}} codes</h5>
-        <div class="form-group has-feedback">
-          <label>Find Code: </label>
-          <input type="text" ng-model="filterText.$" class="form-control"
-                 placeholder="search"/>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group has-feedback">
+        <label>Find Code: </label>
+        <input type="text" ng-model="filterText.$" class="form-control"
+               placeholder="search"/>
 
-          <span ng-if="filterText.$"
-                ng-click="filterText.$ = ''"
-                class="glyphicon glyphicon-remove form-control-feedback"
-                style="cursor: pointer; pointer-events: all;"
-                uib-tooltip="clear">
-                      </span>
-          </div>
+        <span ng-if="filterText.$"
+              ng-click="filterText.$ = ''"
+              class="glyphicon glyphicon-remove form-control-feedback"
+              style="cursor: pointer; pointer-events: all;"
+              uib-tooltip="clear">
+          </span>
+      </div>
+      <p>
+        <span  ng-if="filterText.$">{{(codeSet | filter: filterText).length}} entries found</span>&nbsp;
+      </p>
     </div>
   </div>
 <div class="row" ng-if="codeSet.length && codeSet.length > 0">

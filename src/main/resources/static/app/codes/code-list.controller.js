@@ -5,13 +5,8 @@ angular.module('messageHubDemoApp')
       function ($scope, $state, CodeFactory, CodeTypeFactory) {
         $scope.codeSet = [];
         $scope.codeOptions = [];
-        $scope.codeTypeOption = {};
-
-        $scope.formats = function() {
-          console.log('formats');
-          // $scope.codeSet = $scope.ndcUse.concat($scope.ndcSale);
-        };
-
+        $scope.codeTypeOption = null;
+        $scope.filterText = {$: ""};
         function activate() {
           console.log("Activating Code List Controller!");
           $scope.codeOptions = CodeTypeFactory.query();
@@ -20,7 +15,9 @@ angular.module('messageHubDemoApp')
         activate();
 
         $scope.loadCode = function() {
+          $scope.codeSet = [{value: "loading..."}];
           getCode($scope.codeTypeOption.name);
+          $scope.filterText.$ = "";
         };
 
         function getCode(codeType) {
