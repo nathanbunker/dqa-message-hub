@@ -1,4 +1,4 @@
-angular.module('messageHubDemoApp', ['ngResource', 'ngTreetable', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'angularMoment', 'googlechart', 'angularSpinners']);
+angular.module('messageHubDemoApp', ['ngResource', 'ngTreetable', 'ngSanitize', 'ui.router', 'ui.bootstrap', 'angularMoment', 'googlechart', 'angularSpinners', 'smart-table']);
 
 angular.isUndefinedOrNullOrEmpty = function(val) {
 	if(angular.isArray(val)) {
