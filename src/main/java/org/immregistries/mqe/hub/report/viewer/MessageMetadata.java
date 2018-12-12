@@ -44,6 +44,9 @@ public class MessageMetadata {
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageCode> codes = new ArrayList<>();
+  
+  @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
+  public List<MessageVaccine> vaccines = new ArrayList<>();
 
   public List<MessageCode> getCodes() {
     return codes;
@@ -53,7 +56,15 @@ public class MessageMetadata {
     this.codes = codes;
   }
 
-  public List<MessageDetection> getDetections() {
+  public List<MessageVaccine> getVaccines() {
+	return vaccines;
+}
+
+public void setVaccines(List<MessageVaccine> vaccines) {
+	this.vaccines = vaccines;
+}
+
+public List<MessageDetection> getDetections() {
     return detections;
   }
 

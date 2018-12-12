@@ -2,7 +2,11 @@ package org.immregistries.mqe.hub.submission;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.immregistries.mqe.core.util.DateUtility;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
@@ -13,6 +17,7 @@ import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadata;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
+import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.validator.MqeMessageService;
@@ -25,6 +30,7 @@ import org.immregistries.mqe.validator.report.ReportScorer;
 import org.immregistries.mqe.validator.report.codes.CodeCollection;
 import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
+import org.immregistries.mqe.vxu.MqeVaccination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -139,6 +145,29 @@ public class Hl7MessageConsumer {
       mc.setCodeStatus(cb.getStatus());
       mc.setMessageMetadata(mm);
       mm.getCodes().add(mc);
+    }
+    
+    Map<String, MessageVaccine> map = new HashMap<>();
+    for (MqeVaccination mv : response.getMqeResponse().getMessageObjects().getVaccinations()) {
+    	if (!mv.isAdministered()){
+    		continue;
+    	}
+    	Date date = mv.getAdminDate();
+    	Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
+    	int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
+    	String cvx = mv.getCvxDerived();
+    	String key = cvx+":"+age;
+    	MessageVaccine v = map.get(key);
+    	if (v == null) {
+    		v = new MessageVaccine();
+    		v.setCount(0);
+    		v.setMessageMetadata(mm);
+    		v.setVaccineCvx(cvx);
+    		v.setAge(age);
+    		mm.getVaccines().add(v);
+    		map.put(key, v);
+    	}
+    	v.setCount(v.getCount() + 1);
     }
     metaRepo.save(mm);
 

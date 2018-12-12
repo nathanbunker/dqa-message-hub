@@ -2,6 +2,7 @@ package org.immregistries.mqe.hub.report.vaccineReport;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,7 @@ public class VaccineReportConfig {
         }
         if (cvxs.length > 0) {
           VaccineReportGroup vrg = new VaccineReportGroup(vrgt.getLabel(), cvxs);
-          vaccineReportGroupList.add(vrg);
+          this.vaccineReportGroupList.add(vrg);
           if (vrgt.getDisplayPriority() == null) {
             vrg.setDisplayPriority(0);
           } else {
@@ -77,12 +78,12 @@ public class VaccineReportConfig {
             unknownReportGroup = vrg;
           }
           for (String cvx : cvxList) {
-            List<VaccineReportGroup> vaccineReportGroupList = map.get(cvx);
-            if (vaccineReportGroupList == null) {
-              vaccineReportGroupList = new ArrayList<>();
-              map.put(cvx, vaccineReportGroupList);
+            List<VaccineReportGroup> mappedVrgList = this.map.get(cvx);
+            if (mappedVrgList == null) {
+              mappedVrgList = new ArrayList<>();
+              this.map.put(cvx, mappedVrgList);
             }
-            vaccineReportGroupList.add(vrg);
+            mappedVrgList.add(vrg);
           }
           for (AgeCategoryStatus acst : vrgt.getAgeCategoryStatus()) {
             AgeCategory ageCategory = ageCategoryMap.get(acst.getLabel());
@@ -114,5 +115,23 @@ public class VaccineReportConfig {
       v.add(unknownReportGroup);
     }
     return v;
+  }
+  
+  public List<String> getCvxListForVaccineReportGroup(String label) {
+	  for (VaccineReportGroup vrg : this.vaccineReportGroupList) {
+		  if (vrg.getLabel().equals(label)) {
+			  return Arrays.asList(vrg.getCvxList());
+		  }
+	  }
+	  return new ArrayList<>();
+  }
+  
+  public AgeCategory getAgeCategoryForLabel(String label) {
+	    for (AgeCategory ac : ageCategoryList) {
+	        if (ac.getLabel().equals(label)) {
+	          return ac;
+	        }
+	      }
+	      return otherAgeCategory;
   }
 }

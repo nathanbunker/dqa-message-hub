@@ -7,6 +7,9 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.parser.HL7MessageMap;
 import org.immregistries.mqe.hl7util.parser.MessageParser;
 import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
+import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
+import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +50,12 @@ public class MessageRetrieverService {
       mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateCreated, filters.getDetectionId(), filters.getMessageText(), pager);
     } else if (filters.isCodeTypeFilter() && filters.isCodeValueFilter()) {
       mvpage = mvRepo.findByCodeValue(providerKey, dateCreated, filters.getCodeValue(), filters.getCodeType(), pager);
+    } else if (filters.isVaccineGroupFilter()) {
+    	VaccineReportConfig vaccineReportConfig =
+    	        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    	List<String> cvxs = vaccineReportConfig.getCvxListForVaccineReportGroup(filters.getVaccineGroup());
+    	AgeCategory ages = vaccineReportConfig.getAgeCategoryForLabel(filters.getVaccineGroupAge());
+    	mvpage = mvRepo.findByVaccine(providerKey, dateCreated, cvxs, ages.getAgeHigh(), ages.getAgeLow(), pager);
     } else {
       LOGGER.info("getMessages NO FILTER");
       mvpage = mvRepo.findByProviderAndDate(providerKey, dateCreated, pager);

@@ -98,8 +98,15 @@ angular.module('messageHubDemoApp')
         }
 
         $scope.toggleDetection = function (detectionId) {
-          $scope.searchOptions.filters.detectionId = detectionId;
-          $scope.filterDetectionName = lookupDetectionName(detectionId);
+          if ($scope.searchOptions.filters.detectionId !== detectionId) {
+          	$scope.clearAllFilters();
+          	$scope.searchOptions.filters.detectionId = detectionId;
+          	$scope.filterDetectionName = lookupDetectionName(detectionId);
+          } else {
+            $scope.clearAllFilters();
+          	$scope.searchOptions.filters.detectionId = null;
+          	$scope.filterDetectionName = null;         
+          }
           // populateCalendar();
           // $scope.reloadPageData();
           populateURL();
@@ -109,8 +116,35 @@ angular.module('messageHubDemoApp')
         };
 
         $scope.toggleCodeFilter = function (codeValue, codeType) {
-          $scope.searchOptions.filters.codeValue = codeValue;
-          $scope.searchOptions.filters.codeType = codeType;
+          if ($scope.searchOptions.filters.codeValue !== codeValue && $scope.searchOptions.filters.codeType !== codeType) {
+            $scope.clearAllFilters();          
+          	$scope.searchOptions.filters.codeValue = codeValue;
+          	$scope.searchOptions.filters.codeType = codeType;
+          } else {
+            $scope.clearAllFilters();
+          	$scope.searchOptions.filters.codeValue = null;
+          	$scope.searchOptions.filters.codeType = null;
+          }
+          // populateCalendar();
+          // $scope.reloadPageData();
+          populateURL();
+          loadMessages();
+          $scope.activeJustified = 0;
+          // $scope.showStats = false;
+        };
+        
+        $scope.toggleVaccineGroupFilter = function (label, age) {
+          console.log(label + " - " + age);
+          console.log($scope.searchOptions.filters.vaccineGroup + " - " + $scope.searchOptions.filters.vaccineGroupAge);
+          if ($scope.searchOptions.filters.vaccineGroup !== label || $scope.searchOptions.filters.vaccineGroupAge !== age) {
+            $scope.clearAllFilters();
+          	$scope.searchOptions.filters.vaccineGroup = label;
+          	$scope.searchOptions.filters.vaccineGroupAge = age;
+          } else {
+            $scope.clearAllFilters();
+          	$scope.searchOptions.filters.vaccineGroup = null;
+          	$scope.searchOptions.filters.vaccineGroupAge = null;
+          }
           // populateCalendar();
           // $scope.reloadPageData();
           populateURL();
@@ -526,28 +560,12 @@ angular.module('messageHubDemoApp')
             });
           }
 
-          function getVaccinesNotExpected() {
-              VaccineCodesNotExpected.get({
-                providerKey: $scope.provider.key,
-                dateStart: $filter('date')($scope.searchOptions.date, 'yyyyMMdd'),
-                dateEnd: $filter('date')($scope.searchOptions.date, 'yyyyMMdd')
-              }, function (data) {
-
-                $scope.vaccinationsExpectedMap = data;
-                //alert(codeTypeArray);
-                console.log("getMessageList vaccines not expected list loaded.");
-//    		}).$promise.then(function() {
-              });
-            }
-
-
         function getMessageList() {
           loadMessages();
           getReport();
           getCodes();
           getVaccines();
           getVaccinesExpected();
-          getVaccinesNotExpected();
           getVaccineReportGroupList();
           getAgeCategoryList();
          
@@ -565,10 +583,23 @@ angular.module('messageHubDemoApp')
           } else if (name === 'codeValue') {
             $scope.searchOptions.filters.codeValue = null;
             $scope.searchOptions.filters.codeType = null;
+          } else if (name == 'vaccineGroup') {
+          	$scope.searchOptions.filters.vaccineGroup = null;
           }
           // populateCalendar();
           $scope.reloadPageData();
         };
+        
+        $scope.clearAllFilters = function () {
+          console.log("clearAllFilters");
+          $scope.searchOptions.filters.messageSearchText = null;
+          $scope.searchOptions.filters.ackStatus = null;
+          $scope.searchOptions.filters.detectionId = null;
+          $scope.searchOptions.filters.codeValue = null;
+          $scope.searchOptions.filters.codeType = null;
+          $scope.searchOptions.filters.vaccineGroup = null;
+          $scope.searchOptions.filters.vaccineGroupAge = null;
+        }
 
 //	//Modal calling:
         $scope.openModal = function () {

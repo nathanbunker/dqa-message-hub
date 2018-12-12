@@ -15,11 +15,15 @@ public class ViewerFilter {
   private String detectionId;
   private String codeValue;
   private String codeType;
+  private String vaccineGroup;
+  private String vaccineGroupAge;
 
   private boolean messageTextFilter;
   private boolean detectionIdFilter;
   private boolean codeValueFilter;
   private boolean codeTypeFilter;
+  private boolean vaccineGroupFilter;
+  private boolean vaccineGroupAgeFilter;
 
   public ViewerFilter(String rawAjaxFilterText) {
     if (StringUtils.isNotBlank(rawAjaxFilterText)) {
@@ -33,9 +37,22 @@ public class ViewerFilter {
     setDetectionIdFilterFromString(filterMap.get("detectionId"));
     setCodeValueFilterFromString(filterMap.get("codeValue"));
     setCodeTypeFilterFromString(filterMap.get("codeType"));
+    setVaccineGroupFilterFromString(filterMap.get("vaccineGroup"));
+    setVaccineGroupAgeFilterFromString(filterMap.get("vaccineGroupAge"));
+    
   }
 
-  void setCodeValueFilterFromString(String codeValue) {
+  private void setVaccineGroupAgeFilterFromString(String age) {
+	    this.vaccineGroupAge = age;
+	    this.vaccineGroupAgeFilter = StringUtils.isNotBlank(age);
+}
+
+private void setVaccineGroupFilterFromString(String value) {
+	    this.vaccineGroup = value;
+	    this.vaccineGroupFilter = StringUtils.isNotBlank(value);
+}
+
+void setCodeValueFilterFromString(String codeValue) {
     this.codeValue = codeValue;
     this.codeValueFilter = StringUtils.isNotBlank(codeValue);
   }
@@ -90,36 +107,16 @@ public class ViewerFilter {
     return detectionId;
   }
 
-  public void setDetectionId(String detectionId) {
-    this.detectionId = detectionId;
-  }
-
   public boolean isDetectionIdFilter() {
     return detectionIdFilter;
-  }
-
-  public void setDetectionIdFilter(boolean detectionIdFilter) {
-    this.detectionIdFilter = detectionIdFilter;
   }
 
   public String getCodeValue() {
     return codeValue;
   }
 
-  public void setCodeValue(String codeValue) {
-    this.codeValue = codeValue;
-  }
-
   public String getCodeType() {
     return codeType;
-  }
-
-  public void setCodeType(String codeType) {
-    this.codeType = codeType;
-  }
-
-  public void setMessageTextFilter(boolean messageTextFilter) {
-    this.messageTextFilter = messageTextFilter;
   }
 
   public boolean isCodeValueFilter() {
@@ -129,5 +126,21 @@ public class ViewerFilter {
   public boolean isCodeTypeFilter() {
     return codeTypeFilter;
   }
+
+public String getVaccineGroup() {
+	return vaccineGroup;
+}
+
+public boolean isVaccineGroupFilter() {
+	return vaccineGroupFilter;
+}
+
+public String getVaccineGroupAge() {
+	return vaccineGroupAge;
+}
+
+public boolean isVaccineGroupAgeFilter() {
+	return vaccineGroupAgeFilter;
+}
 
 }

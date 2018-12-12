@@ -3,6 +3,10 @@
     display: flex;
     align-items: center;
   }
+  
+  .vaccinecount:hover {
+  	text-decoration: underline;
+  }
 </style>
 <span class="glyphicon glyphicon-chevron-left text-primary"></span> <a ui-sref="landing-page"
                                                                        ng-click="console.clear()">Select
@@ -112,6 +116,17 @@
 			        MQE Detection:
 		      </span>
         <span class="col-md-10 h4"> {{filterDetectionName}} ({{searchOptions.filters.detectionId}})</span>
+        </div>
+      </div>
+      
+      <div class="row" ng-if="searchOptions.filters.vaccineGroup">
+        <div class="col-md-12">
+		      <span class="col-md-2 h5" style="color:grey;">
+			      <button type="button" class="btn btn-default btn-xs" ng-click="clearFilter('vaccineGroup')"> <i
+               class="fa fa-times" aria-hidden="true"></i> </button>
+			        Vaccine:
+		      </span>
+        <span class="col-md-10 h4"> {{searchOptions.filters.vaccineGroup}} - {{searchOptions.filters.vaccineGroupAge}}</span>
         </div>
       </div>
 
@@ -341,6 +356,7 @@
                 <th class="col-md-4">Vaccine Reported</th>
                 <th class="col-md-3">Count</th>
                 <th class="col-md-3">Status</th>
+                <th class="col-md-1">filter</th>
               </tr>
               </thead>
               <tbody>
@@ -348,13 +364,21 @@
                 <td>{{vaccines.vaccine}}</td>
                 <td>{{vaccines.count}}</td>
                 <td>{{vaccines.status}}</td>
+                <td>
+                  <button type="button"
+                          ng-class="(vaccines.vaccine == searchOptions.filters.vaccineGroup && vaccinesType == searchOptions.filters.vaccineGroupAge) ? 'btn-success' : 'btn-default'"
+                          class="btn btn-xs"
+                          ng-click="toggleVaccineGroupFilter(vaccines.vaccine, vaccinesType);">
+                    <i class="fa fa-filter" aria-hidden="true"></i>
+                  </button>
+                </td>
               </tr>
               </tbody>
             </table>
           </div>
         </div>
       </div>
-      
+
       <div class="row">
         <div class="col-md-9">
           <h3>Expected Vaccines</h3>
@@ -371,28 +395,13 @@
                 <th width="25%">{{vaccineReportGroup}}</th>
                 <td width="15%" ng-class="{'vaccineTypePresentExpected': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Expected', 'vaccineTypePresentPossible': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Possible', 'vaccineTypePresentNotExpected': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Not Expected', 'vaccineTypePresentNotPossible': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Not Possible', 'vaccineTypeNotPresentExpected': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Expected', 'vaccineTypeNotPresentPossible': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Possible', 'vaccineTypeNotPresentNotExpected': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Not Expected', 'vaccineTypeNotPresentNotPossible': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Not Possible'}"
                 ng-repeat="ageCategory in ageCategoryList" ng-init="acm = ageCategoryMap[ageCategory.label]">
-                <span ng-if="acm.count > 0 || acm.status == 'Expected' ">{{acm.count}}</span></td>
+                <span ng-if="acm.count <= 0 && acm.status == 'Expected' ">0</span>
+                <span class="vaccinecount" ng-if="acm.count > 0" ng-click="toggleVaccineGroupFilter(vaccineReportGroup, ageCategory.label);" 
+                style="cursor: pointer">
+                    {{acm.count}}
+                </span></td>
               </tr>
           </table>
-          
-          <h3>Not Expected Vaccines</h3>
-          <table class="vaccineTypeTable" width="500">
-            <thead>
-              <tr>
-              <th width="25%">&nbsp;</th>
-              <th width="15%" ng-repeat="ageCategory in ageCategoryList">{{ageCategory.label}}</th>
-              </tr>
-            </thead>
-              <tr ng-repeat="vaccineReportGroup in vaccineReportGroupList" 
-                  ng-init="ageCategoryMap = vaccinationsNotExpectedMap.map[vaccineReportGroup]"
-                  ng-if="vaccinationsNotExpectedMap.map[vaccineReportGroup] != null">
-                <th width="25%">{{vaccineReportGroup}}</th>
-                <td width="15%" ng-class="{'vaccineTypePresentExpected': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Expected', 'vaccineTypePresentPossible': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Possible', 'vaccineTypePresentNotExpected': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Not Expected', 'vaccineTypePresentNotPossible': ageCategoryMap[ageCategory.label].count > 0 && ageCategoryMap[ageCategory.label].status == 'Not Possible', 'vaccineTypeNotPresentExpected': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Expected', 'vaccineTypeNotPresentPossible': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Possible', 'vaccineTypeNotPresentNotExpected': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Not Expected', 'vaccineTypeNotPresentNotPossible': ageCategoryMap[ageCategory.label].count == 0 && ageCategoryMap[ageCategory.label].status == 'Not Possible'}"
-                ng-repeat="ageCategory in ageCategoryList" ng-init="acm = ageCategoryMap[ageCategory.label]">
-                <span ng-if="acm.count > 0 || acm.status == 'Expected' ">{{acm.count}}</span></td>
-              </tr>
-          </table>
-        
         
         
           <h4>How To Read</h4>
