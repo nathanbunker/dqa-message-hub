@@ -141,11 +141,11 @@ public class PDFDocumentDetectionDocumentationSerializer implements DetectionDoc
 		return _os.toByteArray();
 	}
 	
-	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException {
-		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
-		PDFDocumentDetectionDocumentationSerializer serializer = new PDFDocumentDetectionDocumentationSerializer();
-		FileUtils.writeByteArrayToFile(new File("/Users/hnt5/Desktop/doc.pdf"), serializer.serialize(documentation));
-	}
+//	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException {
+//		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
+//		PDFDocumentDetectionDocumentationSerializer serializer = new PDFDocumentDetectionDocumentationSerializer();
+//		FileUtils.writeByteArrayToFile(new File("/Users/hnt5/Desktop/doc.pdf"), serializer.serialize(documentation));
+//	}
 	
 	private void entry(DetectionDocumentationPayload payload, Body body){
 		Table implDetails = new Table().setCSSClass("table table-bordered");

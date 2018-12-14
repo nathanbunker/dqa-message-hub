@@ -106,11 +106,11 @@ public class PDFTableDetectionDocumentationSerializer implements DetectionDocume
 		return _os.toByteArray();
 	}
 	
-	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException {
-		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
-		PDFTableDetectionDocumentationSerializer serializer = new PDFTableDetectionDocumentationSerializer();
-		FileUtils.writeByteArrayToFile(new File("/Users/hnt5/Desktop/doc.pdf"), serializer.serialize(documentation));
-	}
+//	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException {
+//		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
+//		PDFTableDetectionDocumentationSerializer serializer = new PDFTableDetectionDocumentationSerializer();
+//		FileUtils.writeByteArrayToFile(new File("/Users/hnt5/Desktop/doc.pdf"), serializer.serialize(documentation));
+//	}
 	
 	private List<Tr> rows(DetectionDocumentation documentation, String o, Map<String, Map<String, List<DetectionDocumentationPayload>>> detections){
 		List<Tr> rows = new ArrayList<>();
