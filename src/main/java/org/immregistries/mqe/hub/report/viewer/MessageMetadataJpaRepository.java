@@ -14,10 +14,6 @@ public interface MessageMetadataJpaRepository extends JpaRepository<MessageMetad
       Date dateEnd);
 
   @Query(value = "select mm from MessageMetadata mm where provider = :providerKey and trunc(inputTime) = :forDate")
-  List<MessageMetadata> findByProviderAndDate(@Param("providerKey") String providerKey,
-      @Param("forDate") Date messageInDate);
-
-  @Query(value = "select mm from MessageMetadata mm where provider = :providerKey and trunc(inputTime) = :forDate")
   Page<MessageMetadata> findByProviderAndDatePaged(@Param("providerKey") String providerKey,
       @Param("forDate") Date messageInDate, Pageable pager);
 

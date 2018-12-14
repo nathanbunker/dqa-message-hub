@@ -1,35 +1,51 @@
-<?xml version="1.0"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
-  <xs:element name="vaccinesAdministeredExpectation" type="vaccinesAdministeredExpectationType"/>
-  <xs:complexType name="ageCategoryType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="label"/>
-      <xs:element type="xs:short" name="ageMin"/>
-      <xs:element type="xs:short" name="ageMax"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ageCategoriesType">
-    <xs:sequence>
-      <xs:element type="ageCategoryType" name="ageCategory" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="ageCategoryStatusType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="label"/>
-      <xs:element type="xs:string" name="status"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="vaccineReportGroupType">
-    <xs:sequence>
-      <xs:element type="xs:string" name="label"/>
-      <xs:element type="xs:short" name="cvx" maxOccurs="unbounded" minOccurs="0"/>
-      <xs:element type="ageCategoryStatusType" name="ageCategoryStatus" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="vaccinesAdministeredExpectationType">
-    <xs:sequence>
-      <xs:element type="ageCategoriesType" name="ageCategories"/>
-      <xs:element type="vaccineReportGroupType" name="vaccineReportGroup" maxOccurs="unbounded" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="vaccinesAdministeredExpectation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ageCategories"/>
+        <xs:element maxOccurs="unbounded" ref="vaccineReportGroup"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ageCategories">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ageCategory"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ageCategory">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="label"/>
+        <xs:element ref="ageMin"/>
+        <xs:element ref="ageMax"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ageMin" type="xs:integer"/>
+  <xs:element name="ageMax" type="xs:integer"/>
+  <xs:element name="vaccineReportGroup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="label"/>
+        <xs:element minOccurs="0" ref="displayPriority"/>
+        <xs:element maxOccurs="unbounded" ref="cvx"/>
+        <xs:element maxOccurs="unbounded" ref="ageCategoryStatus"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="displayPriority" type="xs:integer"/>
+  <xs:element name="cvx" type="xs:integer"/>
+  <xs:element name="ageCategoryStatus">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="label"/>
+        <xs:element ref="status"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="status" type="xs:string"/>
+  <xs:element name="label" type="xs:string"/>
 </xs:schema>

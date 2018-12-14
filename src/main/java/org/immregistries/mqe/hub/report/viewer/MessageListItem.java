@@ -13,7 +13,24 @@ public class MessageListItem {
   private String messageReceived;
   private String ackStatus;
   private String patientName;
-//	private boolean mcirError;
+  private int errorsCount;
+  private int warningsCount;
+
+  public int getErrorsCount() {
+    return errorsCount;
+  }
+
+  public void setErrorsCount(int errorsCount) {
+    this.errorsCount = errorsCount;
+  }
+
+  public int getWarningsCount() {
+    return warningsCount;
+  }
+
+  public void setWarningsCount(int warningsCount) {
+    this.warningsCount = warningsCount;
+  }
 
   /**
    * @return the id

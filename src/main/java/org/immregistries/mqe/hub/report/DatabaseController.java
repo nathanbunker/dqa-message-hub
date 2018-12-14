@@ -1,6 +1,8 @@
 package org.immregistries.mqe.hub.report;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +25,6 @@ import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.validator.report.codes.VaccineBucket;
 import org.immregistries.mqe.validator.report.codes.VaccineCollection;
 import org.immregistries.mqe.vxu.VxuField;
-import org.immregistries.mqe.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -60,7 +61,7 @@ public class DatabaseController {
     CodeCollection senderCodes = allDaysMetrics.getCodes();
     Map<String, List<CollectionBucket>> map = new TreeMap<>();
     for (CollectionBucket cb : senderCodes.getCodeCountList()) {
-      String s = cb.getType();
+      String s = cb.getTypeCode();
       VxuField f = VxuField.getByName(s);
       CodesetType t = f.getCodesetType();
       if (t == null) {
@@ -68,7 +69,7 @@ public class DatabaseController {
             "well...  this is embarrasing. there's a field with no type: " + f);
       }
       cb.setSource(f.getHl7Locator());
-      cb.setType(t.getDescription());
+      cb.setTypeName(t.getDescription());
       Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
       if (c != null) {
         if (c.getCodeStatus() != null && StringUtils.isNotBlank(c.getCodeStatus().getStatus())) {
@@ -83,17 +84,19 @@ public class DatabaseController {
         cb.setStatus("Unrecognized");
       }
 
-      List<CollectionBucket> list = map.get(cb.getType());
+      List<CollectionBucket> list = map.get(cb.getTypeName());
 
       if (list == null) {
         list = new ArrayList<>();
         list.add(cb);
-        map.put(cb.getType(), list);
+        map.put(cb.getTypeName(), list);
       } else {
-        //we want to aggregate, and ignore the attributes, so we have to add them up, since they're separate in the database.
+        // we want to aggregate, and ignore the attributes, so we have to add them up,
+        // since they're separate in the database.
         boolean found = false;
         for (CollectionBucket bucket : list) {
-          if (bucket.getType().equals(cb.getType()) && bucket.getValue().equals(cb.getValue())
+          if (bucket.getTypeName().equals(cb.getTypeName())
+              && bucket.getValue().equals(cb.getValue())
               && bucket.getSource().equals(cb.getSource())) {
             bucket.setCount(bucket.getCount() + cb.getCount());
             found = true;
@@ -113,7 +116,6 @@ public class DatabaseController {
     return cm;
   }
 
-
   @RequestMapping(method = RequestMethod.GET,
       value = "/vaccinations/{providerKey}/{dateStart}/{dateEnd}")
   public VaccinationCollectionMap getVaccinationsFor(
@@ -125,7 +127,7 @@ public class DatabaseController {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
-    //map them to age groups.
+    // map them to age groups.
 
     VaccineReportConfig vaccineReportConfig =
         VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
@@ -170,5 +172,214 @@ public class DatabaseController {
     return vcm;
   }
 
+  @RequestMapping(method = RequestMethod.GET, value = "/vaccineReportGroupList/{providerKey}")
+  public List<VaccineReportGroup> getVaccineReportGroupList(
+      @PathVariable("providerKey") String providerKey) {
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    List<VaccineReportGroup> vrg = new ArrayList<>(vaccineReportConfig.getVaccineReportGroupList());
+    Collections.sort(vrg, new Comparator<VaccineReportGroup>() {
+      @Override
+      public int compare(VaccineReportGroup v1, VaccineReportGroup v2) {
+        if (v1.getDisplayPriority() < v2.getDisplayPriority()) {
+          return -1;
+        }
+        if (v1.getDisplayPriority() > v2.getDisplayPriority()) {
+          return 1;
+        }
+        return 0;
+      }
+    });
+    return vrg;
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/ageCategoryList/{providerKey}")
+  public List<AgeCategory> getAgeCategoryList(@PathVariable("providerKey") String providerKey) {
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    return vaccineReportConfig.getAgeCategoryList();
+  }
+
+
+  @RequestMapping(method = RequestMethod.GET,
+      value = "/vaccinationsExpected/{providerKey}/{dateStart}/{dateEnd}")
+  public VaccinationExpectedCollectionMap getVaccinationsExpectedFor(
+      @PathVariable("providerKey") String providerKey,
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+    logger.info("DatabaseController getVaccinationsExpectedFor sender:" + providerKey
+        + " dateStart: " + dateStart + " dateEnd: " + dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
+    senderVaccines = senderVaccines.reduce();
+    // map them to age groups.
+
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    VaccinationExpectedCollectionMap vcm =
+        getVaccinationCollectionMap(senderVaccines, vaccineReportConfig);
+    List<VaccineReportGroup> vaccineReportGroupList =
+        new ArrayList<VaccineReportGroup>(vcm.getMap().keySet());
+    for (VaccineReportGroup vrg : vaccineReportGroupList) {
+      boolean remove = true;
+      for (AgeCategory ac : vaccineReportConfig.getAgeCategoryList()) {
+        Map<AgeCategory, VaccineAdministered> map = vcm.getMap().get(vrg);
+        VaccineAdministered va = map.get(ac);
+        switch (va.getVaccineReportStatus()) {
+          case EXPECTED:
+          case POSSIBLE:
+            remove = false;
+            break;
+          case NOT_EXPECTED:
+          case NOT_POSSIBLE:
+            break;
+        }
+      }
+      if (remove) {
+        vcm.getMap().remove(vrg);
+      }
+
+    }
+    return vcm;
+  }
+
+
+  @RequestMapping(method = RequestMethod.GET,
+      value = "/vaccinationsNotExpected/{providerKey}/{dateStart}/{dateEnd}")
+  public VaccinationExpectedCollectionMap getVaccinationsNoExpectedFor(
+      @PathVariable("providerKey") String providerKey,
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+    logger.info("DatabaseController getVaccinationsNotExpectedFor sender:" + providerKey
+        + " dateStart: " + dateStart + " dateEnd: " + dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
+    senderVaccines = senderVaccines.reduce();
+    // map them to age groups.
+
+    VaccineReportConfig vaccineReportConfig =
+        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
+    VaccinationExpectedCollectionMap vcm =
+        getVaccinationCollectionMap(senderVaccines, vaccineReportConfig);
+    List<VaccineReportGroup> vaccineReportGroupList =
+        new ArrayList<VaccineReportGroup>(vcm.getMap().keySet());
+    for (VaccineReportGroup vrg : vaccineReportGroupList) {
+      boolean remove = false;
+      for (AgeCategory ac : vaccineReportConfig.getAgeCategoryList()) {
+        Map<AgeCategory, VaccineAdministered> map = vcm.getMap().get(vrg);
+        VaccineAdministered va = map.get(ac);
+        switch (va.getVaccineReportStatus()) {
+          case EXPECTED:
+          case POSSIBLE:
+            remove = true;
+            break;
+          case NOT_EXPECTED:
+          case NOT_POSSIBLE:
+            break;
+        }
+      }
+      if (remove) {
+        vcm.getMap().remove(vrg);
+      }
+
+    }
+    return vcm;
+  }
+
+
+  private VaccinationExpectedCollectionMap getVaccinationCollectionMap(
+      VaccineCollection senderVaccines, VaccineReportConfig vaccineReportConfig) {
+    VaccinationExpectedCollectionMap vcm = new VaccinationExpectedCollectionMap();
+    for (VaccineReportGroup vaccineReportGroup : vaccineReportConfig.getVaccineReportGroupList()) {
+      if (vaccineReportGroup.getDisplayPriority() > 0) {
+        Map<AgeCategory, VaccineAdministered> map = new HashMap<>();
+        vcm.getMap().put(vaccineReportGroup, map);
+      }
+    }
+    for (VaccineBucket vb : senderVaccines.getCodeCountList()) {
+      if (vb.isAdministered()) {
+        List<VaccineReportGroup> vrgList =
+            vaccineReportConfig.getVacineReportGroupList(vb.getCode());
+        AgeCategory ac = vaccineReportConfig.getCategoryForAge(vb.getAge());
+        for (VaccineReportGroup vrg : vrgList) {
+          Map<AgeCategory, VaccineAdministered> map = vcm.getMap().get(vrg);
+          if (map == null) {
+            map = new HashMap<>();
+            vcm.getMap().put(vrg, map);
+          }
+          VaccineAdministered va = map.get(ac);
+
+          if (va == null) {
+            va = new VaccineAdministered();
+            va.setPercent(0);
+            AgeCategory age = vaccineReportConfig.getCategoryForAge(vb.getAge());
+            va.setAge(age);
+            va.setVaccine(vrg);
+            va.setCount(vb.getCount());
+            VaccineReportStatus vaccineReportStatus = vrg.getVaccineReportStatusMap().get(age);
+            if (vaccineReportStatus == null) {
+              va.setStatus("");
+            } else {
+              va.setStatus(vaccineReportStatus.getLabel());
+            }
+            map.put(ac, va);
+          } else {
+            va.setCount(va.getCount() + vb.getCount());
+          }
+        }
+      }
+    }
+    for (VaccineReportGroup vrg : vcm.getMap().keySet()) {
+      for (AgeCategory ac : vaccineReportConfig.getAgeCategoryList()) {
+        Map<AgeCategory, VaccineAdministered> map = vcm.getMap().get(vrg);
+        VaccineAdministered va = map.get(ac);
+        if (va == null) {
+          va = new VaccineAdministered();
+          va.setPercent(0);
+          va.setAge(ac);
+          va.setVaccine(vrg);
+          va.setCount(0);
+          VaccineReportStatus vaccineReportStatus = vrg.getVaccineReportStatusMap().get(ac);
+          va.setVaccineReportStatus(vaccineReportStatus);
+          if (vaccineReportStatus == null) {
+            va.setStatus("");
+          } else {
+            va.setStatus(vaccineReportStatus.getLabel());
+          }
+          map.put(ac, va);
+        }
+        if (va.getVaccineReportStatus() == null) {
+          va.setVaccineReportStatus(VaccineReportStatus.NOT_EXPECTED);
+        }
+        String reportStyleClass = VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_POSSIBLE;
+        switch (va.getVaccineReportStatus()) {
+          case EXPECTED:
+            reportStyleClass =
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_EXPECTED
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_EXPECTED;
+            break;
+          case NOT_EXPECTED:
+            reportStyleClass =
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_EXPECTED
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_EXPECTED;
+            break;
+          case NOT_POSSIBLE:
+            reportStyleClass =
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_NOT_POSSIBLE
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_NOT_POSSIBLE;
+            break;
+          case POSSIBLE:
+            reportStyleClass =
+                va.getCount() > 0 ? VaccineAdministered.REPORT_STYLE_CLASS_PRESENT_POSSIBLE
+                    : VaccineAdministered.REPORT_STYLE_CLASS_NOT_PRESENT_POSSIBLE;
+            break;
+          default:
+
+        }
+        va.setReportStyleClass(reportStyleClass);
+      }
+    }
+    return vcm;
+  }
 
 }

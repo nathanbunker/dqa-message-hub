@@ -13,6 +13,21 @@ angular.module('messageHubDemoApp')
   return $resource('messages/:id');
 })
 
+// .factory("FacilityDetail", function($resource, $stateParams) {
+//   return {
+//     getFacility: function(urlParts) {
+//       console.log(urlParts);
+//       return $resource('facilities/pin/:pin').get({pin: urlParts.pin})
+//       .$promise.then(function(data) {
+//         var returnData = {'urlParts':urlParts ,'facility':data};
+//         console.log("about to return some great data: ");
+//         console.log(returnData);
+//         return returnData;
+//       });
+//     }
+//   }
+// })
+
 .factory('FacilityList', function ($resource) {
   return $resource('facilities/');
 })
@@ -112,6 +127,26 @@ angular.module('messageHubDemoApp')
   return $resource('codes/vaccinations/:providerKey/:dateStart/:dateEnd');//gets a collection of codes from the provider
 })
 
+.factory('VaccineCodesExpected', function ($resource) {
+  return $resource('codes/vaccinationsExpected/:providerKey/:dateStart/:dateEnd');
+})
+
+.factory('VaccineCodesNotExpected', function ($resource) {
+  return $resource('codes/vaccinationsNotExpected/:providerKey/:dateStart/:dateEnd');
+})
+
+.factory('VaccineReportGroupList', function ($resource) {
+  return $resource('codes/vaccineReportGroupList/:providerKey');
+})
+
+.factory('AgeCategoryList', function ($resource) {
+  return $resource('codes/ageCategoryList/:providerKey');
+})
+
+
+
+
+
 .directive('fileModel', ['$parse', function ($parse) {
   return {
     restrict: 'A',
@@ -152,6 +187,15 @@ angular.module('messageHubDemoApp')
 
 .factory('NistClearException', function ($resource) {
   return $resource('nist/validator/clear-exception');//clears the nist validator exception
+})
+
+.factory('CodeFactory', function($resource) {
+  return $resource('codes/:codesetType');
+})
+
+
+.factory('CodeTypeFactory', function($resource) {
+  return $resource('codes/');
 })
 
 ;

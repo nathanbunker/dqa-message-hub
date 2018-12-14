@@ -1,28 +1,5 @@
 package org.immregistries.mqe.hub.detection.documentation;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.text.WordUtils;
-import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.validator.detection.DetectionDocumentation;
-import org.immregistries.mqe.validator.detection.DetectionDocumentation.DetectionDocumentationPayload;
-import org.immregistries.mqe.vxu.VxuField;
-import org.immregistries.mqe.vxu.VxuObject;
-import org.springframework.stereotype.Service;
-import org.xhtmlrenderer.pdf.ITextRenderer;
-
-import com.itextpdf.text.Document;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.tool.xml.XMLWorkerHelper;
 import com.hp.gagawa.java.elements.Body;
 import com.hp.gagawa.java.elements.H2;
 import com.hp.gagawa.java.elements.H3;
@@ -37,9 +14,28 @@ import com.hp.gagawa.java.elements.Text;
 import com.hp.gagawa.java.elements.Th;
 import com.hp.gagawa.java.elements.Thead;
 import com.hp.gagawa.java.elements.Tr;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.tool.xml.XMLWorkerHelper;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.io.FileUtils;
+import org.immregistries.mqe.validator.detection.DetectionDocumentation;
+import org.immregistries.mqe.validator.detection.DetectionDocumentation.DetectionDocumentationPayload;
+import org.immregistries.mqe.vxu.VxuObject;
+import org.springframework.stereotype.Service;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
 @Service
-public class PDFDetectionDocumentationSerializer implements DetectionDocumentationSerializer<byte[]> {
+public class PDFTableDetectionDocumentationSerializer implements DetectionDocumentationSerializer<byte[]> {
 
 	@Override
 	public byte[] serialize(DetectionDocumentation documentation) throws IOException, DocumentException, com.lowagie.text.DocumentException {
@@ -91,15 +87,10 @@ public class PDFDetectionDocumentationSerializer implements DetectionDocumentati
 	public byte[] transformMethodOne(String html) throws DocumentException, IOException{
 		ByteArrayOutputStream _os = new ByteArrayOutputStream();
 		Document document = new Document();
-        // step 2
         PdfWriter writer = PdfWriter.getInstance(document, _os);
-        // step 3
         document.open();
-        // step 4
         XMLWorkerHelper.getInstance().parseXHtml(writer, document,new StringReader(html));
-        // step 5
-        document.close();
-        
+        document.close();    
 		_os.close();
 		return _os.toByteArray();
 	}
@@ -117,7 +108,7 @@ public class PDFDetectionDocumentationSerializer implements DetectionDocumentati
 	
 //	public static void main(String[] args) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException {
 //		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
-//		HTMLDetectionDocumentationSerializer serializer = new HTMLDetectionDocumentationSerializer();
+//		PDFTableDetectionDocumentationSerializer serializer = new PDFTableDetectionDocumentationSerializer();
 //		FileUtils.writeByteArrayToFile(new File("/Users/hnt5/Desktop/doc.pdf"), serializer.serialize(documentation));
 //	}
 	
@@ -158,10 +149,47 @@ public class PDFDetectionDocumentationSerializer implements DetectionDocumentati
 						__row = new Tr();
 						
 					}
+					
+					Table implDetails = new Table();
+					if(payload.getDetection().getDisplayText() != null && !payload.getDetection().getDisplayText().isEmpty()) {
+						implDetails.appendChild(new Tr().setStyle("background-color: #d4d4d4;")
+												.appendChild(new Th().setColspan("2")
+															.appendChild(new Text("Description"))),
+												new Tr()
+												.appendChild(new Td().setColspan("2")
+															.appendChild(new Text(payload.getDetection().getDisplayText()))));
+					}
+					
+					if(payload.getDescription() != null && !payload.getDescription().isEmpty()) {
+						implDetails.appendChild(new Tr().setStyle("background-color: #d4d4d4;")
+												.appendChild(new Th().setColspan("2")
+															.appendChild(new Text("Additionnal Documentation"))),
+												new Tr()
+												.appendChild(new Td().setColspan("2")
+															.appendChild(new Text(payload.getDescription()))));
+					}
+					
+					if(payload.getImplementationDetailsPerRule() != null) {
+					
+						implDetails.appendChild(new Tr().setStyle("background-color: #d4d4d4;")
+																			.appendChild(new Th().setColspan("2")
+																							.appendChild(new Text("Implementation Details"))),
+																			
+																	new Tr().setStyle("background-color: #d4d4d4;")
+																			.appendChild(new Th()
+																							.appendChild(new Text("Rule Name")))
+																			.appendChild(new Th()
+																							.appendChild(new Text("Details"))));
+						for(Entry<String, String> details: payload.getImplementationDetailsPerRule().entrySet()) {
+							implDetails.appendChild(new Tr()
+									.appendChild(new Td().appendChild(new Text(details.getKey())))
+									.appendChild(new Td().appendChild(new Text(details.getValue()))));
+						}
+					}
+					
 					__row.appendChild(
-							new Td().appendChild(new Text(payload.getDetection().getMqeMqeCode())).setStyle("width : 50px;"),
-							new Td().appendChild(new Text(payload.getDetection().getDisplayText()))
-									.appendChild(new Span().appendChild(new Text(payload.getDescription()))),
+							new Td().appendChild(new Span().appendChild(new Text(payload.getDetection().getMqeMqeCode()))),
+							new Td().appendChild(implDetails),
 							new Td().appendChild(new Text(payload.isActive() ? "Active" : "Not Active")));
 					rows.add(__row);
 				}

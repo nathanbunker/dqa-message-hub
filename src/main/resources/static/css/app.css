@@ -13,6 +13,13 @@ textarea {
     text-transform: uppercase;
 }
 
+.panel-danger>.panel-heading {
+    background-color: white;
+}
+
+.detection-warn {
+    color:#828282;
+}
 .loading span {
     font-size: larger;
 }
@@ -48,11 +55,12 @@ body {
 
 
 span.h7h { /* #h7h stands for HL7 Highlight */
-    background-color: #cae3ea;
+    background-color: #5eb5c9;
     font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
     /* font-weight:bold; */
     font-size: 1em;
     font-weight: bold;
+    color:white;
     border-radius: .25em;
 }
 
@@ -212,3 +220,71 @@ input[type="file"] {
 input[type="password"] {
     font-size:20px;
 }
+
+.vaccineTypeTable {
+}
+
+.vaccineTypePresentExpected {
+	padding: 4px;
+	text-align: center;
+	background-color: #00cc00;
+	border-width: 2px, 2px, 2px 2px;
+	border-color: black;
+	border-style: sold;
+}
+
+.vaccineTypePresentPossible {
+	padding: 4px;
+	text-align: center;
+	background-color: #f2f2f2;
+	border-width: 2px, 2px, 2px 2px;
+	border-color: black;
+	border-style: sold;
+}
+
+.vaccineTypePresentNotExpected {
+	padding: 4px;
+	text-align: center;
+	background-color: #ffff66;
+	border-style: none;
+}
+
+.vaccineTypePresentNotPossible {
+	padding: 4px;
+	text-align: center;
+	background-color: #ff3300;
+	border-style: none;
+}
+
+.vaccineTypeNotPresentExpected {
+	padding: 4px;
+	text-align: center;
+	background-color: #ff3300;
+	border-width: 2px, 2px, 2px 2px;
+	border-color: black;
+	border-style: sold;
+}
+
+.vaccineTypeNotPresentPossible {
+	padding: 4px;
+	text-align: center;
+	background-color: #f2f2f2;
+	border-width: 2px, 2px, 2px 2px;
+	border-color: black;
+	border-style: sold;
+}
+
+.vaccineTypeNotPresentNotExpected {
+	padding: 4px;
+	text-align: center;
+	background-color: #ffffff;
+	border-style: none;
+}
+
+.vaccineTypeNotPresentNotPossible {
+	padding: 4px;
+	text-align: center;
+	background-color: #ffffff;
+	border-style: none;
+}
+

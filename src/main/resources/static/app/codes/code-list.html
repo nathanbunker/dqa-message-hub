@@ -1,0 +1,81 @@
+<h1>Codebase Codes</h1>
+<div class="form-group typeahead">
+  Choose Code:
+  <select name="repeatSelect" id="repeatSelect"
+          ng-options="item as item.description for item in codeOptions"
+          ng-model="codeTypeOption"
+          ng-change="loadCode()"
+  >
+  </select>
+</div>
+
+
+<div ng-if="codeTypeOption.description">
+  <div class="row"  ng-if="codeSet.length && codeSet.length > 0">
+    <div class="col-md-6 ">
+      <h3>{{codeTypeOption.description}} Codes </h3>
+      <h5>{{codeSet.length ? codeSet.length : 0}} codes</h5>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group has-feedback">
+        <label>Find Code: </label>
+        <input type="text" ng-model="filterText.$" class="form-control"
+               placeholder="search"/>
+
+        <span ng-if="filterText.$"
+              ng-click="filterText.$ = ''"
+              class="glyphicon glyphicon-remove form-control-feedback"
+              style="cursor: pointer; pointer-events: all;"
+              uib-tooltip="clear">
+          </span>
+      </div>
+      <p>
+        <span  ng-if="filterText.$">{{(codeSet | filter: filterText).length}} entries found</span>&nbsp;
+      </p>
+    </div>
+  </div>
+<div class="row" ng-if="codeSet.length && codeSet.length > 0">
+  <div class="col-md-12">
+    <table class="table table-striped ">
+      <thead>
+      <tr>
+        <th class="col-md-2">Code</th>
+        <th class="col-md-2">Label</th>
+        <th class="col-md-3">Description</th>
+        <th class="col-md-1">Status</th>
+        <th class="col-md-4">Linked Codes</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr ng-repeat="code in codeSet | filter: filterText | orderBy: ['-codeStatus.status','value']">
+        <td>
+          {{::code.value}}
+        </td>
+        <td>
+          <span>{{::code.label}}</span>
+        </td>
+        <td>
+          <span>{{::code.description}}</span>
+        </td>
+        <td>
+          <span>{{::code.codeStatus.status}}</span>
+        </td>
+        <!--<td class="col-md-2" ng-repeat-start="link in code.reference.linkTo">-->
+        <td>
+          <p ng-repeat="link in code.reference.linkTo">
+            {{::link.value}} - {{::link.codeset}}
+          </p>
+          <div ng-if="code.codeStatus.deprecated.reason > ''">
+            <p>New Code Value: {{::code.codeStatus.deprecated.newCodeValue}}</p>
+            <p>Reason: {{::code.codeStatus.deprecated.reason}}</p>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+  <div class="col-md-12" ng-if="!codeSet.length || codeSet.length < 1">
+    No Codes in codebase.
+  </div>
+</div>
