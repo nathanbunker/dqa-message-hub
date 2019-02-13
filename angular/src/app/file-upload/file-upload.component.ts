@@ -7,9 +7,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FileUploadComponent implements OnInit {
 
+  uploadInfo: FileUploadInfo = {
+    fileId: ''
+  };
+
   constructor() { }
+
+  update() {
+    this.uploadInfo = {
+      fileId : this.uploadInfo.fileId + '*'
+    };
+  }
 
   ngOnInit() {
   }
 
+}
+
+export interface FileUploadInfo {
+    fileId: string;
 }

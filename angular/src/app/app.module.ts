@@ -10,13 +10,15 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCoffee, faSlidersH, faStethoscope, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     FileUploadComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    FileUploadDetailsComponent
   ],
   imports: [
     BrowserModule,
