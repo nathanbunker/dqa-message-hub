@@ -25,6 +25,7 @@ import { DocumentationComponent } from './documentation/documentation.component'
 import { SettingsComponent } from './settings/settings.component';
 import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
+import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { DetectionDocComponent } from './documentation/detection-doc/detection-d
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
+    NgxChartsModule, 
     NgbModule.forRoot()
   ],
   providers: [],
