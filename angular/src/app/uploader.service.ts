@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {interval, Observable} from 'rxjs';
+import {concat, interval, Observable} from 'rxjs';
 import {flatMap, pluck, takeWhile} from 'rxjs/operators';
 
 @Injectable({
@@ -8,8 +8,7 @@ import {flatMap, pluck, takeWhile} from 'rxjs/operators';
 })
 export class UploaderService {
 
-  constructor(private $http: HttpClient) {
-  }
+  constructor(private $http: HttpClient) {}
 
   uploadFileToUrl(file: File): Observable<FileUploadInfo> {
     const form: FormData = new FormData();
@@ -24,14 +23,13 @@ export class UploaderService {
   }
 
   watch(fileId: string): Observable<FileUploadInfo> {
-    return interval(1000).pipe(
+    return concat(interval(1000).pipe(
       flatMap(tick => {
         return this.reportFileProcess(fileId);
       }),
-      takeWhile((info: FileUploadInfo) => (info.status === 'started' || info.status === 'reading'))
-    );
+      takeWhile((info: FileUploadInfo) => (info.status === 'started' || info.status === 'reading')),
+    ), this.reportFileProcess(fileId));
   }
-
 
   reportFileProcess(fileId: string): Observable<FileUploadInfo> {
     return this.$http.get<FileUploadInfo>('file/report-file', {
@@ -47,20 +45,36 @@ export class UploaderService {
     );
   }
 
-  pauseFileProcess() {
-
+  pauseFileProcess(fileId: string) {
+    return this.$http.get<FileUploadInfo>('file/stop-file', {
+      params: {
+        fileId: fileId
+      }
+    });
   }
 
-  unpauseFileProcess() {
-
+  unpauseFileProcess(fileId: string) {
+    return this.$http.get<FileUploadInfo>('file/unpause-file', {
+      params: {
+        fileId: fileId
+      }
+    });
   }
 
-  getAcks() {
-
+  getAcks(fileId: string) {
+    return this.$http.get<string[]>('file/report-acks', {
+      params: {
+        fileId: fileId
+      }
+    });
   }
 
-  removeFile() {
-
+  removeFile(fileId: string) {
+    return this.$http.get<FileUploadInfo>('file/remove-file', {
+      params: {
+        fileId: fileId
+      }
+    });
   }
 }
 

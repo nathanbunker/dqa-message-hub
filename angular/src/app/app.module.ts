@@ -10,7 +10,14 @@ import { FooterComponent } from './footer/footer.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCoffee, faSlidersH, faStethoscope, faCaretDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCoffee,
+  faSlidersH,
+  faStethoscope,
+  faCaretDown,
+  faTrashAlt,
+  faPause, faDownload
+} from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CalendarComponent } from './dashboard/calendar/calendar.component';
@@ -64,6 +71,6 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 export class AppModule {
   constructor() {
   // Add an icon to the library for convenient access in other components
-  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown);
+  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload);
   }
 }

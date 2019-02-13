@@ -12,8 +12,24 @@ export class FileUploadComponent implements OnInit {
   fileUploads: {
     [id: string]: Observable<FileUploadInfo>
   };
+  file: File;
 
-  constructor(private $uploader: UploaderService) {}
+  constructor(private $uploader: UploaderService) {
+  }
+
+  keysOf(object: any) {
+    return Object.keys(object);
+  }
+
+  setFile(event) {
+    if (event.target.files && event.target.files.length > 0) {
+      this.file = event.target.files[0];
+    }
+  }
+
+  submit() {
+    this.uploadFile(this.file);
+  }
 
   uploadFile(file: File) {
     this.$uploader.uploadFileToUrl(file).subscribe(
@@ -32,5 +48,4 @@ export class FileUploadComponent implements OnInit {
       }
     });
   }
-
 }
