@@ -9,7 +9,15 @@ export class DashboardComponent implements OnInit {
 
   constructor() { }
 
+  calendarCurrent: CalendarInfo = {
+    year: '2019'
+  };
+  
   ngOnInit() {
   }
 
+}
+
+export interface CalendarInfo {
+  year: string;
 }
