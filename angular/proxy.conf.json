@@ -1,0 +1,8 @@
+{
+  "*": {
+    "target": "http://localhost:8756/mqe",
+    "changeOrigin": true,
+    "secure": false,
+    "logLevel": "debug"
+  }
+}

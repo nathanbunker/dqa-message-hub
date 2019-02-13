@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
+import {FileUploadInfo, UploaderService} from '../uploader.service';
+import {concat, Observable, of} from 'rxjs';
 
 @Component({
   selector: 'app-file-upload',
@@ -7,23 +9,28 @@ import { Component, OnInit } from '@angular/core';
 })
 export class FileUploadComponent implements OnInit {
 
-  uploadInfo: FileUploadInfo = {
-    fileId: ''
+  fileUploads: {
+    [id: string]: Observable<FileUploadInfo>
   };
 
-  constructor() { }
+  constructor(private $uploader: UploaderService) {}
 
-  update() {
-    this.uploadInfo = {
-      fileId : this.uploadInfo.fileId + '*'
-    };
+  uploadFile(file: File) {
+    this.$uploader.uploadFileToUrl(file).subscribe(
+      (fileInfo: FileUploadInfo) => {
+        this.$uploader.initiateFileProcess(fileInfo.fileId).subscribe();
+        this.fileUploads[fileInfo.fileId] = concat(of(fileInfo), this.$uploader.watch(fileInfo.fileId));
+      }
+    );
   }
 
   ngOnInit() {
+    this.fileUploads = {};
+    this.$uploader.getQueues().subscribe(queue => {
+      for (const file of queue) {
+        this.fileUploads[file.fileId] = concat(of(file), this.$uploader.watch(file.fileId));
+      }
+    });
   }
 
-}
-
-export interface FileUploadInfo {
-    fileId: string;
 }
