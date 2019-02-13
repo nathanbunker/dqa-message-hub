@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --project mqe-hub-web",
+    "dev": "ng build --project dev",
+    "prod": "node --max_old_space_size=2048 ./node_modules/@angular/cli/bin/ng build --prod --no-progress --project prod ",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",

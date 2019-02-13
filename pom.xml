@@ -169,9 +169,11 @@
           <filesets>
             <fileset>
               <!-- Clean module (PROD Angular build location) -->
-              <directory>ted/module</directory>
+              <directory>src/main/resources/static/module</directory>
               <includes>
-                <include>*</include>
+                <include>*.js</include>
+                <include>*.map</include>
+                <include>*.html</include>
               </includes>
             </fileset>
             <fileset>
@@ -203,8 +205,8 @@
         <version>1.6</version>
         <configuration>
           <nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
-          <nodeVersion>v9.10.0</nodeVersion>
-          <npmVersion>5.8.0</npmVersion>
+          <nodeVersion>v10.15.0</nodeVersion>
+          <npmVersion>6.4.1</npmVersion>
           <workingDirectory>angular</workingDirectory>
         </configuration>
         <executions>
@@ -236,7 +238,7 @@
             <configuration>
               <arguments>run-script prod</arguments>
             </configuration>
-            <phase>${frontend.prod.phase}</phase>
+            <phase>generate-resources</phase>
           </execution>
         </executions>
       </plugin>
