@@ -9,9 +9,7 @@ export class DashboardComponent implements OnInit {
 
   constructor() { }
 
-  calendarCurrent: CalendarInfo = {
-    year: '2019'
-  };
+  calendarCurrent: CalendarInfo = {"provider":"","messageHistory":[{"day":"2019-02-13","count":15}, {"day":"2019-02-14","count":11}],"year":2019};
   
   ngOnInit() {
   }
@@ -19,5 +17,7 @@ export class DashboardComponent implements OnInit {
 }
 
 export interface CalendarInfo {
-  year: string;
+  year: number;
+  provider: string;
+  messageHistory: any[];
 }
