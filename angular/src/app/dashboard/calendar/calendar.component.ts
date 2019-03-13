@@ -16,6 +16,14 @@ export class CalendarComponent implements OnInit {
 
   @Input()
   calendarInfo: CalendarInfo;
+  searchOptions = {};
+  resultsMetaData = {
+    page: 0,
+    elementsPerPage: 10,
+    maxSize: 10,
+    totalElements: 0, // Don't modify this except with the actual list length. Modifying this causes a page reload...
+    messages: [],
+  };
 
   calendarChart: GoogleChartInterface = {
     chartType: 'Calendar',
@@ -28,16 +36,16 @@ export class CalendarComponent implements OnInit {
       [ new Date(2012, 3, 17), 38229 ]
     ],
     // opt_firstRowIsData: true,
-    options: 
-    //{'title': 'Date'},
+    options:
+    // {'title': 'Date'},
     {
       title: '',
-    
-    //	        height: 220,
+
+    // 	        height: 220,
       calendar: {
         cellSize: 20,
-    //	        	yearLabel : {display:'none', color:'grey', /*fontSize: 100*/},
-    //	        forceIFrame: true, //This doesn't seem to work.  
+    // 	        	yearLabel : {display:'none', color:'grey', /*fontSize: 100*/},
+    // 	        forceIFrame: true, //This doesn't seem to work.
         focusedCellColor: {
           stroke: '#d3362d',
           strokeOpacity: 1,
@@ -49,14 +57,29 @@ export class CalendarComponent implements OnInit {
           strokeWidth: 1
         }
       },
-    
+
       colorAxis: {colors: ['#9AF3BF', '#259253']},
       tooltip: {isHtml: true},
     }
   };
 
+myChartObject = {type: 'Calendar', data: {
+  'cols': [
+    {id: 'Date', label: 'Day', type: 'date'},
+    {id: 'count', label: 'Slices', type: 'number'},
+    {
+      id: 'tooltip',
+      type: 'string',
+      role: 'tooltip',
+      'p': {'html': true}
+    }
+  ],
+  'rows': []
+}
+};
+
   handleChartClick = function (selectedItem) {
-    console.log("handleChartClick");
+    console.log('handleChartClick');
     console.log(selectedItem);
     if (selectedItem) {
 //        		&& selectedItem.row >= 0) {
@@ -65,35 +88,20 @@ export class CalendarComponent implements OnInit {
       this.calendarDisplayYear = moment(
           this.searchOptions.date).year();
       this.resultsMetaData.page = 1;
-      //this.reloadPageData();
+      // this.reloadPageData();
     }
-  }
+  };
 
   ngOnInit() {
-    //this.calendarChart.dataTable = this.calendarInfo;
+    // this.calendarChart.dataTable = this.calendarInfo;
   }
 
-//So...  for some reason google charts sends the date back as if it were in UTC time...
+// So...  for some reason google charts sends the date back as if it were in UTC time...
 convertChartDateToLocalDate(chartDate) {
   var m = moment.utc(chartDate);
   var offsetMinutes = m.toDate().getTimezoneOffset();
   m.add(offsetMinutes, 'minutes');
   return m.toDate();
-}
-
-myChartObject = {type:'Calendar', data: {
-  "cols": [
-    {id: "Date", label: "Day", type: "date"},
-    {id: "count", label: "Slices", type: "number"},
-    {
-      id: "tooltip",
-      type: 'string',
-      role: 'tooltip',
-      'p': {'html': true}
-    }
-  ],
-  "rows": []
-}
 }
 
 }

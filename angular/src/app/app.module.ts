@@ -33,11 +33,10 @@ import { DocumentationComponent } from './documentation/documentation.component'
 import { SettingsComponent } from './settings/settings.component';
 import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
-// import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
-//import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
+import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
 
 @NgModule({
   declarations: [
@@ -60,17 +59,16 @@ import { FormsModule } from '@angular/forms';
     SettingsComponent,
     CodeDocComponent,
     DetectionDocComponent,
-    ProviderTypeaheadComponent
+    ProviderTypeaheadComponent,
+    DatepickerComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
     HttpClientModule,
-    // NgxChartsModule,
     Ng2GoogleChartsModule,
     NgbModule,
-    //,NgbdDatepickerRange
     FormsModule
   ],
   providers: [],
