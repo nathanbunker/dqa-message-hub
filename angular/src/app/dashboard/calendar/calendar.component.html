@@ -2,4 +2,4 @@
   Calendar Goes Here!
   {{calendarInfo | json}}
 </p>
-<ngx-charts-heat-map></ngx-charts-heat-map>
+<google-chart [data]="calendarChart" (chartSelect)='handleChartClick($event)'></google-chart>
