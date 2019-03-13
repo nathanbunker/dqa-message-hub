@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "settings")
+@RequestMapping(value = "api/settings")
 @RestController
 public class MqeSettingsController {
 

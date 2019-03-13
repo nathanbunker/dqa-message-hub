@@ -13,13 +13,13 @@ export class UploaderService {
   uploadFileToUrl(file: File): Observable<FileUploadInfo> {
     const form: FormData = new FormData();
     form.append('file', file);
-    return this.$http.post<FileUploadInfo>('file/upload-messages', form);
+    return this.$http.post<FileUploadInfo>('api/file/upload-messages', form);
   }
 
   initiateFileProcess(fileId: string): Observable<FileUploadInfo> {
     const form: FormData = new FormData();
     form.append('fileId', fileId);
-    return this.$http.post<FileUploadInfo>('file/process-file', form);
+    return this.$http.post<FileUploadInfo>('api/file/process-file', form);
   }
 
   watch(fileId: string): Observable<FileUploadInfo> {
@@ -32,7 +32,7 @@ export class UploaderService {
   }
 
   reportFileProcess(fileId: string): Observable<FileUploadInfo> {
-    return this.$http.get<FileUploadInfo>('file/report-file', {
+    return this.$http.get<FileUploadInfo>('api/file/report-file', {
       params: {
         fileId: fileId
       }
@@ -40,13 +40,13 @@ export class UploaderService {
   }
 
   getQueues(): Observable<FileUploadInfo[]> {
-    return this.$http.get('file/get-queues').pipe(
+    return this.$http.get('api/file/get-queues').pipe(
       pluck('uploads')
     );
   }
 
   pauseFileProcess(fileId: string) {
-    return this.$http.get<FileUploadInfo>('file/stop-file', {
+    return this.$http.get<FileUploadInfo>('api/file/stop-file', {
       params: {
         fileId: fileId
       }
@@ -54,7 +54,7 @@ export class UploaderService {
   }
 
   unpauseFileProcess(fileId: string) {
-    return this.$http.get<FileUploadInfo>('file/unpause-file', {
+    return this.$http.get<FileUploadInfo>('api/file/unpause-file', {
       params: {
         fileId: fileId
       }
@@ -62,7 +62,7 @@ export class UploaderService {
   }
 
   getAcks(fileId: string) {
-    return this.$http.get<string[]>('file/report-acks', {
+    return this.$http.get<string[]>('api/file/report-acks', {
       params: {
         fileId: fileId
       }
@@ -70,7 +70,7 @@ export class UploaderService {
   }
 
   removeFile(fileId: string) {
-    return this.$http.get<FileUploadInfo>('file/remove-file', {
+    return this.$http.get<FileUploadInfo>('api/file/remove-file', {
       params: {
         fileId: fileId
       }
