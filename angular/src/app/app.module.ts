@@ -37,6 +37,7 @@ import { DetectionDocComponent } from './documentation/detection-doc/detection-d
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
 //import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -68,8 +69,9 @@ import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provi
     HttpClientModule,
     // NgxChartsModule,
     Ng2GoogleChartsModule,
-    NgbModule
+    NgbModule,
     //,NgbdDatepickerRange
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
