@@ -33,7 +33,10 @@ import { DocumentationComponent } from './documentation/documentation.component'
 import { SettingsComponent } from './settings/settings.component';
 import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+import { Ng2GoogleChartsModule } from 'ng2-google-charts';
+import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
+import { FormsModule } from '@angular/forms';
+import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
 
 @NgModule({
   declarations: [
@@ -55,15 +58,18 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
     DocumentationComponent,
     SettingsComponent,
     CodeDocComponent,
-    DetectionDocComponent
+    DetectionDocComponent,
+    ProviderTypeaheadComponent,
+    DatepickerComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FontAwesomeModule,
     HttpClientModule,
-    NgxChartsModule,
-    NgbModule.forRoot()
+    Ng2GoogleChartsModule,
+    NgbModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
