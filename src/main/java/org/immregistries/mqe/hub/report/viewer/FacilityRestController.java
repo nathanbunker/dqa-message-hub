@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  */
 @RestController
-@RequestMapping(value = "/facilities")
+@RequestMapping(value = "/api/facilities")
 public class FacilityRestController {
 
   private static final Logger LOGGER = LoggerFactory

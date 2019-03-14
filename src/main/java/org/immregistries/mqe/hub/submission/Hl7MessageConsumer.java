@@ -2,22 +2,35 @@ package org.immregistries.mqe.hub.submission;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.immregistries.mqe.core.util.DateUtility;
 import org.immregistries.mqe.hl7util.Reportable;
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
+import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.hub.report.SenderMetricsService;
+import org.immregistries.mqe.hub.report.viewer.MessageCode;
+import org.immregistries.mqe.hub.report.viewer.MessageDetection;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadata;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
+import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
+import org.immregistries.mqe.validator.detection.Detection;
+import org.immregistries.mqe.validator.detection.ValidationReport;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
+import org.immregistries.mqe.validator.report.codes.CodeCollection;
+import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
-import org.joda.time.DateTime;
+import org.immregistries.mqe.vxu.MqeVaccination;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +59,7 @@ public class Hl7MessageConsumer {
     if (sender == null) {
       sender = "MQE";
     }
-    
-    
+
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
 
     //force serial processing...
@@ -69,8 +81,10 @@ public class Hl7MessageConsumer {
     MqeMessageServiceResponse dqr = response.getMqeResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
-    this.saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
-        response.getSender(), sentDate);
+    MessageMetadata mm = this
+        .saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
+            response.getSender(), sentDate, response);
+
     return response;
   }
 
@@ -92,7 +106,8 @@ public class Hl7MessageConsumer {
 //    return sentDate;
 //  }
 
-  private void saveMessageForSender(String message, String ack, String sender, Date sentDate) {
+  private MessageMetadata saveMessageForSender(String message, String ack, String sender,
+      Date sentDate, Hl7MessageHubResponse response) {
     MessageMetadata mm = new MessageMetadata();
     //for demo day, let's make a random date in the last month.
     mm.setInputTime(sentDate);
@@ -100,13 +115,70 @@ public class Hl7MessageConsumer {
     mm.setMessage(message);
     mm.setResponse(ack);
     mm.setProvider(sender);
+
+    for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
+      for (ValidationReport vr : rr.getValidationDetections()) {
+        Detection d = vr.getDetection();
+        if (SeverityLevel.ERROR == d.getSeverity() ||
+            SeverityLevel.WARN == d.getSeverity()) {
+          StringBuilder locBldr = new StringBuilder();
+          for (Hl7Location loc : vr.getHl7LocationList()) {
+            locBldr.append(loc.toString());
+          }
+          String loc = locBldr.toString();
+          MessageDetection md = new MessageDetection();
+          md.setDetectionId(d.getMqeMqeCode());
+          md.setLocationTxt(loc);
+          md.setMessageMetadata(mm);
+          mm.getDetections().add(md);
+        }
+      }
+    }
+
+    MqeMessageMetrics metrics = scorer.getMqeMetricsFor(response.getMqeResponse());
+    CodeCollection c = metrics.getCodes();
+    for (CollectionBucket cb : c.getCodeCountList()) {
+      MessageCode mc = new MessageCode();
+      mc.setCodeCount(cb.getCount());
+      mc.setCodeType(cb.getTypeCode());
+      mc.setCodeValue(cb.getValue());
+      mc.setCodeStatus(cb.getStatus());
+      mc.setMessageMetadata(mm);
+      mm.getCodes().add(mc);
+    }
+    
+    Map<String, MessageVaccine> map = new HashMap<>();
+    for (MqeVaccination mv : response.getMqeResponse().getMessageObjects().getVaccinations()) {
+    	if (!mv.isAdministered()){
+    		continue;
+    	}
+    	Date date = mv.getAdminDate();
+    	Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
+    	int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
+    	String cvx = mv.getCvxDerived();
+    	String key = cvx+":"+age;
+    	MessageVaccine v = map.get(key);
+    	if (v == null) {
+    		v = new MessageVaccine();
+    		v.setCount(0);
+    		v.setMessageMetadata(mm);
+    		v.setVaccineCvx(cvx);
+    		v.setAge(age);
+    		mm.getVaccines().add(v);
+    		map.put(key, v);
+    	}
+    	v.setCount(v.getCount() + 1);
+    }
     metaRepo.save(mm);
+
+    return mm;
   }
 
-  private void saveMetricsFromValidationResults(String sender,
+  private MqeMessageMetrics saveMetricsFromValidationResults(String sender,
       MqeMessageServiceResponse validationResults, Date metricsDate) {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
     metricsSvc.addToSenderMetrics(sender, metricsDate, metrics);
+    return metrics;
   }
 
   private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults,

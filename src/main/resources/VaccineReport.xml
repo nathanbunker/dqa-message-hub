@@ -29,6 +29,7 @@
 	</ageCategories>
 	<vaccineReportGroup>
 		<label>Adenovirus</label>
+		<displayPriority>0</displayPriority>
 		<cvx>143</cvx>
 		<cvx>54</cvx>
 		<cvx>55</cvx>
@@ -56,6 +57,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Adjuvant</label>
+		<displayPriority>0</displayPriority>
 		<cvx>801</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -80,6 +82,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Anthrax</label>
+		<displayPriority>0</displayPriority>
 		<cvx>24</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -104,6 +107,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Antitoxin</label>
+		<displayPriority>0</displayPriority>
 		<cvx>27</cvx>
 		<cvx>12</cvx>
 		<ageCategoryStatus>
@@ -129,6 +133,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>BCG</label>
+		<displayPriority>0</displayPriority>
 		<cvx>19</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -153,6 +158,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Cholera</label>
+		<displayPriority>0</displayPriority>
 		<cvx>26</cvx>
 		<cvx>172</cvx>
 		<cvx>173</cvx>
@@ -180,6 +186,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Dengue Fever</label>
+		<displayPriority>0</displayPriority>
 		<cvx>56</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -204,6 +211,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>DTaP</label>
+		<displayPriority>2</displayPriority>
 		<cvx>28</cvx>
 		<cvx>20</cvx>
 		<cvx>106</cvx>
@@ -241,6 +249,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Hantavirus</label>
+		<displayPriority>0</displayPriority>
 		<cvx>57</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -265,6 +274,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Hep A</label>
+		<displayPriority>9</displayPriority>
 		<cvx>83</cvx>
 		<cvx>52</cvx>
 		<cvx>84</cvx>
@@ -295,6 +305,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Hep B</label>
+		<displayPriority>3</displayPriority>
 		<cvx>146</cvx>
 		<cvx>110</cvx>
 		<cvx>132</cvx>
@@ -329,6 +340,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Hep E</label>
+		<displayPriority>0</displayPriority>
 		<cvx>59</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -353,6 +365,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Herpes</label>
+		<displayPriority>0</displayPriority>
 		<cvx>60</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -377,6 +390,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Hib</label>
+		<displayPriority>5</displayPriority>
 		<cvx>146</cvx>
 		<cvx>170</cvx>
 		<cvx>50</cvx>
@@ -413,6 +427,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>HIV</label>
+		<displayPriority>0</displayPriority>
 		<cvx>61</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -437,6 +452,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>HPV</label>
+		<displayPriority>11</displayPriority>
 		<cvx>118</cvx>
 		<cvx>62</cvx>
 		<cvx>137</cvx>
@@ -464,6 +480,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Immune Globulin</label>
+		<displayPriority>0</displayPriority>
 		<cvx>86</cvx>
 		<cvx>14</cvx>
 		<cvx>87</cvx>
@@ -495,6 +512,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Influenza</label>
+		<displayPriority>15</displayPriority>
 		<cvx>160</cvx>
 		<cvx>151</cvx>
 		<cvx>123</cvx>
@@ -544,6 +562,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Japenese Encephalitis</label>
+		<displayPriority>0</displayPriority>
 		<cvx>134</cvx>
 		<cvx>39</cvx>
 		<cvx>129</cvx>
@@ -570,6 +589,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Junin Virus</label>
+		<displayPriority>0</displayPriority>
 		<cvx>63</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -594,6 +614,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Leprosy</label>
+		<displayPriority>0</displayPriority>
 		<cvx>65</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -618,6 +639,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Lieshmaiasis</label>
+		<displayPriority>0</displayPriority>
 		<cvx>64</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -642,6 +664,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Lyme Disease</label>
+		<displayPriority>0</displayPriority>
 		<cvx>66</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -666,6 +689,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Malaria</label>
+		<displayPriority>0</displayPriority>
 		<cvx>67</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -690,6 +714,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Measles</label>
+		<displayPriority>0</displayPriority>
 		<cvx>5</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -714,6 +739,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Melanoma</label>
+		<displayPriority>0</displayPriority>
 		<cvx>68</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -738,6 +764,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Mening</label>
+		<displayPriority>12</displayPriority>
 		<cvx>108</cvx>
 		<cvx>163</cvx>
 		<cvx>162</cvx>
@@ -774,6 +801,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>MMR</label>
+		<displayPriority>7</displayPriority>
 		<cvx>4</cvx>
 		<cvx>3</cvx>
 		<cvx>94</cvx>
@@ -800,6 +828,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Mumps</label>
+		<displayPriority>0</displayPriority>
 		<cvx>7</cvx>
 		<cvx>38</cvx>
 		<ageCategoryStatus>
@@ -825,6 +854,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Parainfluenza</label>
+		<displayPriority>0</displayPriority>
 		<cvx>69</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -849,6 +879,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>PCV</label>
+		<displayPriority>6</displayPriority>
 		<cvx>177</cvx>
 		<cvx>133</cvx>
 		<cvx>100</cvx>
@@ -876,6 +907,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Pertussis</label>
+		<displayPriority>0</displayPriority>
 		<cvx>11</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -900,6 +932,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Plague</label>
+		<displayPriority>0</displayPriority>
 		<cvx>23</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -924,6 +957,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Polio</label>
+		<displayPriority>4</displayPriority>
 		<cvx>146</cvx>
 		<cvx>170</cvx>
 		<cvx>110</cvx>
@@ -959,6 +993,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>PPSV23</label>
+		<displayPriority>13</displayPriority>
 		<cvx>33</cvx>
 		<cvx>109</cvx>
 		<ageCategoryStatus>
@@ -984,6 +1019,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Q Fever</label>
+		<displayPriority>0</displayPriority>
 		<cvx>70</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1008,6 +1044,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Rabies</label>
+		<displayPriority>0</displayPriority>
 		<cvx>175</cvx>
 		<cvx>176</cvx>
 		<cvx>40</cvx>
@@ -1036,6 +1073,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Rheumatic Fever</label>
+		<displayPriority>0</displayPriority>
 		<cvx>72</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1086,6 +1124,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Rift Valley Fever</label>
+		<displayPriority>0</displayPriority>
 		<cvx>73</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1110,6 +1149,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>RIG</label>
+		<displayPriority>0</displayPriority>
 		<cvx>34</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1134,6 +1174,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Rotavirus</label>
+		<displayPriority>1</displayPriority>
 		<cvx>119</cvx>
 		<cvx>116</cvx>
 		<cvx>74</cvx>
@@ -1161,6 +1202,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>RSV</label>
+		<displayPriority>0</displayPriority>
 		<cvx>71</cvx>
 		<cvx>93</cvx>
 		<cvx>145</cvx>
@@ -1187,6 +1229,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Rubella</label>
+		<displayPriority>0</displayPriority>
 		<cvx>6</cvx>
 		<cvx>38</cvx>
 		<ageCategoryStatus>
@@ -1212,6 +1255,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Smallpox</label>
+		<displayPriority>0</displayPriority>
 		<cvx>75</cvx>
 		<cvx>105</cvx>
 		<cvx>79</cvx>
@@ -1238,6 +1282,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Staphylococcus Bacterio Lysate</label>
+		<displayPriority>0</displayPriority>
 		<cvx>76</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1262,6 +1307,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Td/Tdap</label>
+		<displayPriority>10</displayPriority>
 		<cvx>138</cvx>
 		<cvx>9</cvx>
 		<cvx>113</cvx>
@@ -1290,6 +1336,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Tetanus</label>
+		<displayPriority>0</displayPriority>
 		<cvx>35</cvx>
 		<cvx>142</cvx>
 		<cvx>112</cvx>
@@ -1316,6 +1363,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Tick-Borne Encephalitis</label>
+		<displayPriority>0</displayPriority>
 		<cvx>77</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1340,6 +1388,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>TIG</label>
+		<displayPriority>0</displayPriority>
 		<cvx>13</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1364,6 +1413,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Tuberculin Skin Test</label>
+		<displayPriority>0</displayPriority>
 		<cvx>98</cvx>
 		<cvx>95</cvx>
 		<cvx>96</cvx>
@@ -1391,6 +1441,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Tularemia</label>
+		<displayPriority>0</displayPriority>
 		<cvx>78</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1415,6 +1466,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Typhoid</label>
+		<displayPriority>0</displayPriority>
 		<cvx>25</cvx>
 		<cvx>41</cvx>
 		<cvx>53</cvx>
@@ -1444,6 +1496,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Typhus</label>
+		<displayPriority>0</displayPriority>
 		<cvx>131</cvx>
 		<ageCategoryStatus>
 			<label>Baby</label>
@@ -1468,6 +1521,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Unknown</label>
+		<displayPriority>0</displayPriority>
 		<cvx>998</cvx>
 		<cvx>999</cvx>
 		<cvx>99</cvx>
@@ -1494,6 +1548,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Varicella</label>
+		<displayPriority>8</displayPriority>
 		<cvx>94</cvx>
 		<cvx>21</cvx>
 		<ageCategoryStatus>
@@ -1519,6 +1574,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Varicella Immune Globin</label>
+		<displayPriority>0</displayPriority>
 		<cvx>36</cvx>
 		<cvx>117</cvx>
 		<ageCategoryStatus>
@@ -1544,6 +1600,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Venezuelan Equine Encephalitis</label>
+		<displayPriority>0</displayPriority>
 		<cvx>81</cvx>
 		<cvx>80</cvx>
 		<cvx>92</cvx>
@@ -1570,6 +1627,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Yellow Fever</label>
+		<displayPriority>0</displayPriority>
 		<cvx>37</cvx>
 		<cvx>183</cvx>
 		<cvx>184</cvx>
@@ -1596,6 +1654,7 @@
 	</vaccineReportGroup>
 	<vaccineReportGroup>
 		<label>Zoster</label>
+		<displayPriority>14</displayPriority>
 		<cvx>121</cvx>
 		<cvx>187</cvx>
 		<cvx>188</cvx>

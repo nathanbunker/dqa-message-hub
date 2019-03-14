@@ -7,9 +7,10 @@ import java.io.InputStream;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.JAXBIntrospector;
 import javax.xml.bind.Unmarshaller;
 import org.immregistries.mqe.hub.report.vaccineReport.generated.ObjectFactory;
-import org.immregistries.mqe.hub.report.vaccineReport.generated.VaccinesAdministeredExpectationType;
+import org.immregistries.mqe.hub.report.vaccineReport.generated.VaccinesAdministeredExpectation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +35,9 @@ public enum VaccineReportBuilder {
 
         jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
         Unmarshaller jaxbUM = jaxbContext.createUnmarshaller();
-        VaccinesAdministeredExpectationType vaet =
-            ((JAXBElement<VaccinesAdministeredExpectationType>) jaxbUM.unmarshal(inputStream)).getValue();
+        VaccinesAdministeredExpectation vaet =
+            (VaccinesAdministeredExpectation) JAXBIntrospector
+                .getValue(jaxbUM.unmarshal(inputStream));
         vaccineReportConfig = new VaccineReportConfig(vaet);
       } catch (JAXBException e) {
         throw new RuntimeException("Could not marshall the vaccine report meta data", e);

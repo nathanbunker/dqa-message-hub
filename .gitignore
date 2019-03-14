@@ -3,7 +3,10 @@
 .classpath
 .project
 /.apt_generated/
-
+angular/node_modules
+angular/node
+node_modules
+node
 \.factorypath
 
 \.settings/

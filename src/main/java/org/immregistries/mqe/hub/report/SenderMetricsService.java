@@ -175,7 +175,7 @@ public class SenderMetricsService {
       //none of these are in the db yet.
       CodeCount cc = new CodeCount();
       cc.setAttribute(bucket.getAttribute());
-      VxuField f = VxuField.getByName(bucket.getType());
+      VxuField f = VxuField.getByName(bucket.getTypeCode());
       cc.setCodeType(f.toString());
       cc.setOrigin(f.getHl7Locator());
       cc.setCodeValue(bucket.getValue());

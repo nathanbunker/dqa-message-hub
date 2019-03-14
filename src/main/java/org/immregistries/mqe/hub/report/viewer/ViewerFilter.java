@@ -12,13 +12,18 @@ import org.apache.commons.lang3.StringUtils;
 public class ViewerFilter {
 
   private String messageText;
-  private Integer statisticId;
-  private String ackStatusCd1;
-  private String ackStatusCd2;
+  private String detectionId;
+  private String codeValue;
+  private String codeType;
+  private String vaccineGroup;
+  private String vaccineGroupAge;
 
   private boolean messageTextFilter;
-  private boolean statisticFilter;
-  private boolean ackStatusFilter;
+  private boolean detectionIdFilter;
+  private boolean codeValueFilter;
+  private boolean codeTypeFilter;
+  private boolean vaccineGroupFilter;
+  private boolean vaccineGroupAgeFilter;
 
   public ViewerFilter(String rawAjaxFilterText) {
     if (StringUtils.isNotBlank(rawAjaxFilterText)) {
@@ -29,8 +34,32 @@ public class ViewerFilter {
   public void setFiltersFromAjaxString(String ajaxString) {
     Map<String, String> filterMap = filterTextToMap(ajaxString);
     setMessageTextFilterFromString(filterMap.get("messageSearchText"));
-    setStatisticFilterFromString(filterMap.get("statisticId"));
-    setAckStatusesFromString(filterMap.get("ackStatus"));
+    setDetectionIdFilterFromString(filterMap.get("detectionId"));
+    setCodeValueFilterFromString(filterMap.get("codeValue"));
+    setCodeTypeFilterFromString(filterMap.get("codeType"));
+    setVaccineGroupFilterFromString(filterMap.get("vaccineGroup"));
+    setVaccineGroupAgeFilterFromString(filterMap.get("vaccineGroupAge"));
+    
+  }
+
+  private void setVaccineGroupAgeFilterFromString(String age) {
+	    this.vaccineGroupAge = age;
+	    this.vaccineGroupAgeFilter = StringUtils.isNotBlank(age);
+}
+
+private void setVaccineGroupFilterFromString(String value) {
+	    this.vaccineGroup = value;
+	    this.vaccineGroupFilter = StringUtils.isNotBlank(value);
+}
+
+void setCodeValueFilterFromString(String codeValue) {
+    this.codeValue = codeValue;
+    this.codeValueFilter = StringUtils.isNotBlank(codeValue);
+  }
+
+  void setCodeTypeFilterFromString(String codeType) {
+      this.codeType = codeType;
+    this.codeTypeFilter = StringUtils.isNotBlank(codeType);
   }
 
   void setMessageTextFilterFromString(String messageTextSearch) {
@@ -38,23 +67,9 @@ public class ViewerFilter {
     this.messageTextFilter = StringUtils.isNotBlank(messageText);
   }
 
-  void setStatisticFilterFromString(String statisticIdStr) {
-    if (StringUtils.isNumeric(statisticIdStr)) {
-      this.statisticId = Integer.parseInt(statisticIdStr);
-    }
-    this.statisticFilter = statisticId != null && statisticId > -1;
-  }
-
-  void setAckStatusesFromString(String ackStatusCsv) {
-    if (ackStatusCsv != null) {
-      String[] list = ackStatusCsv.split(",");
-      this.ackStatusCd1 = list[0];
-      if (list.length > 1) {
-        this.ackStatusCd2 = list[1];
-      }
-    }
-    this.ackStatusFilter =
-        StringUtils.isNotBlank(ackStatusCd2) || StringUtils.isNotBlank(ackStatusCd1);
+  void setDetectionIdFilterFromString(String detectionIdStr) {
+    this.detectionId = detectionIdStr;
+    this.detectionIdFilter = StringUtils.isNotBlank(detectionIdStr);
   }
 
   public Map<String, String> filterTextToMap(String filterText) {
@@ -82,44 +97,50 @@ public class ViewerFilter {
   }
 
   /**
-   * @return the statisticId
-   */
-  public Integer getStatisticId() {
-    return statisticId;
-  }
-
-  /**
-   * @return the ackStatusCd1
-   */
-  public String getAckStatusCd1() {
-    return ackStatusCd1;
-  }
-
-  /**
-   * @return the ackStatusCd2
-   */
-  public String getAckStatusCd2() {
-    return ackStatusCd2;
-  }
-
-  /**
    * @return the hasMessageTextFilter
    */
   public boolean isMessageTextFilter() {
     return messageTextFilter;
   }
 
-  /**
-   * @return the hasStatisticFilter
-   */
-  public boolean isStatisticFilter() {
-    return statisticFilter;
+  public String getDetectionId() {
+    return detectionId;
   }
 
-  /**
-   * @return the hasAckStatusFilter
-   */
-  public boolean isAckStatusFilter() {
-    return ackStatusFilter;
+  public boolean isDetectionIdFilter() {
+    return detectionIdFilter;
   }
+
+  public String getCodeValue() {
+    return codeValue;
+  }
+
+  public String getCodeType() {
+    return codeType;
+  }
+
+  public boolean isCodeValueFilter() {
+    return codeValueFilter;
+  }
+
+  public boolean isCodeTypeFilter() {
+    return codeTypeFilter;
+  }
+
+public String getVaccineGroup() {
+	return vaccineGroup;
+}
+
+public boolean isVaccineGroupFilter() {
+	return vaccineGroupFilter;
+}
+
+public String getVaccineGroupAge() {
+	return vaccineGroupAge;
+}
+
+public boolean isVaccineGroupAgeFilter() {
+	return vaccineGroupAgeFilter;
+}
+
 }

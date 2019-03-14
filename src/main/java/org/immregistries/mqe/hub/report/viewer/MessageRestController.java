@@ -9,6 +9,7 @@ import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hl7util.parser.model.HL7MessagePart;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReader;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReaderNIST;
+import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Josh
  */
 @RestController
-@RequestMapping(value = "/messages")
+@RequestMapping(value = "/api/messages")
 //@Transactional(isolation = Isolation.READ_UNCOMMITTED)
 public class MessageRestController {
 
@@ -48,9 +49,12 @@ public class MessageRestController {
       @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
       @PathVariable("page") int pageNumber, @PathVariable("messages") int itemsCount,
       String filters) {
+
     LOGGER.info("jsonMessagesGetter - calling for messages.  ");
-    MessageListContainer container = messageRetreiver
-        .getMessages(providerKey, date, null, pageNumber, itemsCount);
+
+    ViewerFilter vf = new ViewerFilter(filters);
+
+    MessageListContainer container = messageRetreiver.getMessages(providerKey, date, vf, pageNumber, itemsCount);
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
             .getTotalPages() + " current page: " + container.getPageNumber());
@@ -73,6 +77,30 @@ public class MessageRestController {
     mdi.setVxuParts(vxuLocs);
     mdi.setMessageMetaData(mli);
     mdi.setProviderKey(mq.getProvider());
+    for (MessageCode mc : mq.getCodes()) {
+      CodeDetail cd = new CodeDetail();
+      cd.setCodeCount(mc.getCodeCount());
+      cd.setCodeStatus(mc.getCodeStatus());
+      cd.setCodeType(mc.getCodeType());
+      cd.setCodeValue(mc.getCodeValue());
+      mdi.getCodes().add(cd);
+    }
+
+    List<MessageDetection> mdList = mq.getDetections();
+    for (MessageDetection mdt : mdList) {
+      Detection d = Detection.getByMqeErrorCodeString(mdt.getDetectionId());
+      String l = mdt.getLocationTxt();
+      DetectionDetail dd = new DetectionDetail();
+      dd.setDetectionId(mdt.getDetectionId());
+      if (d!=null) {
+        dd.setDescription(d.getDisplayText());
+        dd.setName(d.toString());
+        dd.setSeverity(d.getSeverity().getCode());
+        dd.setLocation(l);
+      }
+        mdi.getDetections().add(dd);
+
+    }
 
     String received = mq.getMessage().replaceAll("[\\r]+", "\n");
     mdi.setMessageReceived(received);

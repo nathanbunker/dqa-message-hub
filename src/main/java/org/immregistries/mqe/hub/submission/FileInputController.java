@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RequestMapping(value = "/file")
+@RequestMapping(value = "/api/file")
 @RestController
 public class FileInputController {
 
@@ -51,11 +51,13 @@ public class FileInputController {
     String fileId = "file" + String.valueOf(new Date().getTime());
     FileUploadData fileUpload = new FileUploadData(facilityId, file.getOriginalFilename(), fileId);
     ByteArrayOutputStream result = new ByteArrayOutputStream();
-    byte[] buffer = new byte[1024];
     int length;
+    byte[] buffer = new byte[1024];
+
     while ((length = inputStream.read(buffer)) != -1) {
       result.write(buffer, 0, length);
     }
+
     fileUpload.setData(result);
 
     this.fileQueue.put(fileId, fileUpload);
@@ -200,6 +202,11 @@ public class FileInputController {
       }
     }
 
+    zis = null;
+    entry= null;
+
+    fileUpload.setData(null);
+
     logger.info(
         "\nFilename: " + fileUpload.getFileName() + "\n" + "Number of messages: " + fileUpload
             .getNumberOfMessages() + "\n" + "Reported under: " + fileUpload);
@@ -208,18 +215,21 @@ public class FileInputController {
     
     fileUpload.setStatus("started");
 
+    //Is it possible to eliminate messages from the input set as they're processed?
+
     try {
-      for (String message : fileUpload.getHl7Messages()) {
+      for (int idx = 0; idx < fileUpload.getHl7Messages().size(); idx++) {
+        String message = fileUpload.getHl7Messages().get(idx);
         while (!"started".equals(fileUpload.getStatus())) {
-          Thread.sleep(1000);
-          logger.warn(
-              "File " + fileId + " Stopped. Waiting for restart. Remaining Messages to process: "
-                  + fileUpload.getNumberUnProcessed());
-          if ("deleted".equals(fileUpload.getStatus())) {
-            return fileUpload;
+            Thread.sleep(1000);
+            logger.warn(
+                "File " + fileId + " Stopped. Waiting for restart. Remaining Messages to process: "
+                    + fileUpload.getNumberUnProcessed());
+            if ("deleted".equals(fileUpload.getStatus())) {
+              return fileUpload;
+            }
           }
-        }
-        String sender = quickParser.getMsh4Sender(message);
+          String sender = quickParser.getMsh4Sender(message);
         
         if (StringUtils.isBlank(sender)) {
           sender = "Unspecified";
@@ -228,6 +238,7 @@ public class FileInputController {
 
         String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, sender);
 
+        fileUpload.getHl7Messages().set(idx, null);
 
         //If the ack ends with a line break, remove it.
         ackResult = ackResult.replaceAll("\\r$", "");

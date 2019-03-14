@@ -92,6 +92,9 @@ angular.module('messageHubDemoApp')
 					//find the next spot that value is in the string.
 					var value = valueItem.value;
 					var idxStart = popOffString.indexOf(value);
+					if (value === '') {
+					  idxStart = 1;
+					}
 					var separatorValue = popOffString.substring(0, idxStart);
 
 					if (separatorValue) {

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "/nist/validator")
+@RequestMapping(value = "/api/nist/validator")
 @RestController
 public class NistValidatorService {
   //INSTANCE;
