@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "/messages")
+@RequestMapping(value = "/api/messages")
 @RestController
 public class MessageInputController {
 
@@ -43,7 +43,7 @@ public class MessageInputController {
     return ack;
   }
 
-//  @Transactional
+  @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
   public String urlEncodedHttpFormPost(
       String MESSAGEDATA, String USERID, String PASSWORD, String FACILITYID) throws Exception {

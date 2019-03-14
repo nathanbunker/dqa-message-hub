@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Josh
  */
 @RestController
-@RequestMapping(value = "/messages")
+@RequestMapping(value = "/api/messages")
 //@Transactional(isolation = Isolation.READ_UNCOMMITTED)
 public class MessageRestController {
 

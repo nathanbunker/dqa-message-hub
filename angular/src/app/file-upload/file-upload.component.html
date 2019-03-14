@@ -1,0 +1,12 @@
+<app-file-upload-details *ngFor="let key of keysOf(fileUploads)" [fileUploadInfo]="fileUploads[key] | async"></app-file-upload-details>
+
+<div class="container" style="margin-top: 10px;">
+  <div class="row">
+    <div class="col-sm-10">
+      <input type="file" (change)="setFile($event)"/>
+    </div>
+    <div class="col-sm-2">
+      <button (click)="submit()" class="btn btn-primary" [disabled]="!file">Submit</button>
+    </div>
+  </div>
+</div>
