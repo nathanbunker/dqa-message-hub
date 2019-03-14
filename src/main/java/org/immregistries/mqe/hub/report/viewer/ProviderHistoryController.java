@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping(value = "/provider")
+@RequestMapping(value = "/api/provider")
 public class ProviderHistoryController {
 
   private static final Logger LOGGER = LoggerFactory
