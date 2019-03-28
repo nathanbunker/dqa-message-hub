@@ -33,14 +33,12 @@ public class MqeHl7TestingController {
 
     Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
     messageSubmission.setMessage(message);
-    if (message.contains("|VXU")) {
+    if (message.contains("|QBP")) {
+      return iisSandboxSubmission.submitMessageToIISSandbox(message);
+    } else {
       String response = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
       logger.info("ACK: " + response);
       return iisSandboxSubmission.submitMessageToIISSandbox(message);
-    } else if (message.contains("|QBP")) {
-      return iisSandboxSubmission.submitMessageToIISSandbox(message);
-    } else {
-      return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
     }
   }
 
