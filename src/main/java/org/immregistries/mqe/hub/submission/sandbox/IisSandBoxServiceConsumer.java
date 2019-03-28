@@ -15,6 +15,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 
+/**
+ * 
+ * Handle submitting VXU and QBP to the
+ * IIS Sandbox as simple http posts.
+ * 
+ * @author jamesabrannan
+ *
+ */
 @Service
 public class IisSandBoxServiceConsumer {
 
