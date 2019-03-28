@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
+import org.immregistries.mqe.hub.submission.IISSandboxSubmissionImpl;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ public class MqeHl7TestingController {
   @Autowired
   private Hl7MessageConsumer messageConsumer;
 
+  @Autowired
+  private IISSandboxSubmissionImpl iisSandboxSubmission;
+
   @RequestMapping(value = "hl7", method = RequestMethod.POST)
   public String hl7MessageInterface(
       @RequestBody String message) throws Exception {
@@ -29,8 +33,15 @@ public class MqeHl7TestingController {
 
     Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
     messageSubmission.setMessage(message);
-
-    return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    if (message.contains("|VXU")) {
+      String response = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+      logger.info("ACK: " + response);
+      return iisSandboxSubmission.submitMessageToIISSandbox(message);
+    } else if (message.contains("|QBP")) {
+      return iisSandboxSubmission.submitMessageToIISSandbox(message);
+    } else {
+      return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    }
   }
 
 
