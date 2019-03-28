@@ -1,0 +1,343 @@
+{
+	"info": {
+		"_postman_id": "0189f7e0-eae5-41d3-9829-5ee0d4d42fd8",
+		"name": "mqe-hub-testing",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "MQE Save Post Query - JSON",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"MSH|^~\\\\&||1255-60-20|MCIR|MDCH|20190326220014-0400||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|T|2.5.1\\rPID|||3WzJ-A.01.012045431^^^AIRA-TEST^MR||Sawsan^Andy^^^^^L|Edmund^Clay|20171101|M||2076-8^Native Hawaiian or Other Pacific Islander^HL70005|417 Bridge St NW^^Grand Rapids^MI^49544^USA^P||^PRN^PH^^^616^9245843|||||||||2135-2^Hispanic or Latino^HL70005|Birth Place PID-23\\rPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20170301|20170301\\rNK1|1|Sawsan^Clay^^^^^L|MTH^Mother^HL70063|81 Page Pl^^GR^MI^49544^USA^P|^PRN^PH^^^616^9245843\\rORC|RE||V51L2.3^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\\rRXA|0|1|20190301||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||Y5841RR||MSD^Merck and Co^MVX||||A\\rRXR|SC^^HL70162|RA^^HL70163\\rOBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V02^VFC eligible - Medicaid/Medicaid Managed Care^HL70064||||||F|||20170301|||VXC40^Eligibility captured at the immunization level^CDCPHINVS\\rOBX|2|CE|30956-7^Vaccine Type^LN|2|21^Varicella^CVX||||||F\\rOBX|3|TS|29768-9^Date vaccine information statement published^LN|2|20080313||||||F\\rOBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20170301||||||F\\rORC|RE||BQ61L11032.2^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\\rRXA|0|1|20190301||66019-0302-10^FluMist Quadrivalent^NDC|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||N3783EO||MED^^MVX|||CP|A\",\"user\":\"regularUser\",\"password\":\"password123\",\"facilityCode\":\"Mercy Hospital\"}"
+				},
+				"url": {
+					"raw": "http://localhost:8756/mqe/api/messages/json/saved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8756",
+					"path": [
+						"mqe",
+						"api",
+						"messages",
+						"json",
+						"saved"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MQE NoSave Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"message\":\"MSH|^~\\\\&||1255-60-20|MCIR|MDCH|20190326220014-0400||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|T|2.5.1\\rPID|||3WzJ-A.01.012045431^^^AIRA-TEST^MR||Sawsan^Andy^^^^^L|Edmund^Clay|20171101|M||2076-8^Native Hawaiian or Other Pacific Islander^HL70005|417 Bridge St NW^^Grand Rapids^MI^49544^USA^P||^PRN^PH^^^616^9245843|||||||||2135-2^Hispanic or Latino^HL70005|Birth Place PID-23\\rPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20170301|20170301\\rNK1|1|Sawsan^Clay^^^^^L|MTH^Mother^HL70063|81 Page Pl^^GR^MI^49544^USA^P|^PRN^PH^^^616^9245843\\rORC|RE||V51L2.3^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\\rRXA|0|1|20190301||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||Y5841RR||MSD^Merck and Co^MVX||||A\\rRXR|SC^^HL70162|RA^^HL70163\\rOBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V02^VFC eligible - Medicaid/Medicaid Managed Care^HL70064||||||F|||20170301|||VXC40^Eligibility captured at the immunization level^CDCPHINVS\\rOBX|2|CE|30956-7^Vaccine Type^LN|2|21^Varicella^CVX||||||F\\rOBX|3|TS|29768-9^Date vaccine information statement published^LN|2|20080313||||||F\\rOBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20170301||||||F\\rORC|RE||BQ61L11032.2^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\\rRXA|0|1|20190301||66019-0302-10^FluMist Quadrivalent^NDC|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||N3783EO||MED^^MVX|||CP|A\",\"user\":\"regularUser\",\"password\":\"password123\",\"facilityCode\":\"Mercy Hospital\"}"
+				},
+				"url": {
+					"raw": "http://localhost:8756/mqe/api/messages/json/notsaved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8756",
+					"path": [
+						"mqe",
+						"api",
+						"messages",
+						"json",
+						"notsaved"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Form Submission Query - FORM POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "USER",
+							"value": "Mercy",
+							"type": "text"
+						},
+						{
+							"key": "PASSWORD",
+							"value": "password123",
+							"type": "text"
+						},
+						{
+							"key": "FACILITYCODE",
+							"value": "Mercy Hospital",
+							"type": "text"
+						},
+						{
+							"key": "MESSAGE",
+							"value": "MSH|^~\\&||1255-60-20|MCIR|MDCH|20190328143418-0400||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|T|2.5.1\nPID|||3WzJ-A.01.01-2051113226^^^AIRA-TEST^MR||Ryland^Kenton^^^^^L|Ferris^Jensen|20171101|M||2076-8^Native Hawaiian or Other Pacific Islander^HL70005|417 Bridge St NW^^Grand Rapids^MI^49544^USA^P||^PRN^PH^^^616^9245843|||||||||2135-2^Hispanic or Latino^HL70005|Birth Place PID-23\nPD1|||||||||||02^Reminder/Recall - any method^HL70215|||||A|20170301|20170301\nNK1|1|Ryland^Jensen^^^^^L|MTH^Mother^HL70063|81 Page Pl^^GR^MI^49544^USA^P|^PRN^PH^^^616^9245843\nORC|RE||V51L2.3^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\nRXA|0|1|20190301||21^Varicella^CVX|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||Y5841RR||MSD^Merck and Co^MVX||||A\nRXR|SC^^HL70162|RA^^HL70163\nOBX|1|CE|64994-7^Vaccine funding program eligibility category^LN|1|V02^VFC eligible - Medicaid/Medicaid Managed Care^HL70064||||||F|||20170301|||VXC40^Eligibility captured at the immunization level^CDCPHINVS\nOBX|2|CE|30956-7^Vaccine Type^LN|2|21^Varicella^CVX||||||F\nOBX|3|TS|29768-9^Date vaccine information statement published^LN|2|20080313||||||F\nOBX|4|TS|29769-7^Date vaccine information statement presented^LN|2|20170301||||||F\nORC|RE||BQ61L11032.2^AIRA|||||||I-23432^Burden^Donna^A^^^^^NIST-AA-1||57422^RADON^NICHOLAS^^^^^^NIST-AA-1^L\nRXA|0|1|20190301||66019-0302-10^FluMist Quadrivalent^NDC|0.5|mL^milliliters^UCUM||00^Administered^NIP001||||||N3783EO||MED^^MVX|||CP|A",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8756/mqe/api/messages/form/saved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8756",
+					"path": [
+						"mqe",
+						"api",
+						"messages",
+						"form",
+						"saved"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Form Submission Save Post - FORM POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "USER",
+							"value": "Mercy",
+							"type": "text"
+						},
+						{
+							"key": "PASSWORD",
+							"value": "password123",
+							"type": "text"
+						},
+						{
+							"key": "FACILITYCODE",
+							"value": "Mercy Hospital",
+							"type": "text"
+						},
+						{
+							"key": "MESSAGE",
+							"value": "MSH|^~\\&|||||20140515001020-0500||QBP^Q11^QBP_Q11|793543|P|2.5.1|||ER|AL|||||Z34^CDCPHINVS\nQPD|Z34^Request Immunization History^CDCPHINVS|37374859|123456^^^MYEHR^MR|Child^Bobbie^Q^^^^L|Que^Suzy^^^^^M|20050512|M|10 East Main St^^Myfaircity^GA^^^L\nRCP|I|5^RD&records&HL70126",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8756/mqe/api/messages/form/saved",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8756",
+					"path": [
+						"mqe",
+						"api",
+						"messages",
+						"form",
+						"saved"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http urlencoded hl7 interface endpoing",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "MESSAGEDATA",
+							"value": "this is a message",
+							"type": "text"
+						},
+						{
+							"key": "USERID",
+							"value": "me-the-user",
+							"type": "text"
+						},
+						{
+							"key": "PASSWORD",
+							"value": "123456",
+							"type": "text"
+						},
+						{
+							"key": "FACILITYID",
+							"value": "12312-1412-12412",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:8082/messages/form-standard",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"messages",
+						"form-standard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "hl7 ack tester",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "MSH|^~\\&|||||20161005163142-0400||VXU^V04^VXU_V04|1Zvx-F.71.8714.Gx|P|2.5.1|\nPID|||1Zvx-F.71.8714^^^AIRA-TEST^MR||Sharples^Lilyana^Duena^^^^L|Sheridan^Israt|20040501|F||2131-1^Other Race^CDCREC|18 Adson Ave^^Sault Sainte Marie^MI^49783^USA^P||^PRN^PH^^^906^4904239|||||||||2186-5^not Hispanic or Latino^CDCREC|\nNK1|1|Sheridan^Israt^^^^^L|MTH^Mother^HL70063|18 Adson Ave^^Sault Sainte Marie^MI^49783^USA^P|^PRN^PH^^^906^4904239|\nORC|RE||28222^TCH-FT|\nRXA|0|1|20050715||94^MMRV^CVX|999|||01^Historical^NIP001|\nORC|RE||28223^TCH-FT|\nRXA|0|1|20050812||94^MMRV^CVX|999|||01^Historical^NIP001|\n"
+				},
+				"url": {
+					"raw": "localhost:8082/tester/hl7",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"tester",
+						"hl7"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "demo - json",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"message\": \"This is a cool message\",\n  \"user\": \"regularUser\",\n  \"password\": \"password123\",\n  \"facilityCode\": \"MQETestFacility\"\n}"
+				},
+				"url": {
+					"raw": "localhost:8082/messages/json",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"messages",
+						"json"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "demo - json example",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/messages/json/example",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"messages",
+						"json",
+						"example"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "URL Mappings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:8082/mappings",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"mappings"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

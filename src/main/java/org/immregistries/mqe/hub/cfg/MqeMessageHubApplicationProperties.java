@@ -10,6 +10,7 @@ import org.immregistries.mqe.validator.ValidatorProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,13 @@ public class MqeMessageHubApplicationProperties {
   private String ssApiKey;
   private String ssAuthId;
   private String ssActivationStatus;
+  
+  @Value("${mqe.sandbox.iis.pop}")
+  private String iisSandboxPopUrl;
+
+  public String getIisSandboxPopUrl() {
+    return iisSandboxPopUrl;
+  }
 
   public String getNistValidatorUrl() {
     return nistValidatorUrl;

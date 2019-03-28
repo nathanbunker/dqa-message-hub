@@ -4,7 +4,7 @@ import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 
 public class Hl7MessageHubResponse {
 
-  private String vxu;
+  private String message;
   private String ack;
 
   private MqeMessageServiceResponse mqeResponse;
@@ -36,12 +36,20 @@ public class Hl7MessageHubResponse {
   }
 
   public String getVxu() {
-    return vxu;
+    return message;
   }
 
   public void setVxu(String vxu) {
-    this.vxu = vxu;
+    this.message = vxu;
   }
 
-
+  public void setQbp(String qbp) {
+    this.message = qbp;
+  }
+  
+  public String getQbp(String qbp) {
+    return this.message;
+  }
+  
+ 
 }

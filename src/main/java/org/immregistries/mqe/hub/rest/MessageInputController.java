@@ -3,13 +3,18 @@ package org.immregistries.mqe.hub.rest;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.immregistries.mqe.hl7util.test.MessageGenerator;
 import org.immregistries.mqe.hub.report.FileResponse;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
+import org.immregistries.mqe.hub.rest.exception.MessageInputControllerException;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
+import org.immregistries.mqe.hub.submission.sandbox.IisSandBoxServiceConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +28,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MessageInputController {
 
+  public static final String QBP_STRING = "|QBP^";
+  public static final String ERR_INVALID_VXU_EMPTY = "INVALID REQUEST:  VXU is empty";
+  public static final String ERR_INVALID_QBP_EMPTY = "INVALID REQUEST:  QBP is empty";
+
   private static final Logger logger = LoggerFactory.getLogger(MessageInputController.class);
 
   @Autowired
   private Hl7MessageConsumer messageConsumer;
+
+  @Autowired
+  private IisSandBoxServiceConsumer sandboxService;
 
   @Autowired
   MessageMetadataJpaRepository metaRepo;
@@ -45,8 +57,8 @@ public class MessageInputController {
 
   @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
-  public String urlEncodedHttpFormPost(
-      String MESSAGEDATA, String USERID, String PASSWORD, String FACILITYID) throws Exception {
+  public String urlEncodedHttpFormPost(String MESSAGEDATA, String USERID, String PASSWORD,
+      String FACILITYID) throws Exception {
 
     String response = "hl7 message interface endpoint! message: " + MESSAGEDATA + " user: " + USERID
         + " password: " + PASSWORD + " facilityId: " + FACILITYID;
@@ -76,9 +88,8 @@ public class MessageInputController {
       }
     }
 
-    fr.setResponseMessage(
-        "There are " + (me.size() / 2) + " messages. # of AA: " + fr.getAa_count() + " # of AE: "
-            + fr.getAe_count());
+    fr.setResponseMessage("There are " + (me.size() / 2) + " messages. # of AA: " + fr.getAa_count()
+        + " # of AE: " + fr.getAe_count());
 
     return fr;
   }
@@ -138,28 +149,60 @@ public class MessageInputController {
         + submission.getUser() + " password: " + submission.getPassword() + " facilityId: "
         + submission.getFacilityCode());
 
-    String vxu = submission.getMessage();
-
-    if (vxu != null) {
-      Hl7MessageHubResponse response = messageConsumer.processMessage(submission);
-      vxu = vxu.replaceAll("[\\r]+", "\n");
-      response.setVxu(vxu);
-
-      //process the ack to display right on the web:
-      String ack = response.getAck();
-      if (ack != null) {
-        ack = ack.replaceAll("[\\r]+", "\n");
-      }
-      response.setAck(ack);
-      logger.info("ACK: \n" + ack);
-      return response;
-    } else {
-      Hl7MessageHubResponse response = new Hl7MessageHubResponse();
-      response.setSender(submission.getFacilityCode());
-      response.setAck("INVALID REQUEST:  VXU is empty");
-      return response;
-    }
+    return this.processVXU(submission);
   }
+
+
+  /**
+   * Accept a vxu or qbp submission and return
+   * a response. If vxu then send to MQE to process
+   * and to IIS Sandbox to save. Return the ACK from 
+   * MQE unless IIS Sandbox fails to save. If qbp send
+   * to IIS Sandbox only and return ACK.
+   * Accepts unescaped messages and form post
+   * Content-type: application/x-www-form-urlencoded
+   * Form Fields: user, password, facility
+   * 
+   * @param request
+   * @return
+   */
+  @RequestMapping(value = "form/saved", method = RequestMethod.POST)
+  public Hl7MessageHubResponse postFormSaved(HttpServletRequest request) {
+
+    String user = request.getParameter("USER");
+    String password = request.getParameter("PASSWORD");
+    String facility = request.getParameter("FACILITY");
+    String message = StringEscapeUtils.escapeEcmaScript(request.getParameter("MESSAGE"));
+
+    Hl7MessageSubmission submission = new Hl7MessageSubmission();
+    submission.setFacilityCode(facility);
+    submission.setUser(user);
+    submission.setPassword(password);
+    submission.setMessage(message);
+
+    return this.processSaveEndpoint(submission);
+  }
+
+  /**
+   * Accept a vxu or qbp submission and return
+   * a response. If vxu then send to MQE to process
+   * and to IIS Sandbox to save. Return the ACK from 
+   * MQE unless IIS Sandbox fails to save. If qbp send
+   * to IIS Sandbox only and return ACK.
+   * Accepts json submission with escapped message.
+   * {"message":"","user":"","password":"","facilityCode":""}
+   * 
+   * @param submission
+   * @return
+   */
+  @RequestMapping(value = "json/saved", method = RequestMethod.POST)
+  public Hl7MessageHubResponse jsonFormSaved(@RequestBody Hl7MessageSubmission submission) {
+
+    return this.processSaveEndpoint(submission);
+
+  }
+
+
 
   @RequestMapping(value = "json/example", method = RequestMethod.GET)
   public Hl7MessageSubmission getExampleJsonFormPost() {
@@ -169,6 +212,91 @@ public class MessageInputController {
     example.setUser("regularUser");
     example.setPassword("password123");
     return example;
+  }
+
+
+  /**
+   * Handle the processing of data submitted through jsonFormSaved and postFormSaved methods
+   * 
+   * @param submission
+   * @return
+   */
+  private Hl7MessageHubResponse processSaveEndpoint(Hl7MessageSubmission submission) {
+    Hl7MessageHubResponse response = null;
+    try {
+      if (submission.getMessage().contains(MessageInputController.QBP_STRING)) {
+        response = this.processQbp(submission);
+      } else {
+        response = this.processVXU(submission, true);
+        if (!response.getAck().equals(ERR_INVALID_VXU_EMPTY)
+            && response.getAck().trim().length() > 0) {
+          Hl7MessageHubResponse responseSandBox = this.sandboxService.saveVxu(submission);
+          logger.info(responseSandBox.getAck());
+        } else {
+          throw new MessageInputControllerException("Acknowledgement from IIS Sandbox was empty.");
+        }
+      }
+      return response;
+    } catch (Exception ex) {
+      logger.error(ex.getMessage());
+      throw new MessageInputControllerException(ex.getMessage(), ex);
+    }
+  }
+
+  /**
+   * Handle the processing of QBP queries
+   * 
+   * @param submission
+   * @return
+   * @throws Exception
+   */
+  private Hl7MessageHubResponse processQbp(Hl7MessageSubmission submission) throws Exception {
+    Hl7MessageHubResponse response;
+    if (submission.getMessage() != null && submission.getMessage().trim().length() > 0) {
+      response = this.sandboxService.processQuery(submission);
+    } else {
+      response = new Hl7MessageHubResponse();
+      response.setSender(IisSandBoxServiceConsumer.FACILITY_IIS);
+      response.setAck(MessageInputController.ERR_INVALID_QBP_EMPTY);
+    }
+    return response;
+  }
+
+  /**
+   * Submit H17MessageSubmission and get H17MessageHubResponse
+   * 
+   * @param vxu
+   * @param submission
+   * @return
+   */
+  private Hl7MessageHubResponse processVXU(Hl7MessageSubmission submission) {
+    return this.processVXU(submission, false);
+  }
+
+  private Hl7MessageHubResponse processVXU(Hl7MessageSubmission submission,
+      boolean isThrowException) {
+    if (submission.getMessage() != null && submission.getMessage().trim().length() > 0) {
+      Hl7MessageHubResponse response = messageConsumer.processMessage(submission);
+      response.setVxu(submission.getMessage().replaceAll("[\\r]+", "\n"));
+
+
+      //process the ack to display right on the web:
+      String ack = response.getAck();
+      if (ack != null && ack.trim().length() > 0) {
+        ack = ack.replaceAll("[\\r]+", "\n");
+      }
+      response.setAck(ack);
+      logger.info("ACK: \n" + ack);
+      return response;
+    } else {
+      Hl7MessageHubResponse response = new Hl7MessageHubResponse();
+      response.setSender(submission.getFacilityCode());
+      response.setAck(MessageInputController.ERR_INVALID_VXU_EMPTY);
+      if (isThrowException)
+        throw new MessageInputControllerException(
+            "sender: " + response.getSender() + ": " + response.getAck());
+      return response;
+    }
   }
 
 }
