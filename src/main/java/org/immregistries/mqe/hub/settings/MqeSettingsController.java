@@ -60,7 +60,7 @@ public class MqeSettingsController {
 
 
   @RequestMapping(value = "", method = RequestMethod.POST)
-  public String settingsSetter(@RequestBody SettingsContainer settings) throws Exception {
+  public void settingsSetter(@RequestBody SettingsContainer settings) throws Exception {
 
     logger.info("settingsSetter: " + settings);
 
@@ -79,7 +79,6 @@ public class MqeSettingsController {
       s.setName(setting.getName());
       settingsRepo.save(s);
     }
-    return "Complete!";
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)

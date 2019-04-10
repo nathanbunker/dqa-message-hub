@@ -1,3 +1,33 @@
-<p>
-  settings works!
-</p>
+<div *ngIf="settings|async as s">
+<h4>Smarty Streets</h4>
+<p><label for="AuthID">Auth ID: </label><input type="text" id="AuthID"
+                                              class="form-control" ng-trim="false"
+                                              [(ngModel)]="s.smartyStreetsAuthID"></p>
+<p><label for="APIKey">API Key: </label>
+  <input type="password" id="APIKey" class="form-control" ng-trim="false"
+        [(ngModel)]="s.smartyStreetsAPIKey"></p>
+<p><label for="Activation">Enable</label>
+  <input type="radio" id="Activation" value="ENABLED"
+        [(ngModel)]="s.smartyStreetsActivation"> Disable <input type="radio"
+                                                            value="DISABLED"
+                                                            [(ngModel)]="s.smartyStreetsActivation">
+</p><br>
+
+<h4>NIST HL7v2 Validation Service</h4>
+<p>URL: <input type="text" id="nistURL" class="form-control" ng-trim="false"
+              [(ngModel)]="s.nistURL"></p>
+<p>Enable <input type="radio" name="nistActivation" value="ENABLED"
+                [(ngModel)]="s.nistActivation">
+  Disable <input type="radio" name="nistActivation" value="DISABLED"
+                [(ngModel)]="s.nistActivation"></p>
+<!-- <div ng-if="nistException != null ? true:false">
+  <p>Exception: {{s.nistException}}</p><br>
+</div> -->
+
+<!--NIST Tool Location: <input type="file" file-model="myFile"/><br>-->
+
+<button class="btn btn-primary" type="submit" (click)="submit(s)">Submit</button>
+
+<pre>{{s | json}}</pre>
+
+</div>
