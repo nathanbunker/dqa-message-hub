@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping(value = "/codes")
+@RequestMapping(value = "/api/codes")
 @RestController
 public class DatabaseController {
 

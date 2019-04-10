@@ -1,0 +1,26 @@
+
+    <div style="background-color: grey; height: 100px; color: white; padding-bottom: 20px;">
+            <div class="container">
+                <div class="row" >
+                    <div class="col-md-8">
+                        <div class="dropdown" > 
+                            <button class="dropbtn" ng-click="hideMenu = !hideMenu" style="padding-top: 20px; height: 100px; padding-bottom: 19px;">
+                                <fa-icon icon="sliders-h"></fa-icon>
+                                MQE Menu 
+                                <fa-icon icon="caret-down"></fa-icon>
+                            </button>
+                            <div class="dropdown-content" ng-show="hideMenu" ng-click="hideMenu = !hideMenu"> 
+                                <a class="dropdown-item" routerLink="dashboard">Dashboard</a>
+                                <a class="dropdown-item" routerLink='file'>File Upload</a>  
+                                <hr />
+                                <a class="dropdown-item" routerLink="demo">Message Validation</a>
+                                <hr />
+                                <a class="dropdown-item" routerLink="settings">Settings</a>
+                                <a class="dropdown-item" routerLink="detections">Detections Documentation</a>
+                                <a class="dropdown-item" routerLink="code-page">Code Base Documentation</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>

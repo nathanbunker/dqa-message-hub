@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itextpdf.text.DocumentException;
 
-@RequestMapping(value = "/documentation")
+@RequestMapping(value = "/api/documentation")
 @RestController
 public class DocumentationController {
 
