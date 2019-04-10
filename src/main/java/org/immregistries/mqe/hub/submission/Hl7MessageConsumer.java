@@ -3,6 +3,7 @@ package org.immregistries.mqe.hub.submission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -61,9 +62,11 @@ public class Hl7MessageConsumer {
     }
 
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
+    
+    HashMap<String, String> detectionsOverride = retrieveDetectionOverrides(sender);
 
     //force serial processing...
-    MqeMessageServiceResponse validationResults = validator.processMessage(message);
+    MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
 
     String ack = makeAckFromValidationResults(validationResults, nistReportableList);
 
@@ -75,7 +78,19 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(
+  // Possibly use sender facility to gather sender's detection config
+  private HashMap<String, String> retrieveDetectionOverrides(String sender) {
+	HashMap<String, String> detectionsOverride = new HashMap<String, String>();
+	//detectionsOverride.put("MQE0119", "ERROR"); // debug with: patient dob is underage, default is ACCEPT
+	
+	if (detectionsOverride.isEmpty()) {
+		//Detection.resetDetectionSeverityToDefault();
+	}
+	
+	return detectionsOverride;
+}
+
+public Hl7MessageHubResponse processMessageAndSaveMetrics(
       Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
     MqeMessageServiceResponse dqr = response.getMqeResponse();

@@ -1,6 +1,10 @@
 package org.immregistries.mqe.hub.cfg;
 
 import javax.annotation.PostConstruct;
+
+import org.immregistries.mqe.hub.settings.DetectionProperties;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.hub.settings.MqeSettings;
 import org.immregistries.mqe.hub.settings.MqeSettingsJpaRepository;
 import org.immregistries.mqe.hub.settings.MqeSettingsName;
@@ -25,6 +29,9 @@ public class MqeMessageHubApplicationProperties {
 
   @Autowired
   private MqeSettingsJpaRepository settingsRepo;
+  
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
   private MqeServiceConnectionStatus nistValidatorConnectionStatus = MqeServiceConnectionStatus.ENABLED;
   private String nistValidatorUrl = "http://localhost:8756/hl7v2ws//services/soap/MessageValidationV2";
@@ -54,6 +61,17 @@ public class MqeMessageHubApplicationProperties {
     s.setName(name.name);
     s.setValue(value);
     settingsRepo.save(s);
+  }
+  
+  public void saveDetectionsGroupProperty(String groupId, String mqeCode, String value) {
+	  DetectionsSettings d = detectionsSettingsRepo.findByGroupId(groupId);
+	  if (d == null) {
+		  d = new DetectionsSettings();
+	  }
+	  d.setGroupId(groupId);
+	  d.setMqeCode(mqeCode);
+	  d.setSeverity(value);
+	  detectionsSettingsRepo.save(d);
   }
 
   @PostConstruct
@@ -104,6 +122,8 @@ public class MqeMessageHubApplicationProperties {
       vp.setSsApiAuthId(this.ssAuthId);
     }
 
+    DetectionProperties dp = DetectionProperties.INSTANCE;
+    
   }
 
 }
