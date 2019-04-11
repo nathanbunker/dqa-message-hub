@@ -1,6 +1,7 @@
-import {Component, OnInit} from '@angular/core';
-import {FileUploadInfo, UploaderService} from '../uploader.service';
-import {concat, Observable, of} from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { FileUploadInfo, UploaderService } from '../services/uploader.service';
+import { concat, Observable, of, interval } from 'rxjs';
+import { tap, take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-file-upload',
@@ -27,6 +28,18 @@ export class FileUploadComponent implements OnInit {
     }
   }
 
+  delete(fileId: string) {
+    this.$uploader.removeFile(fileId).pipe(
+      tap(() => {
+        delete this.fileUploads[fileId];
+      }),
+    ).toPromise();
+  }
+
+  resume(fileId: string) {
+    this.fileUploads[fileId] = concat(this.fileUploads[fileId], this.$uploader.watch(fileId));
+  }
+
   submit() {
     this.uploadFile(this.file);
   }
@@ -34,8 +47,11 @@ export class FileUploadComponent implements OnInit {
   uploadFile(file: File) {
     this.$uploader.uploadFileToUrl(file).subscribe(
       (fileInfo: FileUploadInfo) => {
-        this.$uploader.initiateFileProcess(fileInfo.fileId).subscribe();
-        this.fileUploads[fileInfo.fileId] = concat(of(fileInfo), this.$uploader.watch(fileInfo.fileId));
+        this.$uploader.initiateFileProcess(fileInfo.fileId).toPromise();
+        this.fileUploads[fileInfo.fileId] = concat(
+          of(fileInfo),
+          this.$uploader.watch(fileInfo.fileId)
+        );
       }
     );
   }
@@ -44,7 +60,11 @@ export class FileUploadComponent implements OnInit {
     this.fileUploads = {};
     this.$uploader.getQueues().subscribe(queue => {
       for (const file of queue) {
-        this.fileUploads[file.fileId] = concat(of(file), this.$uploader.watch(file.fileId));
+        if (file.status !== 'started' && file.status !== 'reading') {
+          this.fileUploads[file.fileId] =  of(file);
+        } else {
+          this.fileUploads[file.fileId] =  concat(of(file), this.$uploader.watch(file.fileId));
+        }
       }
     });
   }
