@@ -1,8 +1,13 @@
-<p>
-  dashboard pagesssss!
-</p>
-
-<h4>Recent Activity</h4>
-<app-provider-typeahead></app-provider-typeahead>
-<app-datepicker></app-datepicker>
-<app-calendar [calendarInfo]="calendarCurrent"></app-calendar>
+<div class="container dashboard-container">
+<h4>Provider Dashboard</h4>
+<div *ngIf="facilityList|async as f">
+    <app-provider-typeahead (typeaheadChoice)="newFacility($event)" [facilityList]="f"></app-provider-typeahead>
+</div>
+<!-- <app-datepicker></app-datepicker> -->
+<div *ngIf="year1|async as y1">
+<app-calendar [calendarInfo]="y1"></app-calendar>
+</div>
+<div *ngIf="year2|async as y2">
+    <app-calendar [calendarInfo]="y2"></app-calendar>
+</div>
+</div>

@@ -1,4 +1,14 @@
-<label for="provider-typeahead">Search for a state:</label>
-<input id="provider-typeahead" type="text" class="form-control" [(ngModel)]="model" [ngbTypeahead]="search"/>
-<hr>
-<pre>Model: {{ model | json }}</pre>
+<div class="typeahead-container">
+    <label for="provider-typeahead">Provider:</label>
+    <input id="provider-typeahead" 
+    type="text" 
+    class="form-control provider-typeahead" 
+    [(ngModel)]="model" 
+    [ngbTypeahead]="search"
+    placeholder="Begin Typing to find a provider"
+    (selectItem)="selectedItem($event)"
+    (focus)="focus$.next($event.target.value)"
+    (click)="click$.next($event.target.value)"
+    #typeaheadinstance="ngbTypeahead"
+    />
+</div>

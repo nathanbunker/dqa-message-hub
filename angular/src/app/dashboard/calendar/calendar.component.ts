@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { CalendarInfo } from 'src/app/dashboard/dashboard.component';
 import { Input } from '@angular/core';
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 import * as moment from 'moment';
@@ -14,69 +13,40 @@ export class CalendarComponent implements OnInit {
 
   constructor() { }
 
+  ngOnInit() {
+    this.setDataSeries();
+  }
+
   @Input()
   calendarInfo: CalendarInfo;
-  searchOptions = {};
-  resultsMetaData = {
-    page: 0,
-    elementsPerPage: 10,
-    maxSize: 10,
-    totalElements: 0, // Don't modify this except with the actual list length. Modifying this causes a page reload...
-    messages: [],
-  };
 
-  calendarChart: GoogleChartInterface = {
-    chartType: 'Calendar',
-    dataTable: [
-      ['Date', 'Attendance'],
-      [ new Date(2012, 3, 13), 37032 ],
-      [ new Date(2012, 3, 14), 38024 ],
-      [ new Date(2012, 3, 15), 38024 ],
-      [ new Date(2012, 3, 16), 38108 ],
-      [ new Date(2012, 3, 17), 38229 ]
-    ],
-    // opt_firstRowIsData: true,
-    options:
-    // {'title': 'Date'},
-    {
-      title: '',
+  resizeTimer:any;
+  // onResized($event) {
+  //   clearTimeout(this.resizeTimer);
+  //   this.resizeTimer = setTimeout(function() {
+  //     console.log("div is resized...");
+  //     console.log(this.calendarChart);
+  //     //force a redraw
+  //         }, 500);
+  // }
+  
+  setDataSeries() {
+    this.calendarChart.dataTable = [['Date', 'Count']];
+    // this.calendarChart.dataTable.push([ new Date(2019, 3, 13), 37032 ]);
+    this.calendarInfo.messageHistory.forEach((msgDate) => {
+      this.calendarChart.dataTable.push(
+        [this.convertChartDateToLocalDate(msgDate.day),msgDate.count]
+      )      
+    });
+  }
 
-    // 	        height: 220,
-      calendar: {
-        cellSize: 20,
-    // 	        	yearLabel : {display:'none', color:'grey', /*fontSize: 100*/},
-    // 	        forceIFrame: true, //This doesn't seem to work.
-        focusedCellColor: {
-          stroke: '#d3362d',
-          strokeOpacity: 1,
-          strokeWidth: 1,
-        },
-        monthOutlineColor: {
-          stroke: 'grey',
-          strokeOpacity: 0.5,
-          strokeWidth: 1
-        }
-      },
-
-      colorAxis: {colors: ['#9AF3BF', '#259253']},
-      tooltip: {isHtml: true},
-    }
-  };
-
-myChartObject = {type: 'Calendar', data: {
-  'cols': [
-    {id: 'Date', label: 'Day', type: 'date'},
-    {id: 'count', label: 'Slices', type: 'number'},
-    {
-      id: 'tooltip',
-      type: 'string',
-      role: 'tooltip',
-      'p': {'html': true}
-    }
-  ],
-  'rows': []
-}
-};
+  // So...  for some reason google charts sends the date back as if it were in UTC time...
+  convertChartDateToLocalDate(chartDate) {
+    var m = moment.utc(chartDate);
+    var offsetMinutes = m.toDate().getTimezoneOffset();
+    m.add(offsetMinutes, 'minutes');
+    return m.toDate();
+  }
 
   handleChartClick = function (selectedItem) {
     console.log('handleChartClick');
@@ -92,17 +62,59 @@ myChartObject = {type: 'Calendar', data: {
     }
   };
 
-  ngOnInit() {
-    // this.calendarChart.dataTable = this.calendarInfo;
+calendarChart: GoogleChartInterface = {
+  chartType: 'Calendar',
+  dataTable: [
+    ['Date', 'Count'],
+  ],
+  options:
+  {
+    title: '',
+    height: 250,
+    calendar: {
+      cellSize: 20,
+      focusedCellColor: {
+        stroke: '#d3362d',
+        strokeOpacity: 1,
+        strokeWidth: 1,
+      },
+      monthOutlineColor: {
+        stroke: 'grey',
+        strokeOpacity: 0.5,
+        strokeWidth: 1
+      }
+    },
+
+    colorAxis: { colors: ['#9AF3BF', '#259253'] },
+    tooltip: { isHtml: true },
   }
+};
 
-// So...  for some reason google charts sends the date back as if it were in UTC time...
-convertChartDateToLocalDate(chartDate) {
-  var m = moment.utc(chartDate);
-  var offsetMinutes = m.toDate().getTimezoneOffset();
-  m.add(offsetMinutes, 'minutes');
-  return m.toDate();
+myChartObject = {
+  type: 'Calendar', data: {
+    'cols': [
+      { id: 'Date', label: 'Day', type: 'date' },
+      { id: 'count', label: 'Slices', type: 'number' },
+      {
+        id: 'tooltip',
+        type: 'string',
+        role: 'tooltip',
+        'p': { 'html': true }
+      }
+    ],
+    'rows': []
+  }
+};
+
 }
 
+export interface CalendarInfo {
+  year: number;
+  provider: string;
+  messageHistory: MessageDate[];
 }
 
+export interface MessageDate {
+  day: string;
+  count:number;
+}
