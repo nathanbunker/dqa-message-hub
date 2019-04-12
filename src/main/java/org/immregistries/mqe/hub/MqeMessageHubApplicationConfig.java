@@ -1,5 +1,6 @@
 package org.immregistries.mqe.hub;
 
+import org.immregistries.mqe.validator.detection.DetectionDocumentation;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -29,6 +30,11 @@ public class MqeMessageHubApplicationConfig extends SpringBootServletInitializer
         registry.addMapping("/**").allowedMethods("*").allowedOrigins("http://localhost:4200");
       }
     };
+  }
+
+  @Bean
+  public DetectionDocumentation createDocumentation() throws java.lang.NoSuchFieldException {
+    return DetectionDocumentation.getDetectionDocumentation();
   }
 
   public static void main(String[] args) throws Exception {

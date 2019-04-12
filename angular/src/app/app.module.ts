@@ -1,6 +1,6 @@
 import {BrowserModule} from '@angular/platform-browser';
 import {NgModule} from '@angular/core';
-
+import {TableModule} from 'primeng/table';
 import {HttpClientModule} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,7 +16,7 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -37,6 +37,7 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
 import { FormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
+import { DocumentationService } from './services/documentation.service';
 
 @NgModule({
   declarations: [
@@ -69,14 +70,15 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     HttpClientModule,
     Ng2GoogleChartsModule,
     NgbModule,
+    TableModule,
     FormsModule
   ],
-  providers: [],
+  providers: [ DocumentationService],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor() {
   // Add an icon to the library for convenient access in other components
-  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload);
+  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload, faChevronRight, faChevronDown, faSearch);
   }
 }

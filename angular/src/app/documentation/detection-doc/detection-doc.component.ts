@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { DocumentationService, DetectionDocumentation } from '../../services/documentation.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-detection-doc',
@@ -7,9 +9,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class DetectionDocComponent implements OnInit {
 
-  constructor() { }
+  detections: Observable<DetectionDocumentation[]>;
+  exportType: 'Table' | 'Document';
+  activeFilter: boolean;
+
+  constructor(private doc: DocumentationService) {
+    this.exportType = 'Document';
+  }
 
   ngOnInit() {
+    this.detections = this.doc.getDocumentation();
   }
 
 }
