@@ -4,6 +4,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
+import org.immregistries.mqe.hub.submission.IISGateway;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class MqeHl7TestingController {
 
   @Autowired
   private Hl7MessageConsumer messageConsumer;
+  
+  @Autowired
+  private IISGateway iisGatewayService;
 
   @RequestMapping(value = "hl7", method = RequestMethod.POST)
   public String hl7MessageInterface(
@@ -29,6 +33,10 @@ public class MqeHl7TestingController {
 
     Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
     messageSubmission.setMessage(message);
+	
+	if(message.contains(MessageInputController.QBP_INPUT_PATTERN)) {
+    	return iisGatewayService.queryIIS(messageSubmission) 	;
+    } 
 
     return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
   }

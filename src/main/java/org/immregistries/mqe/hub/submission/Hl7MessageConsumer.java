@@ -50,6 +50,8 @@ public class Hl7MessageConsumer {
   private MessageMetadataJpaRepository metaRepo;
   @Autowired
   NistValidatorHandler nistValidatorHandler;
+  @Autowired
+  private IISGateway iisGatewayService;
 
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
@@ -78,6 +80,7 @@ public class Hl7MessageConsumer {
   public Hl7MessageHubResponse processMessageAndSaveMetrics(
       Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
+	submitMessageToIIS(messageSubmission);
     MqeMessageServiceResponse dqr = response.getMqeResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
@@ -86,6 +89,10 @@ public class Hl7MessageConsumer {
             response.getSender(), sentDate, response);
 
     return response;
+  }
+  
+  private void submitMessageToIIS(Hl7MessageSubmission messageSubmission) {
+	iisGatewayService.sendVXU(messageSubmission);	
   }
 
 //  int daysSpread = 60;

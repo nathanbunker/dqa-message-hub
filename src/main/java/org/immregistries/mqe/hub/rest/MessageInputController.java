@@ -10,6 +10,7 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
+import org.immregistries.mqe.hub.submission.IISGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MessageInputController {
 
   private static final Logger logger = LoggerFactory.getLogger(MessageInputController.class);
+  public static final String QBP_INPUT_PATTERN="QBP^";
 
   @Autowired
   private Hl7MessageConsumer messageConsumer;
@@ -33,6 +35,9 @@ public class MessageInputController {
 
   @Autowired
   private Hl7MessageConsumer msgr;
+  
+  @Autowired
+  private IISGateway iisGatewayService;
 
   @RequestMapping(value = "in", method = RequestMethod.POST)
   public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission)
@@ -57,6 +62,10 @@ public class MessageInputController {
     messageSubmission.setUser(USERID);
     messageSubmission.setPassword(PASSWORD);
     messageSubmission.setFacilityCode(FACILITYID);
+	
+	if(MESSAGEDATA.contains(QBP_INPUT_PATTERN)) {
+    	return iisGatewayService.queryIIS(messageSubmission) 	;
+    }
 
     String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
     return ack;
