@@ -26,7 +26,8 @@ public class IISGateway {
   private static final boolean ENABLED = false;
 
   //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
-  public static final String IIS_GATEWAY_URL = "http://localhost/iis-kernel/pop";
+  @Value("${iisgateway.url}")
+  private String IIS_GATEWAY_URL = "http://localhost/iis-kernel/pop";
 
   public String queryIIS(Hl7MessageSubmission messageSubmission) {
 
