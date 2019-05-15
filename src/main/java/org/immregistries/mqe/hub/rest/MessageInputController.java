@@ -1,8 +1,10 @@
 package org.immregistries.mqe.hub.rest;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import org.immregistries.mqe.hl7util.test.MessageGenerator;
 import org.immregistries.mqe.hub.report.FileResponse;
@@ -10,6 +12,7 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
+import org.immregistries.mqe.hub.submission.IISGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,40 @@ public class MessageInputController {
 
   private static final Logger logger = LoggerFactory.getLogger(MessageInputController.class);
 
+  private static final String HL7_QBP = "QBP";
+  private static final String HL7_MSH = "MSH";
+
+  public static boolean isQBP(String message) {
+
+    try {
+      BufferedReader in = new BufferedReader(new StringReader(message));
+      String line;
+      try {
+        while ((line = in.readLine()) != null) {
+          if (line.startsWith(HL7_MSH) && line.length() > 4) {
+            char sep = line.charAt(3);
+            int barPos = 1;
+            while (barPos < 9) {
+              int pos = line.indexOf(sep);
+              if (pos == -1) {
+                return false;
+              }
+              line = line.substring(pos + 1);
+              barPos++;
+            }
+            return line.startsWith(HL7_QBP);
+          }
+        }
+      } finally {
+        in.close();
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+
   @Autowired
   private Hl7MessageConsumer messageConsumer;
 
@@ -33,6 +70,9 @@ public class MessageInputController {
 
   @Autowired
   private Hl7MessageConsumer msgr;
+
+  @Autowired
+  private IISGateway iisGatewayService;
 
   @RequestMapping(value = "in", method = RequestMethod.POST)
   public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission)
@@ -45,8 +85,8 @@ public class MessageInputController {
 
   @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
-  public String urlEncodedHttpFormPost(
-      String MESSAGEDATA, String USERID, String PASSWORD, String FACILITYID) throws Exception {
+  public String urlEncodedHttpFormPost(String MESSAGEDATA, String USERID, String PASSWORD,
+      String FACILITYID) throws Exception {
 
     String response = "hl7 message interface endpoint! message: " + MESSAGEDATA + " user: " + USERID
         + " password: " + PASSWORD + " facilityId: " + FACILITYID;
@@ -57,6 +97,10 @@ public class MessageInputController {
     messageSubmission.setUser(USERID);
     messageSubmission.setPassword(PASSWORD);
     messageSubmission.setFacilityCode(FACILITYID);
+
+    if (isQBP(MESSAGEDATA)) {
+      return iisGatewayService.queryIIS(messageSubmission);
+    }
 
     String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
     return ack;
@@ -76,9 +120,8 @@ public class MessageInputController {
       }
     }
 
-    fr.setResponseMessage(
-        "There are " + (me.size() / 2) + " messages. # of AA: " + fr.getAa_count() + " # of AE: "
-            + fr.getAe_count());
+    fr.setResponseMessage("There are " + (me.size() / 2) + " messages. # of AA: " + fr.getAa_count()
+        + " # of AE: " + fr.getAe_count());
 
     return fr;
   }
