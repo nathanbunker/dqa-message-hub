@@ -10,6 +10,7 @@ import org.immregistries.mqe.hl7util.builder.HL7Util;
 import org.immregistries.mqe.hl7util.model.CodedWithExceptions;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,15 +24,17 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class IISGateway {
 
-  private static final boolean ENABLED = false;
 
-  //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
+  @Value("${iisgateway.enable}")
+  private boolean iisgatewayEnable = false;
+  
   @Value("${iisgateway.url}")
-  private String IIS_GATEWAY_URL = "http://localhost/iis-kernel/pop";
+  private String iisgatewayUrl = "http://localhost/iis-kernel/pop";
+  //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
 
   public String queryIIS(Hl7MessageSubmission messageSubmission) {
 
-    if (ENABLED) {
+    if (iisgatewayEnable) {
       RestTemplate restTemplate = new RestTemplate();
 
       HttpHeaders headers = new HttpHeaders();
@@ -46,7 +49,7 @@ public class IISGateway {
       HttpEntity<MultiValueMap<String, String>> request =
           new HttpEntity<MultiValueMap<String, String>>(map, headers);
       ResponseEntity<String> result =
-          restTemplate.exchange(IIS_GATEWAY_URL, HttpMethod.POST, request, String.class);
+          restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
       return result.getBody();
     } else {
       String ackType = "AR";
@@ -98,7 +101,7 @@ public class IISGateway {
   }
 
   public void sendVXU(Hl7MessageSubmission messageSubmission) {
-    if (ENABLED) {
+    if (iisgatewayEnable) {
       RestTemplate restTemplate = new RestTemplate();
 
       HttpHeaders headers = new HttpHeaders();
@@ -113,7 +116,7 @@ public class IISGateway {
       HttpEntity<MultiValueMap<String, String>> request =
           new HttpEntity<MultiValueMap<String, String>>(map, headers);
       ResponseEntity<String> result =
-          restTemplate.exchange(IIS_GATEWAY_URL, HttpMethod.POST, request, String.class);
+          restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
       return;
     }
   }
