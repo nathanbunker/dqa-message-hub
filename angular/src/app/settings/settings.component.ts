@@ -10,6 +10,8 @@ import { Observable } from 'rxjs';
 export class SettingsComponent implements OnInit {
 
   settings: Observable<Settings>;
+  nistException: Observable<any>;
+  nistStatus: Observable<any>;
 
   messageEvaluation: {
     authid: string,
@@ -21,10 +23,14 @@ export class SettingsComponent implements OnInit {
 
   submit(settings: Settings) {
     this.settingsService.saveSettings(settings);
+    this.nistException = this.settingsService.getException();
+    this.nistStatus = this.settingsService.getStatus();
   }
 
   ngOnInit() {
     this.settings = this.settingsService.getSettings();
+    this.nistException = this.settingsService.getException();
+    this.nistStatus = this.settingsService.getStatus();
   }
 
 }

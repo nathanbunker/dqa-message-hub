@@ -9,6 +9,7 @@ import { map, pluck } from 'rxjs/operators';
 export class SettingsService {
 
   url = 'api/settings/';
+  nistSettingsUrl = 'api/nist/validator/';
 
   constructor(private $http: HttpClient) { }
 
@@ -56,6 +57,14 @@ export class SettingsService {
     );
   }
 
+  getException(): Observable<any> {
+    return this.$http.get<any>(this.nistSettingsUrl + 'exception');
+  }
+
+  getStatus(): Observable<any> {
+    return this.$http.get<any>(this.nistSettingsUrl + 'status');
+  }
+
 }
 
 export interface SettingsInfo {
@@ -70,6 +79,4 @@ export interface Settings {
 
   nistURL?: string;
   nistActivation?: string;
-  nistConnectionStatus?: string;
-  nistException?: string;
 }

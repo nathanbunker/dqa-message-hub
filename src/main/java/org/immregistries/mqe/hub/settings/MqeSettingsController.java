@@ -79,6 +79,8 @@ public class MqeSettingsController {
       s.setName(setting.getName());
       settingsRepo.save(s);
     }
+    
+    props.initializeDatabaseProperties();
   }
 
   @RequestMapping(value = "", method = RequestMethod.GET)
