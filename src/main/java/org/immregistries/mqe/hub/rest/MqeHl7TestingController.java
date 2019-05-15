@@ -21,30 +21,28 @@ public class MqeHl7TestingController {
 
   @Autowired
   private Hl7MessageConsumer messageConsumer;
-  
+
   @Autowired
   private IISGateway iisGatewayService;
 
   @RequestMapping(value = "hl7", method = RequestMethod.POST)
-  public String hl7MessageInterface(
-      @RequestBody String message) throws Exception {
+  public String hl7MessageInterface(@RequestBody String message) throws Exception {
 
     logger.info("hl7MessageInterface demo!");
 
     Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
     messageSubmission.setMessage(message);
-	
-	if(message.contains(MessageInputController.QBP_INPUT_PATTERN)) {
-    	return iisGatewayService.queryIIS(messageSubmission) 	;
-    } 
+
+    if (MessageInputController.isQBP(message)) {
+      return iisGatewayService.queryIIS(messageSubmission);
+    }
 
     return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
   }
 
 
   @RequestMapping(value = "hl7/validationList", method = RequestMethod.POST)
-  public MqeMessageServiceResponse hl7ValidationList(
-      @RequestBody String message) throws Exception {
+  public MqeMessageServiceResponse hl7ValidationList(@RequestBody String message) throws Exception {
     logger.info("hl7ValidationList demo!");
     //send through the Validator in the MQE Validator project.
     MqeMessageService validator = MqeMessageService.INSTANCE;
