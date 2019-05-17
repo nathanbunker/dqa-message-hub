@@ -22,6 +22,14 @@ public class DetectionsSettings {
 	private String groupId;
 	private String mqeCode;
 	private String severity;
+	
+	public DetectionsSettings() {}
+	
+	public DetectionsSettings(String groupId, String mqeCode, String severity) {
+		this.groupId = groupId;
+		this.mqeCode = mqeCode;
+		this.severity = severity;
+	}
 
 	public long getId() {
 		return id;

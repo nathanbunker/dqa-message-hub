@@ -1,64 +1,96 @@
 package org.immregistries.mqe.hub.settings;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
-
-import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.validator.detection.Detection;
+import java.io.InputStreamReader;
+import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum DetectionProperties {
   INSTANCE;
   private final Logger LOGGER = LoggerFactory.getLogger(DetectionProperties.class);
-  Properties prop = new Properties();
-
-
+  
+  private final String propertyFileName = "detections.properties";
+  public final String GROUP_PROPERTY = "GROUP_ID";
+  public final String DEFAULT_GROUP = "DEFAULT";
+  MqeProperties prop = new MqeProperties();
+  private HashSet<DetectionsSettings> allPropertySettings = new HashSet<DetectionsSettings>();
+  
   DetectionProperties() {
     loadProps();
-    updateProps();
   }
-
-  private void updateProps() {
-	for (Detection detection : Detection.values()) {
-		String mqeCode = detection.getMqeMqeCode();
-		if (prop.getProperty(mqeCode) != null) {
-			String severityLabel = prop.getProperty(mqeCode);
-			SeverityLevel severityLevel = SeverityLevel.findByLabel(severityLabel);
-			detection.setSeverity(severityLevel);
+  
+  private void loadPropertiesFromFile() throws IOException {
+	  InputStream inputStream = getInputStreamForProperties();
+	  if (inputStream == null) {
+		  return;
+	  }
+	  
+	  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+	  
+	  try {
+		  String currentLine = reader.readLine();
+		  String currentGroup = "";
+		  while (currentLine != null) {
+			  if (!currentLine.isEmpty()) {
+				  String [] strToken = currentLine.split("=");
+				  System.out.println(strToken[0] + " " + strToken[1]);
+				  String propName = strToken[0];
+				  String propVal = strToken[1];
+				  if (GROUP_PROPERTY.contentEquals(propName)) {
+					  currentGroup = propVal;
+				  } else {
+					  DetectionsSettings ds = new DetectionsSettings(currentGroup, propName, propVal);
+					  allPropertySettings.add(ds);
+				  }
+			  }
+			  currentLine = reader.readLine();
+		  }
+		} catch (IOException e) {
+			LOGGER.error("Error reading detection properties, using defaults");
+		} finally {
+			reader.close();
 		}
-	}
   }
+  
+
 
 private void loadProps() {
     try {
-      prop.load(getInputStreamForProperties());
+  	  loadPropertiesFromFile();
     } catch (IOException e) {
       LOGGER.error("Error reading detection properties, using defaults");
     }
   }
 
-  public InputStream getInputStreamForProperties() {
+  public HashSet<DetectionsSettings> getAllPropertySettings() {
+	return allPropertySettings;
+}
+
+public void setAllPropertySettings(HashSet<DetectionsSettings> allPropertySettings) {
+	this.allPropertySettings = allPropertySettings;
+}
+
+public InputStream getInputStreamForProperties() {
     InputStream is;
-    String fileName = "detections.properties";
     try {
-      is = getFileFromRootDirectory(fileName);
-      LOGGER.warn("Using " + fileName + " from directory");
+      is = getFileFromRootDirectory(propertyFileName);
+      LOGGER.warn("Using " + propertyFileName + " from directory");
     } catch (FileNotFoundException | NullPointerException e) {
-      LOGGER.warn(fileName + " not found in directory with jar.  checking classpath");
-      is = getFileFromClasspath(fileName);
+      LOGGER.warn(propertyFileName + " not found in directory with jar.  checking classpath");
+      is = getFileFromClasspath(propertyFileName);
       if (is != null) {
-        LOGGER.warn("Using " + fileName + " from classpath (resources folder in jar)");
+        LOGGER.warn("Using " + propertyFileName + " from classpath (resources folder in jar)");
       }
     }
     if (is != null) {
       return is;
     } else {
-      throw new IllegalArgumentException(
-          "You cannot reference " + fileName + " if the input stream is null.  Verify that you are building an input stream from a file that exists. ");
+      return null;
     }
   }
 
@@ -73,7 +105,7 @@ private void loadProps() {
     LOGGER.warn("Looking in: " + dir + "/" + resourcePath + " for file");
     return new FileInputStream(resourcePath);
   }
-  
+ 
 
 
 }

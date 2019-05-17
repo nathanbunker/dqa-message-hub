@@ -21,6 +21,8 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.detection.Detection;
@@ -51,6 +53,8 @@ public class Hl7MessageConsumer {
   private MessageMetadataJpaRepository metaRepo;
   @Autowired
   NistValidatorHandler nistValidatorHandler;
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
@@ -68,6 +72,9 @@ public class Hl7MessageConsumer {
     //force serial processing...
     MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
 
+    // apply sender level detection overrides
+    applySenderDetectionOverrides(sender, validationResults);
+    
     String ack = makeAckFromValidationResults(validationResults, nistReportableList);
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
@@ -78,7 +85,19 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  // Possibly use sender facility to gather sender's detection config
+  private void applySenderDetectionOverrides(String sender, MqeMessageServiceResponse validationResults) {
+	List<ValidationRuleResult> results = validationResults.getValidationResults();
+	for (ValidationRuleResult res : results) {
+		for (ValidationReport report : res.getIssues()) {
+			DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(sender, report.getDetection().getMqeMqeCode());
+			if (setting != null) {
+				report.setSeverityLevel(SeverityLevel.findByLabel(setting.getSeverity()));
+			}
+		}
+	}
+}
+
+// Possibly use sender facility to gather sender's detection config
   private HashMap<String, String> retrieveDetectionOverrides(String sender) {
 	HashMap<String, String> detectionsOverride = new HashMap<String, String>();
 	//detectionsOverride.put("MQE0119", "ERROR"); // debug with: patient dob is underage, default is ACCEPT

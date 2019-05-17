@@ -1,16 +1,21 @@
 package org.immregistries.mqe.hub.cfg;
 
+import java.util.HashSet;
+
 import javax.annotation.PostConstruct;
 
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.settings.DetectionProperties;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsService;
 import org.immregistries.mqe.hub.settings.MqeSettings;
 import org.immregistries.mqe.hub.settings.MqeSettingsJpaRepository;
 import org.immregistries.mqe.hub.settings.MqeSettingsName;
 import org.immregistries.mqe.hub.submission.MqeServiceConnectionStatus;
 import org.immregistries.mqe.hub.submission.NistValidatorHandler;
 import org.immregistries.mqe.validator.ValidatorProperties;
+import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,9 @@ public class MqeMessageHubApplicationProperties {
 
   @Autowired
   private MqeSettingsJpaRepository settingsRepo;
+  
+  @Autowired
+  private DetectionsSettingsService detectionsSettingsSvc;
   
   @Autowired
   private DetectionsSettingsJpaRepository detectionsSettingsRepo;
@@ -61,17 +69,6 @@ public class MqeMessageHubApplicationProperties {
     s.setName(name.name);
     s.setValue(value);
     settingsRepo.save(s);
-  }
-  
-  public void saveDetectionsGroupProperty(String groupId, String mqeCode, String value) {
-	  DetectionsSettings d = detectionsSettingsRepo.findByGroupId(groupId);
-	  if (d == null) {
-		  d = new DetectionsSettings();
-	  }
-	  d.setGroupId(groupId);
-	  d.setMqeCode(mqeCode);
-	  d.setSeverity(value);
-	  detectionsSettingsRepo.save(d);
   }
 
   @PostConstruct
@@ -122,8 +119,32 @@ public class MqeMessageHubApplicationProperties {
       vp.setSsApiAuthId(this.ssAuthId);
     }
 
-    DetectionProperties dp = DetectionProperties.INSTANCE;
+    DetectionProperties detectionProp = DetectionProperties.INSTANCE;
     
+    // have to do all autowired service calls outside of enum
+    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
+    updateDetectionsInMemory(detectionProp);
   }
 
+  private void updateDetectionsInMemory(DetectionProperties detectionProp) {
+	for (Detection detection : Detection.values()) {
+		String mqeCode = detection.getMqeMqeCode();
+		
+		// set default application overrides
+		SeverityLevel defaultSeverityLevel = getDefaultSeverityByCode(detectionProp, mqeCode);
+		if (defaultSeverityLevel != null) {
+			detection.setSeverity(defaultSeverityLevel);
+		}
+	}
+  }
+  
+  private SeverityLevel getDefaultSeverityByCode(DetectionProperties detectionProp, String mqeCode) {
+	  SeverityLevel severityLevel = null;
+	  
+	  DetectionsSettings ds = detectionsSettingsRepo.findByGroupIdAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
+	  if (ds != null) {
+		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
+	  }
+	  return severityLevel;
+  }
 }
