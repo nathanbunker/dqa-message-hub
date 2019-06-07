@@ -3,6 +3,7 @@ package org.immregistries.mqe.hub.submission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,8 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.detection.Detection;
@@ -50,7 +53,10 @@ public class Hl7MessageConsumer {
   private MessageMetadataJpaRepository metaRepo;
   @Autowired
   NistValidatorHandler nistValidatorHandler;
-
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  @Autowired
+  private IISGateway iisGatewayService;
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
@@ -61,10 +67,15 @@ public class Hl7MessageConsumer {
     }
 
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
+    
+    HashMap<String, String> detectionsOverride = retrieveDetectionOverrides(sender);
 
     //force serial processing...
-    MqeMessageServiceResponse validationResults = validator.processMessage(message);
+    MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
 
+    // apply sender level detection overrides
+    applySenderDetectionOverrides(sender, validationResults);
+    
     String ack = makeAckFromValidationResults(validationResults, nistReportableList);
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
@@ -75,9 +86,34 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(
+  private void applySenderDetectionOverrides(String sender, MqeMessageServiceResponse validationResults) {
+	List<ValidationRuleResult> results = validationResults.getValidationResults();
+	for (ValidationRuleResult res : results) {
+		for (ValidationReport report : res.getIssues()) {
+			DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(sender, report.getDetection().getMqeMqeCode());
+			if (setting != null) {
+				report.setSeverityLevel(SeverityLevel.findByLabel(setting.getSeverity()));
+			}
+		}
+	}
+}
+
+// Possibly use sender facility to gather sender's detection config
+  private HashMap<String, String> retrieveDetectionOverrides(String sender) {
+	HashMap<String, String> detectionsOverride = new HashMap<String, String>();
+	//detectionsOverride.put("MQE0119", "ERROR"); // debug with: patient dob is underage, default is ACCEPT
+	
+	if (detectionsOverride.isEmpty()) {
+		//Detection.resetDetectionSeverityToDefault();
+	}
+	
+	return detectionsOverride;
+}
+
+public Hl7MessageHubResponse processMessageAndSaveMetrics(
       Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
+	submitMessageToIIS(messageSubmission);
     MqeMessageServiceResponse dqr = response.getMqeResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
@@ -86,6 +122,10 @@ public class Hl7MessageConsumer {
             response.getSender(), sentDate, response);
 
     return response;
+  }
+  
+  private void submitMessageToIIS(Hl7MessageSubmission messageSubmission) {
+	iisGatewayService.sendVXU(messageSubmission);	
   }
 
 //  int daysSpread = 60;
