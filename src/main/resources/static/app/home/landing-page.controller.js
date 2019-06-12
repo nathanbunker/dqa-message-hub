@@ -228,8 +228,7 @@ angular.module('messageHubDemoApp')
 		}
 		return rows;
 	}
-	
-	
+
 	$scope.handleChartClick = function(selectedItem) {
         if (selectedItem && selectedItem.row >= 0) {
         	var m = moment.utc(selectedItem.date);

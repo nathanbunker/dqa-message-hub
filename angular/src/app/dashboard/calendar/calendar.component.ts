@@ -79,8 +79,15 @@ export class CalendarComponent implements OnInit {
   }
 
   setDataSeries() {
+
     this.calendarChart.dataTable = [['Date', 'Count']];
-    // this.calendarChart.dataTable.push([ new Date(2019, 3, 13), 37032 ]);
+    
+    if (!this.calendarInfo.messageHistory || this.calendarInfo.messageHistory.length < 1) {
+      this.calendarChart.dataTable.push([new Date(this.calendarInfo.year, 0, 1), 0]);
+    } else {
+      alert('['+this.calendarInfo.messageHistory+']');
+    }
+
     this.calendarInfo.messageHistory.forEach((msgDate) => {
       this.calendarChart.dataTable.push(
         [this.convertChartDateToLocalDate(msgDate.day), msgDate.count]

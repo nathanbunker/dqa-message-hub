@@ -24,13 +24,13 @@ export class SettingsService {
       }
     });
 
-    this.saveAll(list);
+    return this.saveAll(list);
   }
 
   private saveAll(settings: SettingsInfo[]) {
+    // console.log(settings);
     // CALL POST ON API
-    this.$http.post(this.url, {settings}).subscribe();
-    console.log(settings);
+    return this.$http.post(this.url, {settings});
   }
 
   private getAll(): Observable<SettingsInfo[]> {

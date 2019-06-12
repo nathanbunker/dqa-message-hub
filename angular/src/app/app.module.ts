@@ -1,8 +1,8 @@
+import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { HttpClientModule } from '@angular/common/http';
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { HeaderComponent } from './header/header.component';
@@ -40,6 +40,8 @@ import { DocumentationService } from './services/documentation.service';
 import { ReportingService } from './services/reporting.service';
 import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -73,7 +75,9 @@ import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
     Ng2GoogleChartsModule,
     NgbModule,
     TableModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({ positionClass: 'toast-top-right' })
   ],
   providers: [DocumentationService, ReportingService, ProviderDashboardGuard],
   bootstrap: [AppComponent]

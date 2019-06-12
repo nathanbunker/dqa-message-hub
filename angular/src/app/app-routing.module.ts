@@ -10,7 +10,7 @@ import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 const routes: Routes = [
   {
     path: 'file',
-    component: FileUploadComponent
+    component: FileUploadComponent,
   },
   {
     path: 'dashboard',
@@ -34,9 +34,9 @@ const routes: Routes = [
   },
   {
     path: 'settings',
-    component: SettingsComponent
+    component: SettingsComponent,
   }
-];
+]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],
