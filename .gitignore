@@ -18,3 +18,5 @@ node
 *.db
 
 \.vscode/
+
+angular/package-lock\.json
