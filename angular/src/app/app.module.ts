@@ -38,6 +38,8 @@ import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provi
 import { FormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
 import { DocumentationService } from './services/documentation.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -71,7 +73,9 @@ import { DocumentationService } from './services/documentation.service';
     Ng2GoogleChartsModule,
     NgbModule,
     TableModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({ positionClass: 'toast-top-right' })
   ],
   providers: [ DocumentationService],
   bootstrap: [AppComponent]

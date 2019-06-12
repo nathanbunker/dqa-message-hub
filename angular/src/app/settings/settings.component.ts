@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { SettingsService, Settings } from '../settings.service';
 import { Observable } from 'rxjs';
+import { ToastrService } from 'ngx-toastr';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-settings',
@@ -19,10 +21,15 @@ export class SettingsComponent implements OnInit {
     activation: string
   };
 
-  constructor(private settingsService: SettingsService) { }
+  constructor(private settingsService: SettingsService, private toastrService: ToastrService) { }
 
   submit(settings: Settings) {
-    this.settingsService.saveSettings(settings);
+    this.settingsService.saveSettings(settings).subscribe((response) => {
+      this.toastrService.success('Settings Saved!');
+    },
+    (error: HttpErrorResponse) => {
+      this.toastrService.error('Error! ' + error.message);
+    });
     this.nistException = this.settingsService.getException();
     this.nistStatus = this.settingsService.getStatus();
   }
