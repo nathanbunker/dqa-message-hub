@@ -1,3 +1,46 @@
-<p>
-  detections works!
-</p>
+<div class="heading">
+  <h4>Detections</h4>
+</div>
+<div *ngIf="errors">
+  <h4>Errors</h4>
+  <ng-container *ngTemplateOutlet="detectionTable; context: { $implicit: errors }"></ng-container>
+</div>
+<div *ngIf="warnings">
+  <h4>Warnings</h4>
+  <ng-container *ngTemplateOutlet="detectionTable; context: { $implicit: warnings }"></ng-container>
+</div>
+
+<ng-template #detectionTable let-rows>
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th style="width: 12%;">Count</th>
+        <th style="width: 50%;">Issue</th>
+        <th style="width: 13%;">Code</th>
+        <th style="width: 13%;">Location</th>
+        <th style="width: 12%;">filter</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let issue of rows">
+        <td>{{issue.count}}</td>
+        <td>{{issue.applicationErrorCode.alternateText}}</td>
+        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+        <td>
+          <span *ngFor="let location of issue.hl7LocationList">
+              {{location.segmentId}}-{{location.fieldPosition}}
+          </span>
+        </td>
+        <td>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [class]="'btn btn-sm ' + (filters.detectionId === issue.applicationErrorCode.alternateIdentifier ? 'btn-success': 'btn-default')"
+            (click)="filter(issue.applicationErrorCode.alternateIdentifier)">
+              <fa-icon icon="filter"></fa-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>

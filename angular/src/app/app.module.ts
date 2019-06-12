@@ -1,7 +1,7 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-import {TableModule} from 'primeng/table';
-import {HttpClientModule} from '@angular/common/http';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TableModule } from 'primeng/table';
+import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
@@ -16,13 +16,12 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload, faChevronRight, faChevronDown, faSearch
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CalendarComponent } from './dashboard/calendar/calendar.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
-import { ReportComponent } from './dashboard/report/report.component';
 import { MessagesComponent } from './dashboard/report/messages/messages.component';
 import { DetectionsComponent } from './dashboard/report/detections/detections.component';
 import { CodesComponent } from './dashboard/report/codes/codes.component';
@@ -38,6 +37,9 @@ import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provi
 import { FormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
 import { DocumentationService } from './services/documentation.service';
+import { ReportingService } from './services/reporting.service';
+import { ProviderComponent } from './dashboard/provider/provider.component';
+import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 
 @NgModule({
   declarations: [
@@ -49,7 +51,6 @@ import { DocumentationService } from './services/documentation.service';
     DashboardComponent,
     CalendarComponent,
     MessageDetailComponent,
-    ReportComponent,
     MessagesComponent,
     DetectionsComponent,
     CodesComponent,
@@ -61,7 +62,8 @@ import { DocumentationService } from './services/documentation.service';
     CodeDocComponent,
     DetectionDocComponent,
     ProviderTypeaheadComponent,
-    DatepickerComponent
+    DatepickerComponent,
+    ProviderComponent,
   ],
   imports: [
     BrowserModule,
@@ -73,12 +75,27 @@ import { DocumentationService } from './services/documentation.service';
     TableModule,
     FormsModule
   ],
-  providers: [ DocumentationService],
+  providers: [DocumentationService, ReportingService, ProviderDashboardGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor() {
-  // Add an icon to the library for convenient access in other components
-  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload, faChevronRight, faChevronDown, faSearch);
+    // Add an icon to the library for convenient access in other components
+    library.add(
+      faSlidersH,
+      faCoffee,
+      faStethoscope,
+      faCaretDown,
+      faTrashAlt,
+      faDownload,
+      faChevronRight,
+      faChevronLeft,
+      faChevronDown,
+      faSearch,
+      faFilter,
+      faSpinner,
+      faCog,
+      faTimes,
+    );
   }
 }
