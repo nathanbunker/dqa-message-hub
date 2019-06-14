@@ -21,6 +21,7 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.mqe.hub.settings.DetectionProperties;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.util.validation.MqeDetection;
@@ -62,15 +63,15 @@ public class Hl7MessageConsumer {
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
 
-    String sender = messageSubmission.getFacilityCode();
-    if (sender == null) {
-      sender = "MQE";
-    }
+    String sender = validator.getSendingFacility(message);
 
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
     
-    HashMap<String, String> detectionsOverride = retrieveDetectionOverrides(sender);
-
+    // probably don't need this - try removing in next sprint
+    retrieveDetectionOverrides(sender); 
+    HashMap<String, String> detectionsOverride = new HashMap<String, String>();
+    //
+    
     //force serial processing...
     MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
 
@@ -90,7 +91,7 @@ public class Hl7MessageConsumer {
   private void applySenderDetectionOverrides(String sender, MqeMessageServiceResponse validationResults) {
 	List<ValidationRuleResult> results = validationResults.getValidationResults();
 	for (ValidationRuleResult res : results) {
-		for (ValidationReport report : res.getIssues()) {
+		for (ValidationReport report : res.getValidationDetections()) {
 			DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(sender, report.getDetection().getMqeMqeCode());
 			if (setting != null) {
 				report.setSeverityLevel(SeverityLevel.findByLabel(setting.getSeverity()));
@@ -101,15 +102,37 @@ public class Hl7MessageConsumer {
 
 // Possibly use sender facility to gather sender's detection config
   private HashMap<String, String> retrieveDetectionOverrides(String sender) {
-	HashMap<String, String> detectionsOverride = new HashMap<String, String>();
-	//detectionsOverride.put("MQE0119", "ERROR"); // debug with: patient dob is underage, default is ACCEPT
+	  HashMap<String, String> detectionsOverride = new HashMap<String, String>();
+	  if (sender == null) {
+		  return detectionsOverride;
+	  }
+	
+	for (Detection detection : Detection.values()) {
+		String mqeCode = detection.getMqeMqeCode();
+		SeverityLevel defaultSeverityLevel = getDefaultSeverityByCode(sender, mqeCode);
+		if (defaultSeverityLevel != null) {
+			detectionsOverride.put(mqeCode, defaultSeverityLevel.getLabel());
+		}
+	}	
 	
 	if (detectionsOverride.isEmpty()) {
-		//Detection.resetDetectionSeverityToDefault();
+		Detection.resetDetectionSeverityToDefault();
 	}
 	
 	return detectionsOverride;
 }
+ 
+  
+  private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
+	  SeverityLevel severityLevel = null;
+	  
+	  DetectionsSettings ds = detectionsSettingsRepo.findByGroupIdAndMqeCode(detectionProp, mqeCode);
+	  if (ds != null) {
+		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
+	  }
+	  return severityLevel;
+  }
+  
 
 public Hl7MessageHubResponse processMessageAndSaveMetrics(
       Hl7MessageSubmission messageSubmission) {

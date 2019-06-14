@@ -4,10 +4,14 @@ import java.util.Date;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
+import org.immregistries.mqe.validator.report.ScoreReportable;
 import org.immregistries.mqe.validator.report.VxuScoredReport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,6 +32,9 @@ public class ReportController {
 
   @Autowired
   private SenderMetricsService metricsSvc;
+  
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
   private ReportScorer scorer = ReportScorer.INSTANCE;
 
@@ -61,6 +68,13 @@ public class ReportController {
     logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
+    for (ScoreReportable score : report.getDetectionCounts()) {
+    	DetectionsSettings detectionSetting = detectionsSettingsRepo.findByGroupIdAndMqeCode(providerKey, score.getMqeCode());
+    	if (detectionSetting != null) {
+	    	SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
+	    	score.setSeverity(severity);
+    	}
+    }
     return report;
   }
 

@@ -125,12 +125,13 @@ public class MqeMessageHubApplicationProperties {
 
   @PostConstruct
   public void postInit() {
-    updateDetectionsInMemory(detectionProp);
-    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
+	  
+	initializeDatabaseProperties();
+	  
     DetectionProperties detectionProp = DetectionProperties.INSTANCE;
-    // have to do all autowired service calls outside of enum
-    
-	  initializeDatabaseProperties();
+    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
+    updateDetectionsInMemory(detectionProp);
+	  
   }
 
   private void updateDetectionsInMemory(DetectionProperties detectionProp) {

@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.parser.MessageParser;
 import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hl7util.parser.model.HL7MessagePart;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReader;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReaderNIST;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +46,9 @@ public class MessageRestController {
 
   @Autowired
   MessageRetrieverService messageRetreiver;
+  
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
   @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}/messages/{messages}/page/{page}")
   public MessageListContainer jsonMessagesGetter(HttpServletRequest request,
@@ -92,10 +99,14 @@ public class MessageRestController {
       String l = mdt.getLocationTxt();
       DetectionDetail dd = new DetectionDetail();
       dd.setDetectionId(mdt.getDetectionId());
-      if (d!=null) {
+      if (d != null) {
         dd.setDescription(d.getDisplayText());
         dd.setName(d.toString());
         dd.setSeverity(d.getSeverity().getCode());
+        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getProvider(), mdt.getDetectionId());
+        if (severityLevelOverride != null) {
+        	dd.setSeverity(severityLevelOverride.getCode());
+        }
         dd.setLocation(l);
       }
         mdi.getDetections().add(dd);
@@ -107,6 +118,15 @@ public class MessageRestController {
     mdi.setMessageResponse(mq.getResponse().replaceAll("[\\r]+", "\n"));
 
     return mdi;
+  }
+  
+  private SeverityLevel getSeverityOverride(String provider, String mqeCode) {
+	  SeverityLevel sl = null;
+	DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(provider, mqeCode);
+		if (setting != null) {
+			sl = SeverityLevel.findByLabel(setting.getSeverity());
+		}
+		return sl;
   }
 
   List<HL7LocationValue> prepareHL7LocationList(List<HL7MessagePart> list) {

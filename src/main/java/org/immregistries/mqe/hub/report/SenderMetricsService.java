@@ -56,6 +56,7 @@ public class SenderMetricsService {
       return out;
     }
 
+    out.setProvider(sender);
     out.getObjectCounts().put(VxuObject.PATIENT, metrics.getPatientCount());
     out.getObjectCounts().put(VxuObject.MESSAGE_HEADER, metrics.getPatientCount());
     out.getObjectCounts().put(VxuObject.VACCINATION, metrics.getVaccinationCount());

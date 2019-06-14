@@ -10,6 +10,8 @@ import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
+import org.immregistries.mqe.hub.settings.DetectionsSettings;
+import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,9 @@ public class MessageRetrieverService {
 
   @Autowired
   MessagesViewJpaRepository mvRepo;
+  
+  @Autowired
+  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
   private final MessageParser parser = new MessageParserHL7();
 
@@ -114,8 +119,14 @@ public class MessageRetrieverService {
     item.setPatientName(patientLast + ", " + patientFirst);
 
     for (MessageDetection d : mv.getDetections()) {
-      Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
-      SeverityLevel sl = dt.getSeverity();
+        Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
+        SeverityLevel sl = dt.getSeverity();
+        
+    	DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(mv.getProvider(), d.getDetectionId());
+		if (setting != null) {
+			sl = SeverityLevel.findByLabel(setting.getSeverity());
+		}
+
       if (sl == SeverityLevel.ERROR) {
         item.setErrorsCount(item.getErrorsCount() + 1);
       } else if (sl == SeverityLevel.WARN) {
