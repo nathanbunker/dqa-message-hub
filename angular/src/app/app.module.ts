@@ -1,8 +1,8 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-
-import {HttpClientModule} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TableModule } from 'primeng/table';
+import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { HeaderComponent } from './header/header.component';
@@ -16,13 +16,12 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CalendarComponent } from './dashboard/calendar/calendar.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
-import { ReportComponent } from './dashboard/report/report.component';
 import { MessagesComponent } from './dashboard/report/messages/messages.component';
 import { DetectionsComponent } from './dashboard/report/detections/detections.component';
 import { CodesComponent } from './dashboard/report/codes/codes.component';
@@ -37,6 +36,12 @@ import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
 import { FormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
+import { DocumentationService } from './services/documentation.service';
+import { ReportingService } from './services/reporting.service';
+import { ProviderComponent } from './dashboard/provider/provider.component';
+import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -48,7 +53,6 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     DashboardComponent,
     CalendarComponent,
     MessageDetailComponent,
-    ReportComponent,
     MessagesComponent,
     DetectionsComponent,
     CodesComponent,
@@ -60,7 +64,8 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     CodeDocComponent,
     DetectionDocComponent,
     ProviderTypeaheadComponent,
-    DatepickerComponent
+    DatepickerComponent,
+    ProviderComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,14 +74,32 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     HttpClientModule,
     Ng2GoogleChartsModule,
     NgbModule,
-    FormsModule
+    TableModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    ToastrModule.forRoot({ positionClass: 'toast-top-right' })
   ],
-  providers: [],
+  providers: [DocumentationService, ReportingService, ProviderDashboardGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor() {
-  // Add an icon to the library for convenient access in other components
-  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload);
+    // Add an icon to the library for convenient access in other components
+    library.add(
+      faSlidersH,
+      faCoffee,
+      faStethoscope,
+      faCaretDown,
+      faTrashAlt,
+      faDownload,
+      faChevronRight,
+      faChevronLeft,
+      faChevronDown,
+      faSearch,
+      faFilter,
+      faSpinner,
+      faCog,
+      faTimes,
+    );
   }
 }

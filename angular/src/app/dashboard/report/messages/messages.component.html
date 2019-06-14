@@ -1,3 +1,54 @@
-<p>
-  messages works!
-</p>
+<div *ngIf="!messageList" style="width: 100%; text-align: center; font-size: 2em;">
+    <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon>
+
+</div>
+<ng-container *ngIf="messageList" >
+  <div>
+      <h5> Messages ({{messageList.totalMessages}})</h5>
+  </div>
+  <div>
+      <table class="table table-sm table-striped">
+          <thead>
+          <tr>
+            <th>Message Control ID</th>
+            <th>Patient Name</th>
+            <th>CVX or NDC</th>
+            <th>Message Received Date</th>
+            <th>Warnings/Errors</th>
+          </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let message of messageList.messageList">
+                <td>
+                    <a [routerLink]="'message/' + message.messageControlId" >{{message.messageControlId}}</a>
+                  </td>
+                  <td>{{message.patientName}}</td>
+                  <td>{{message.cvxList}}</td>
+                  <td>{{message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                  <td>
+                    <span style="min-width: 22px;float: right;">
+                    <button *ngIf="message.errorsCount > 0" class="btn btn-sm btn-danger"
+                            style="width:20px;cursor:default; color: white;"
+                    >{{message.errorsCount}}
+                    </button>
+                    </span>
+                    <span style="width: 27px;float: right;">
+                    <button *ngIf="message.warningsCount > 0" class="btn btn-sm btn-warning"
+                            style="min-width: 22px;cursor:default; color: white;"
+                    >{{message.warningsCount}}
+                    </button>
+                    </span>
+                  </td>
+            </tr>
+          </tbody>
+        </table>
+        <ngb-pagination
+          [(page)]="page"
+          [pageSize]="messageList.itemsPerPage"
+          [collectionSize]="messageList.totalMessages"
+          (pageChange)="changePage($event)" >
+        </ngb-pagination>
+
+  </div>
+</ng-container>
+

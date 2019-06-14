@@ -1,0 +1,10 @@
+.provider-typeahead {
+    font-size: 1.1em;
+    height: 50px;
+    padding-left: 20px;
+    /* margin: 7px; */
+}
+
+.typeahead-container {
+    margin-top:30px;
+}

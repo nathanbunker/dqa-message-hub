@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-/* @import '~bootstrap/dist/css/bootstrap.min.css'; */
+@import '~bootstrap/dist/css/bootstrap.min.css';
 
 /* other fields */
 textarea {
@@ -217,7 +217,7 @@ input[type="file"], .upload-file-name {
 }
 
 input[type="file"] {
-    width:100%;   
+    width:100%;
 }
 
 input[type="password"] {
@@ -337,6 +337,9 @@ ul.pagination > li > a {
     background-color: #3bbfef;
 }
 
+.ui-table .ui-paginator-bottom {
+  border-top: 1px solid #c8c8c8 !important;
+}
 /* Datepicker popup icon */
 
 button.calendar, button.calendar:active {
@@ -346,15 +349,15 @@ button.calendar, button.calendar:active {
     background-size: 23px;
     background-position: center;
   }
-  
+
   /* Sortable table demo */
-  
+
   th[sortable] {
     cursor: pointer;
     user-select: none;
     -webkit-user-select: none;
   }
-  
+
   th[sortable].desc:before, th[sortable].asc:before {
     content: '';
     display: block;
@@ -365,18 +368,53 @@ button.calendar, button.calendar:active {
     float: left;
     margin-left: -22px;
   }
-  
+
   th[sortable].desc:before {
     transform: rotate(180deg);
     -ms-transform: rotate(180deg);
   }
-  
+
   /* Filtering table demo */
   ngbd-table-filtering span.ngb-highlight {
     background-color: yellow;
   }
-  
+
   /* Complete table demo */
   ngbd-table-complete span.ngb-highlight {
     background-color: yellow;
+  }
+
+  .dashboard-tabs .tab-content {
+    width: 100% !important;
+    padding: 5px !important;
+    padding-top: 15px !important;
+  }
+  .dashboard-tabs .nav {
+    width: 100% !important;
+  }
+  /* TOASTR BUGFIX */
+  #toast-container > div {
+    opacity: 1;
+  }
+  .toast {
+    font-size: initial !important;
+    border: initial !important;
+    backdrop-filter: blur(0) !important;
+  }
+  .toast-success {
+    background-color: #51A351 !important;
+  }
+  .toast-error {
+    background-color: #BD362F !important;
+  }
+  .toast-info {
+    background-color: #2F96B4 !important;
+  }
+  .toast-warning {
+    background-color: #F89406 !important;
+  }
+
+  .toast-top-right {
+    top: 110px;
+    right: 12px;
   }

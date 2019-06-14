@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CalendarInfo } from 'src/app/dashboard/dashboard.component';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Input } from '@angular/core';
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 import * as moment from 'moment';
@@ -12,40 +11,30 @@ import * as moment from 'moment';
 })
 export class CalendarComponent implements OnInit {
 
-  constructor() { }
+  searchOptions: {
+    date: Date
+  };
+  resultsMetaData: {
+    page: number
+  };
+  calendarDisplayYear: number;
 
+  @Output()
+  select: EventEmitter<Date>;
   @Input()
   calendarInfo: CalendarInfo;
-  searchOptions = {};
-  resultsMetaData = {
-    page: 0,
-    elementsPerPage: 10,
-    maxSize: 10,
-    totalElements: 0, // Don't modify this except with the actual list length. Modifying this causes a page reload...
-    messages: [],
-  };
-
+  resizeTimer: any;
   calendarChart: GoogleChartInterface = {
     chartType: 'Calendar',
     dataTable: [
-      ['Date', 'Attendance'],
-      [ new Date(2012, 3, 13), 37032 ],
-      [ new Date(2012, 3, 14), 38024 ],
-      [ new Date(2012, 3, 15), 38024 ],
-      [ new Date(2012, 3, 16), 38108 ],
-      [ new Date(2012, 3, 17), 38229 ]
+      ['Date', 'Count'],
     ],
-    // opt_firstRowIsData: true,
     options:
-    // {'title': 'Date'},
     {
       title: '',
-
-    // 	        height: 220,
+      height: 250,
       calendar: {
         cellSize: 20,
-    // 	        	yearLabel : {display:'none', color:'grey', /*fontSize: 100*/},
-    // 	        forceIFrame: true, //This doesn't seem to work.
         focusedCellColor: {
           stroke: '#d3362d',
           strokeOpacity: 1,
@@ -58,51 +47,99 @@ export class CalendarComponent implements OnInit {
         }
       },
 
-      colorAxis: {colors: ['#9AF3BF', '#259253']},
-      tooltip: {isHtml: true},
+      colorAxis: { colors: ['#9AF3BF', '#259253'] },
+      tooltip: { isHtml: true },
     }
   };
 
-myChartObject = {type: 'Calendar', data: {
-  'cols': [
-    {id: 'Date', label: 'Day', type: 'date'},
-    {id: 'count', label: 'Slices', type: 'number'},
-    {
-      id: 'tooltip',
-      type: 'string',
-      role: 'tooltip',
-      'p': {'html': true}
+  myChartObject = {
+    type: 'Calendar', data: {
+      'cols': [
+        { id: 'Date', label: 'Day', type: 'date' },
+        { id: 'count', label: 'Slices', type: 'number' },
+        {
+          id: 'tooltip',
+          type: 'string',
+          role: 'tooltip',
+          'p': { 'html': true }
+        }
+      ],
+      'rows': []
     }
-  ],
-  'rows': []
-}
-};
+  };
 
-  handleChartClick = function (selectedItem) {
+  constructor() {
+    this.select = new EventEmitter<Date>();
+    this.searchOptions = {
+      date: null,
+    };
+    this.resultsMetaData = {
+      page: 1,
+    };
+  }
+
+  setDataSeries() {
+
+    this.calendarChart.dataTable = [['Date', 'Count']];
+    
+    if (!this.calendarInfo.messageHistory || this.calendarInfo.messageHistory.length < 1) {
+      this.calendarChart.dataTable.push([new Date(this.calendarInfo.year, 0, 1), 0]);
+    } else {
+      alert('['+this.calendarInfo.messageHistory+']');
+    }
+
+    this.calendarInfo.messageHistory.forEach((msgDate) => {
+      this.calendarChart.dataTable.push(
+        [this.convertChartDateToLocalDate(msgDate.day), msgDate.count]
+      )
+    });
+  }
+
+  // So...  for some reason google charts sends the date back as if it were in UTC time...
+  convertChartDateToLocalDate(chartDate) {
+    const m = moment.utc(chartDate);
+    const offsetMinutes = m.toDate().getTimezoneOffset();
+    m.add(offsetMinutes, 'minutes');
+    return m.toDate();
+  }
+
+  handleChartClick(selectedItem) {
     console.log('handleChartClick');
     console.log(selectedItem);
     if (selectedItem) {
-//        		&& selectedItem.row >= 0) {
-      var selectedDate = this.convertChartDateToLocalDate(selectedItem.selectedRowValues[0]);
+      const selectedDate = this.convertChartDateToLocalDate(selectedItem.selectedRowValues[0]);
       this.searchOptions.date = selectedDate;
       this.calendarDisplayYear = moment(
-          this.searchOptions.date).year();
+        this.searchOptions.date).year();
       this.resultsMetaData.page = 1;
-      // this.reloadPageData();
+      this.select.emit(selectedDate)
     }
-  };
-
-  ngOnInit() {
-    // this.calendarChart.dataTable = this.calendarInfo;
   }
 
-// So...  for some reason google charts sends the date back as if it were in UTC time...
-convertChartDateToLocalDate(chartDate) {
-  var m = moment.utc(chartDate);
-  var offsetMinutes = m.toDate().getTimezoneOffset();
-  m.add(offsetMinutes, 'minutes');
-  return m.toDate();
+  ngOnInit() {
+    this.setDataSeries();
+  }
+
+
+
+
+  // onResized($event) {
+  //   clearTimeout(this.resizeTimer);
+  //   this.resizeTimer = setTimeout(function() {
+  //     console.log("div is resized...");
+  //     console.log(this.calendarChart);
+  //     //force a redraw
+  //         }, 500);
+  // }
 }
 
+export interface CalendarInfo {
+  year: number;
+  provider: string;
+  messageHistory: MessageDate[];
 }
 
+export interface MessageDate {
+  day: string;
+  count: number;
+}

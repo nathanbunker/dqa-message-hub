@@ -53,12 +53,16 @@ public class MqeMessageHubApplicationProperties {
 
   public void setNistValidatorConnectionStatus(
       MqeServiceConnectionStatus nistValidatorConnectionStatus) {
-    saveProperty(MqeSettingsName.NIST_ACTIVATION, nistValidatorConnectionStatus.toString());
     this.nistValidatorConnectionStatus = nistValidatorConnectionStatus;
   }
 
   public MqeServiceConnectionStatus getNistValidatorConnectionStatus() {
     return nistValidatorConnectionStatus;
+  }
+  
+  public void disableNistValidator() {
+	saveProperty(MqeSettingsName.NIST_ACTIVATION, MqeServiceConnectionStatus.DISABLED.toString());
+	this.nistValidatorConnectionStatus = MqeServiceConnectionStatus.DISABLED;
   }
 
   public void saveProperty(MqeSettingsName name, String value) {
@@ -70,60 +74,63 @@ public class MqeMessageHubApplicationProperties {
     s.setValue(value);
     settingsRepo.save(s);
   }
+  
+  public void initializeDatabaseProperties() {
+	  logger.info("Initializing Extra Values");
+	    //things here happen after it gets all the properties it can
+	    //find in the file.
+	    //Do other DBParameter lookups here.
+	    {
+	      MqeSettings s = settingsRepo.findByName(MqeSettingsName.NIST_URL.name);
+	      if (s == null) {
+	        saveProperty(MqeSettingsName.NIST_URL, nistValidatorUrl);
+	      } else {
+	        nistValidatorUrl = s.getValue();
+	      }
+	    }
+	    {
+	      MqeSettings s = settingsRepo.findByName(MqeSettingsName.NIST_ACTIVATION.name);
+	      if (s == null) {
+	        saveProperty(MqeSettingsName.NIST_ACTIVATION, nistValidatorConnectionStatus.toString());
+	      } else {
+	        nistValidatorConnectionStatus = MqeServiceConnectionStatus.valueOf(s.getValue());
+	      }
+	    }
+	    nistValidatorHandler.resetNistValidator();
+
+	    ValidatorProperties vp = ValidatorProperties.INSTANCE;
+	    MqeSettings s = settingsRepo.findByName(MqeSettingsName.SS_ACTIVATION.name);
+	    if (s == null) {
+	      this.ssActivationStatus = vp.isAddressCleanserEnabled() ? MqeServiceConnectionStatus.ENABLED.toString() : MqeServiceConnectionStatus.ENABLED.toString();
+	    } else {
+	      this.ssActivationStatus = MqeServiceConnectionStatus.valueOf(s.getValue()).toString();
+	      vp.setAddressCleanserEnabled(MqeServiceConnectionStatus.ENABLED.toString().equals(s.getValue()));
+	    }
+
+	    MqeSettings ssApiKey = settingsRepo.findByName(MqeSettingsName.SS_API_KEY.name);
+	    if (ssApiKey == null) {
+	      this.ssApiKey = vp.getSsApiAuthToken();
+	    } else {
+	      this.ssApiKey = ssApiKey.getValue();
+	      vp.setSsApiAuthToken(this.ssApiKey);
+	    }
+	    MqeSettings ssAuthId = settingsRepo.findByName(MqeSettingsName.SS_AUTH_ID.name);
+	    if (ssApiKey == null) {
+	      this.ssAuthId = vp.getSsApiAuthId();
+	    } else {
+	      this.ssAuthId = ssAuthId.getValue();
+	      vp.setSsApiAuthId(this.ssAuthId);
+	    }
+  }
 
   @PostConstruct
   public void postInit() {
-    logger.info("Initializing Extra Values");
-    //things here happen after it gets all the properties it can
-    //find in the file.
-    //Do other DBParameter lookups here.
-    {
-      MqeSettings s = settingsRepo.findByName(MqeSettingsName.NIST_URL.name);
-      if (s == null) {
-        saveProperty(MqeSettingsName.NIST_URL, nistValidatorUrl);
-      } else {
-        nistValidatorUrl = s.getValue();
-      }
-    }
-    {
-      MqeSettings s = settingsRepo.findByName(MqeSettingsName.NIST_ACTIVATION.name);
-      if (s == null) {
-        saveProperty(MqeSettingsName.NIST_ACTIVATION, nistValidatorConnectionStatus.toString());
-      } else {
-        nistValidatorConnectionStatus = MqeServiceConnectionStatus.valueOf(s.getValue());
-      }
-    }
-    nistValidatorHandler.resetNistValidator();
-
-    ValidatorProperties vp = ValidatorProperties.INSTANCE;
-    MqeSettings s = settingsRepo.findByName(MqeSettingsName.SS_ACTIVATION.name);
-    if (s == null) {
-      this.ssActivationStatus = vp.isAddressCleanserEnabled() ? MqeServiceConnectionStatus.ENABLED.toString() : MqeServiceConnectionStatus.ENABLED.toString();
-    } else {
-      this.ssActivationStatus = MqeServiceConnectionStatus.valueOf(s.getValue()).toString();
-      vp.setAddressCleanserEnabled(MqeServiceConnectionStatus.ENABLED.toString().equals(s.getValue()));
-    }
-
-    MqeSettings ssApiKey = settingsRepo.findByName(MqeSettingsName.SS_API_KEY.name);
-    if (ssApiKey == null) {
-      this.ssApiKey = vp.getSsApiAuthToken();
-    } else {
-      this.ssApiKey = ssApiKey.getValue();
-      vp.setSsApiAuthToken(this.ssApiKey);
-    }
-    MqeSettings ssAuthId = settingsRepo.findByName(MqeSettingsName.SS_AUTH_ID.name);
-    if (ssApiKey == null) {
-      this.ssAuthId = vp.getSsApiAuthId();
-    } else {
-      this.ssAuthId = ssAuthId.getValue();
-      vp.setSsApiAuthId(this.ssAuthId);
-    }
-
-    DetectionProperties detectionProp = DetectionProperties.INSTANCE;
-    
-    // have to do all autowired service calls outside of enum
-    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
     updateDetectionsInMemory(detectionProp);
+    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
+    DetectionProperties detectionProp = DetectionProperties.INSTANCE;
+    // have to do all autowired service calls outside of enum
+    
+	  initializeDatabaseProperties();
   }
 
   private void updateDetectionsInMemory(DetectionProperties detectionProp) {

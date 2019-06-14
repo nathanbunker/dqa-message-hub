@@ -54,7 +54,7 @@ export class UploaderService {
   }
 
   unpauseFileProcess(fileId: string) {
-    return this.$http.get<FileUploadInfo>('api/file/unpause-file', {
+    return this.$http.get('api/file/unpause-file', {
       params: {
         fileId: fileId
       }
@@ -70,7 +70,7 @@ export class UploaderService {
   }
 
   removeFile(fileId: string) {
-    return this.$http.get<FileUploadInfo>('api/file/remove-file', {
+    return this.$http.get('api/file/remove-file', {
       params: {
         fileId: fileId
       }

@@ -23,6 +23,7 @@ import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
 import org.immregistries.mqe.validator.detection.Detection;
@@ -158,7 +159,7 @@ public Hl7MessageHubResponse processMessageAndSaveMetrics(
 
     for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
       for (ValidationReport vr : rr.getValidationDetections()) {
-        Detection d = vr.getDetection();
+        MqeDetection d = vr.getDetection();
         if (SeverityLevel.ERROR == d.getSeverity() ||
             SeverityLevel.WARN == d.getSeverity()) {
           StringBuilder locBldr = new StringBuilder();

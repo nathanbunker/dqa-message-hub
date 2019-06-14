@@ -31,33 +31,44 @@ public class DocumentationController {
 	
 	@Autowired
 	PDFDocumentDetectionDocumentationSerializer pdfDocumentSerializer;
+
+	@Autowired
+	DetectionDocumentation documentation;
 	
 	@RequestMapping(value = "pdf", method = RequestMethod.GET, params = { "type" })
 	public ResponseEntity<byte[]> getDocumentationPDF(@RequestParam("type") String type) throws NoSuchFieldException, SecurityException, IOException, DocumentException, com.lowagie.text.DocumentException{
-		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
-		
+		// Configure Response Metadata
 		HttpHeaders headers = new HttpHeaders();
 	    headers.setContentType(MediaType.parseMediaType("application/pdf"));
 	    String filename = "mqe_detections_documentation.pdf";
 	    headers.setContentDispositionFormData(filename, filename);
 	    headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+
+	    // Is the export type defined ?
 	    boolean isDefType = type != null && !type.isEmpty() && type.toLowerCase().equals("document") || type.toLowerCase().equals("table");
-	    
-	    byte[] bytes = isDefType ? type.toLowerCase().equals("document") ? this.pdfDocumentSerializer.serialize(documentation) : this.pdfTableSerializer.serialize(documentation) : this.pdfDocumentSerializer.serialize(documentation);
+
+		byte[] bytes;
+
+		// Serialize the documentation
+	    if(isDefType && type.toLowerCase().equals("table")) {
+	    	bytes = this.pdfTableSerializer.serialize(documentation);
+		} else {
+	    	bytes = this.pdfDocumentSerializer.serialize(documentation);
+		}
+
+	    // Create HTTP Response
 	    ResponseEntity<byte[]> response = new ResponseEntity<>(bytes, headers, HttpStatus.OK);
 	    return response;
 	}
 	
 	@RequestMapping(value = "json", method = RequestMethod.GET)
 	public ResponseEntity<DetectionDocumentation> getDocumentationJSON() throws NoSuchFieldException, SecurityException {
-	    ResponseEntity<DetectionDocumentation> response = new ResponseEntity<>(DetectionDocumentation.getDetectionDocumentation(), HttpStatus.OK);
+	    ResponseEntity<DetectionDocumentation> response = new ResponseEntity<>(this.documentation, HttpStatus.OK);
 	    return response;
 	}
 	
 	@RequestMapping(value = "table", method = RequestMethod.GET)
-	public ResponseEntity<List<DocumentationTableRow>> getDocumentationTable() throws NoSuchFieldException, SecurityException {
-		DetectionDocumentation documentation = DetectionDocumentation.getDetectionDocumentation();
-		List<DocumentationTableRow> doc = new ArrayList<>();
+	public ResponseEntity<List<DocumentationTableRow>> getDocumentationTable() throws NoSuchFieldException, SecurityException { List<DocumentationTableRow> doc = new ArrayList<>();
 		
 		Map<String, Map<String, Map<String, List<DetectionDocumentationPayload>>>> detections = documentation.getDetections();
 		

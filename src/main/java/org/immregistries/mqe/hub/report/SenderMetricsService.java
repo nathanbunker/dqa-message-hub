@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.immregistries.mqe.vxu.VxuField;
 import org.immregistries.mqe.vxu.VxuObject;
@@ -58,7 +59,7 @@ public class SenderMetricsService {
     out.getObjectCounts().put(VxuObject.PATIENT, metrics.getPatientCount());
     out.getObjectCounts().put(VxuObject.MESSAGE_HEADER, metrics.getPatientCount());
     out.getObjectCounts().put(VxuObject.VACCINATION, metrics.getVaccinationCount());
-    Map<Detection, Integer> attrCounts = out.getAttributeCounts();
+    Map<MqeDetection, Integer> attrCounts = out.getAttributeCounts();
 
     for (SenderDetectionMetrics sam : metrics.getDetectionMetrics()) {
       Detection ma = Detection.getByMqeErrorCodeString(sam.getMqeDetectionCode());
@@ -99,7 +100,7 @@ public class SenderMetricsService {
     }
 
     Map<VxuObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
-    Map<Detection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
+    Map<MqeDetection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
     Map<Integer, Integer> patientAgeCounts = incomingMetrics.getPatientAgeCounts();
 
     for (VxuObject io : objectCounts.keySet()) {
@@ -120,7 +121,7 @@ public class SenderMetricsService {
       }
     }
 
-    for (Detection detection : detectionCounts.keySet()) {
+    for (MqeDetection detection : detectionCounts.keySet()) {
       if (detection == null) {
         continue;
       }
