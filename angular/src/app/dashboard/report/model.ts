@@ -55,10 +55,10 @@ export interface Issue {
 }
 
 export interface Codes {
-  codeCountList: CodeCountList[];
+  codeCount: CodeCount[];
 }
 
-export interface CodeCountList {
+export interface CodeCount {
   typeCode: string;
   typeName?: any;
   source?: any;
@@ -131,3 +131,8 @@ export interface MessageList {
   warningsCount: number;
 }
 
+export interface CodesMap {
+  map: {
+    label: CodeCount[]
+  };
+}

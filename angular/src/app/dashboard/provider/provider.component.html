@@ -78,7 +78,8 @@
     </ngb-tab>
     <ngb-tab [id]="tabsType.CODES" title="Codes">
       <ng-template ngbTabContent>
-      </ng-template>
+        <app-codes [codes]="codesReceivedList$ | async" [filters]="params.filter" (filterBy)="filterBy($event, 'detectionId')"></app-codes>
+    </ng-template>
     </ngb-tab>
     <ngb-tab id="vaccines" title="Vaccines">
       <ng-template ngbTabContent>

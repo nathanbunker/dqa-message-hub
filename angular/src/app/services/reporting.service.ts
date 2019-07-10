@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Messages, IMessageFilter, Report } from '../dashboard/report/model';
+import { Messages, IMessageFilter, Report, CodesMap } from '../dashboard/report/model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +20,14 @@ export class ReportingService {
 
   getReport(provider: string, date: string): Observable<Report> {
     return this.http.get<Report>('api/report/' + provider + '/date/' + date + '/');
+  }
+
+  getCodesReceivedList(provider: string, dateStart: string, dateEnd: string, filter?: string): Observable<CodesMap> {
+    return this.http.get<CodesMap>('api/codes/' + provider + '/' + dateStart + '/' + dateEnd + '/', {
+      params: {
+        filters: filter || '',
+      }
+    });
   }
 
   filterAsString(filter: MessageFilter): string {
