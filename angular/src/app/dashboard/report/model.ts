@@ -110,6 +110,8 @@ export interface ReportScore {
 export interface IMessageFilter {
   messageSearchText?: string;
   detectionId?: string;
+  vaccineGroupAge?: string;
+  vaccineGroup?: string;
 }
 
 export interface Messages {
@@ -129,5 +131,40 @@ export interface MessageList {
   patientName: string;
   errorsCount: number;
   warningsCount: number;
+}
+
+export interface VaccinationExpectedMap {
+  map: {
+    [vaccine: string]: VaccinationExpected,
+  };
+}
+
+export interface CodesMap {
+  map: {
+    [label: string]: CodeCountList[],
+  };
+}
+
+export interface VaccinationExpected {
+  [ageGroup: string]: VaccinationExpectedData;
+}
+
+export interface VaccinationExpectedData {
+  vaccinationVisits: number;
+  count: number;
+  status: string;
+  vaccine: string;
+  percent: number;
+  age: AgeGroup;
+  vaccineReportStatus: string;
+  reportStyleClass: string;
+  ageOrder: number;
+}
+
+export interface AgeGroup {
+  label: string;
+  ageLow: number;
+  ageHigh: number;
+  order: number;
 }
 

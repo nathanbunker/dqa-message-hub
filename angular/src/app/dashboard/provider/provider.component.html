@@ -11,6 +11,7 @@
     <div class="col-md-1" style="margin-top: 75px; margin-left: -120px;">
       <div style="height:73px">
           <button style="font-size: 3em; border: none; color: #D3D3D3;"
+                  *ngIf="(calendarYear$ | async) < currentYear"
                   (click)="nextYear()"
                   type="button" class="btn btn-default btn-sm">
                   <fa-icon icon="chevron-right"></fa-icon>
@@ -62,6 +63,17 @@
           <span *ngIf="report$ | async" >{{filterDisplay.detections[params.filter.detectionId]}}</span> ({{params.filter.detectionId}})
         </td>
       </tr>
+      <tr *ngIf="params.filter.vaccineGroupAge && params.filter.vaccineGroup">
+          <td style="width: 20%;">
+              <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('vaccineGroup', 'vaccineGroupAge')">
+                <fa-icon icon="times"></fa-icon>
+              </button>
+            <span style="color: gray;">Vaccine : </span>
+          </td>
+          <td style="vertical-align: middle; font-weight: bold;">
+              {{params.filter.vaccineGroup}} - {{params.filter.vaccineGroupAge}}
+          </td>
+        </tr>
     </table>
   </div>
 
@@ -80,8 +92,9 @@
       <ng-template ngbTabContent>
       </ng-template>
     </ngb-tab>
-    <ngb-tab id="vaccines" title="Vaccines">
+    <ngb-tab [id]="tabsType.VACCINES" title="Vaccines">
       <ng-template ngbTabContent>
+        <app-vaccines [data]="vaccinationTabData$ | async" [filters]="params.filter" (filterBy)="filterByAll($event)"></app-vaccines>
       </ng-template>
     </ngb-tab>
     <ngb-tab id="report" title="report">

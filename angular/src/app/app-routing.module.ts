@@ -6,7 +6,6 @@ import { SettingsComponent } from './settings/settings.component';
 import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 
-
 const routes: Routes = [
   {
     path: 'file',

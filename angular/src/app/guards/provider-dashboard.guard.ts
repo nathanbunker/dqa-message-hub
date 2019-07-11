@@ -16,6 +16,7 @@ export class ProviderDashboardGuard implements CanActivate {
       ProviderDashboardTab.MESSAGES,
       ProviderDashboardTab.CODES,
       ProviderDashboardTab.DETECTIONS,
+      ProviderDashboardTab.VACCINES,
     ].includes(route.params.tab)) {
       return true;
     } else {

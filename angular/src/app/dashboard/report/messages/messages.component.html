@@ -10,11 +10,11 @@
       <table class="table table-sm table-striped">
           <thead>
           <tr>
-            <th>Message Control ID</th>
-            <th>Patient Name</th>
-            <th>CVX or NDC</th>
-            <th>Message Received Date</th>
-            <th>Warnings/Errors</th>
+            <th style="width: 16%;">Message Control ID</th>
+            <th style="width: 16%;">Patient Name</th>
+            <th style="width: 36%;">CVX or NDC</th>
+            <th style="width: 16%;">Message Received Date</th>
+            <th style="width: 16%;">Warnings/Errors</th>
           </tr>
           </thead>
           <tbody>
@@ -26,13 +26,13 @@
                   <td>{{message.cvxList}}</td>
                   <td>{{message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
                   <td>
-                    <span style="min-width: 22px;float: right;">
+                    <span style="min-width: 27px;float: right;">
                     <button *ngIf="message.errorsCount > 0" class="btn btn-sm btn-danger"
-                            style="width:20px;cursor:default; color: white;"
+                            style="min-width:22px;cursor:default; color: white;"
                     >{{message.errorsCount}}
                     </button>
                     </span>
-                    <span style="width: 27px;float: right;">
+                    <span style="min-width: 27px;float: right;">
                     <button *ngIf="message.warningsCount > 0" class="btn btn-sm btn-warning"
                             style="min-width: 22px;cursor:default; color: white;"
                     >{{message.warningsCount}}
@@ -46,6 +46,7 @@
           [(page)]="page"
           [pageSize]="messageList.itemsPerPage"
           [collectionSize]="messageList.totalMessages"
+          [maxSize]="5" [rotate]="true" [boundaryLinks]="true"
           (pageChange)="changePage($event)" >
         </ngb-pagination>
 

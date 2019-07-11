@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Messages, IMessageFilter, Report } from '../dashboard/report/model';
+import { Messages, IMessageFilter, Report, AgeGroup, VaccinationExpectedMap } from '../dashboard/report/model';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +16,22 @@ export class ReportingService {
         filters: filter || '',
       }
     });
+  }
+
+  getVaccinationReportGroupList(provider: string): Observable<string[]> {
+    return this.http.get<string[]>('api/codes/vaccineReportGroupList/' + provider);
+  }
+
+  getVaccinationsExpected(provider: string, date: string): Observable<VaccinationExpectedMap> {
+    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinationsExpected/' + provider + '/' + date + '/' + date);
+  }
+
+  getAgeCategoryList(provider: string): Observable<AgeGroup[]> {
+    return this.http.get<AgeGroup[]>('api/codes/ageCategoryList/' + provider);
+  }
+
+  getVaccination(provider: string, date: string): Observable<VaccinationExpectedMap> {
+    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinations/' + provider + '/' + date + '/' + date);
   }
 
   getReport(provider: string, date: string): Observable<Report> {
@@ -79,6 +95,14 @@ export class MessageFilter {
 
   get detectionId() {
     return this.filter.detectionId;
+  }
+
+  get vaccineGroupAge() {
+    return this.filter.vaccineGroupAge;
+  }
+
+  get vaccineGroup() {
+    return this.filter.vaccineGroup;
   }
 
   clear(key: keyof IMessageFilter) {

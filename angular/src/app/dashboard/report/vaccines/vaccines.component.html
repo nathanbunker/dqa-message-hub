@@ -1,3 +1,99 @@
-<p>
-  vaccines works!
-</p>
+<div class="heading">
+  <h4>VACCINE TYPES EXPECTED</h4>
+</div>
+<div *ngIf="_providedTable">
+  <ng-container *ngFor="let table of _providedTable" >
+    <h4>{{table.ageGroup}}</h4>
+    <table class="table table-sm table-striped">
+        <thead>
+          <tr>
+            <th style="width: 33%;">Vaccine Reported</th>
+            <th style="width: 25%;">Count</th>
+            <th style="width: 25%;">Status</th>
+            <th style="width: 12%;">filter</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let vaccine of table.vaccines">
+            <td>{{vaccine.vaccine}}</td>
+            <td>{{vaccine.count}}</td>
+            <td>{{vaccine.status}}</td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-sm"
+                [class]="'btn btn-sm ' + (filters.vaccineGroupAge === table.ageGroup && filters.vaccineGroup ===  vaccine.vaccine ? 'btn-success': 'btn-default')"
+                (click)="filter(vaccine.vaccine, table.ageGroup)">
+                  <fa-icon icon="filter"></fa-icon>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </ng-container>
+</div>
+<h3>Expected Vaccines</h3>
+<div *ngIf="_expectedTable">
+    <table class="vaccineTypeTable" width="700">
+      <thead>
+        <tr>
+          <th width="25%">&nbsp;</th>
+          <th width="15%" *ngFor="let ageGroup of orderedAgeGroups">{{ageGroup}}</th>
+        </tr>
+      </thead>
+        <tr *ngFor="let vaccineGroup of _expectedTable">
+          <th width="25%">{{vaccineGroup.vaccine}}</th>
+          <td width="15%" *ngFor="let ageGroup of orderedAgeGroups" [class]="vaccineGroup.groups[ageGroup].class"
+          [ngClass]="{
+            'vaccineTypePresentExpected': vaccineGroup.groups[ageGroup].count > 0 && vaccineGroup.groups[ageGroup].status == 'Expected',
+            'vaccineTypePresentPossible': vaccineGroup.groups[ageGroup].count > 0 && vaccineGroup.groups[ageGroup].status == 'Possible',
+            'vaccineTypePresentNotExpected': vaccineGroup.groups[ageGroup].count > 0 && vaccineGroup.groups[ageGroup].status == 'Not Expected',
+            'vaccineTypePresentNotPossible': vaccineGroup.groups[ageGroup].count > 0 && vaccineGroup.groups[ageGroup].status == 'Not Possible',
+            'vaccineTypeNotPresentExpected': vaccineGroup.groups[ageGroup].count == 0 && vaccineGroup.groups[ageGroup].status == 'Expected',
+            'vaccineTypeNotPresentPossible': vaccineGroup.groups[ageGroup].count == 0 && vaccineGroup.groups[ageGroup].status == 'Possible',
+            'vaccineTypeNotPresentNotExpected': vaccineGroup.groups[ageGroup].count == 0 && vaccineGroup.groups[ageGroup].status == 'Not Expected',
+            'vaccineTypeNotPresentNotPossible': vaccineGroup.groups[ageGroup].count == 0 && vaccineGroup.groups[ageGroup].status == 'Not Possible'}"
+          >
+            <span *ngIf="vaccineGroup.groups[ageGroup].count !== 0 || vaccineGroup.groups[ageGroup].status === 'Expected'">
+              <span *ngIf="vaccineGroup.groups[ageGroup].count !== 0" class="clickable" (click)="filter(vaccineGroup.vaccine, ageGroup)">{{vaccineGroup.groups[ageGroup].count}}</span>
+              <span *ngIf="vaccineGroup.groups[ageGroup].count === 0">{{vaccineGroup.groups[ageGroup].count}}</span>
+            </span>
+          </td>
+        </tr>
+      </table>
+</div>
+
+<h4>How To Read</h4>
+<p>The Vaccine Types Expected table shown above is designed for rapid evaluation of which administered vaccinations
+where submitted for this selection of test messages. The counts in the table represent the number of administered vaccinations
+(excluding historical or otherwise not administered) grouped into vaccine type and age of patient when administered. The cells
+are colored based on the expectations for Present / Not Present for each vaccine type and age group. </p>
+<table class="vaccineTypeTable">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Present</th>
+      <th>Not Present</th>
+    </tr>
+    <tr>
+      <td>Expected</td>
+      <td class="vaccineTypePresentExpected">OK</td>
+      <td class="vaccineTypeNotPresentExpected">PROBLEM</td>
+    </tr>
+  </thead>
+    <tr>
+      <td>Possible</td>
+      <td class="vaccineTypePresentPossible">OK</td>
+      <td class="vaccineTypeNotPresentPossible">OK</td>
+    </tr>
+    <tr>
+      <td>Not Expected</td>
+      <td class="vaccineTypePresentNotExpected">REVIEW</td>
+      <td class="vaccineTypeNotPresentNotExpected">OK</td>
+    </tr>
+    <tr>
+      <td>Not Possible</td>
+      <td class="vaccineTypePresentNotPossible">PROBLEM</td>
+      <td class="vaccineTypeNotPresentNotPossible">OK</td>
+    </tr>
+</table>

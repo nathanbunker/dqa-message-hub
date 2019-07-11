@@ -1,18 +1,20 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
-import { Observable, combineLatest, ReplaySubject, concat, merge, Subject } from 'rxjs';
+import { Observable, combineLatest, ReplaySubject, merge, Subject } from 'rxjs';
 import { CalendarInfo } from '../calendar/calendar.component';
-import { map, take, concatMap, tap, mergeMap, pluck, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { map, take, tap, pluck, distinctUntilChanged, switchMap, shareReplay } from 'rxjs/operators';
 import { FacilityService } from '../../facility.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageFilter, ReportingService } from '../../services/reporting.service';
-import { IMessageFilter, Messages, Report } from '../report/model';
+import { IMessageFilter, Messages, Report, VaccinationExpectedMap, AgeGroup } from '../report/model';
+import { VaccinationsData } from '../report/vaccines/vaccines.component';
 
 export enum ProviderDashboardTab {
   MESSAGES = 'messages',
   CODES = 'codes',
-  DETECTIONS = 'detections'
+  DETECTIONS = 'detections',
+  VACCINES = 'vaccines',
 }
 
 @Component({
@@ -30,9 +32,18 @@ export class ProviderComponent implements OnInit {
     page: number;
   }>;
   filter: ReplaySubject<string>;
+
   calendar$: Observable<CalendarInfo>;
+
   messageList$: Observable<Messages>;
   report$: Observable<Report>;
+
+  vaccinationExpected$: Observable<VaccinationExpectedMap>;
+  vaccinations$: Observable<VaccinationExpectedMap>;
+  vaccinationTabData$: Observable<VaccinationsData>;
+  vaccinationReportGroupList$: Observable<string[]>;
+  ageGroups$: Observable<AgeGroup[]>;
+
   currentYear: number;
   tabsType = ProviderDashboardTab;
   filterDisplay: {
@@ -41,6 +52,8 @@ export class ProviderComponent implements OnInit {
     }
   };
   slideYear: Subject<number>;
+  calendarYear$: Observable<number>;
+
   constructor(
     private route: ActivatedRoute,
     private facilityService: FacilityService,
@@ -72,8 +85,18 @@ export class ProviderComponent implements OnInit {
     ).subscribe();
   }
 
+  filterByAll(filter: MessageFilter) {
+    this.urlParams$.pipe(
+      take(1),
+      tap((params) => {
+        if (filter) {
+          this.filter.next(filter.filterAsString());
+        }
+      }),
+    ).subscribe();
+  }
+
   pageChange(page: number) {
-    console.log('PAGE');
     this.router.navigate(['.'], {
       relativeTo: this.route,
       queryParamsHandling: 'merge',
@@ -83,20 +106,38 @@ export class ProviderComponent implements OnInit {
     });
   }
 
-  clearFilter(filterKey: keyof IMessageFilter) {
+  clearFilter(...filterKey: Array<keyof IMessageFilter>) {
     this.urlParams$.pipe(
       take(1),
       tap((params) => {
-        params.filter.clear(filterKey);
+        filterKey.forEach((key) => {
+          params.filter.clear(key);
+        });
         this.filter.next(params.filter.filterAsString());
       }),
     ).subscribe();
   }
 
   previousYear() {
+    this.calendarYear$.pipe(
+      take(1),
+      tap((year) => {
+        if (year > 0) {
+          this.slideYear.next(year - 1);
+        }
+      })
+    ).subscribe();
   }
 
   nextYear() {
+    this.calendarYear$.pipe(
+      take(1),
+      tap((year) => {
+        if (year < this.currentYear) {
+          this.slideYear.next(year + 1);
+        }
+      })
+    ).subscribe();
   }
 
   dateSelected(date: Date) {
@@ -146,6 +187,26 @@ export class ProviderComponent implements OnInit {
           }),
         );
 
+        this.ageGroups$ = this.reportService.getAgeCategoryList(params.provider);
+        this.vaccinationExpected$ = this.reportService.getVaccinationsExpected(params.provider, params.date);
+        this.vaccinations$ = this.reportService.getVaccination(params.provider, params.date);
+        this.vaccinationReportGroupList$ = this.reportService.getVaccinationReportGroupList(params.provider);
+
+        this.vaccinationTabData$ = combineLatest(
+          this.ageGroups$,
+          this.vaccinationExpected$,
+          this.vaccinations$,
+          this.vaccinationReportGroupList$).pipe(
+            map(([ageGroups, expected, provided, vaccineGroupList]) => {
+              return {
+                ageGroups,
+                expected,
+                provided,
+                vaccineGroupList,
+              };
+            }),
+          );
+
         this.messageList$ = this.reportService.getMessageList(
           params.provider,
           params.date,
@@ -160,7 +221,7 @@ export class ProviderComponent implements OnInit {
 
     this.filter.pipe(
       tap((filters: string) => {
-        this.router.navigate(['.'], {
+        this.router.navigate(['../messages'], {
           relativeTo: this.route,
           queryParamsHandling: 'merge',
           queryParams: {
@@ -170,18 +231,22 @@ export class ProviderComponent implements OnInit {
       })
     ).subscribe();
 
-    this.calendar$ = combineLatest(
-      merge(this.slideYear, this.urlParams$.pipe(
-        pluck('date'),
-        distinctUntilChanged(),
-        map((date: string) => {
-          return moment(date, 'YYYYMMDD').year();
-        })
-      )),
-      this.urlParams$)
+
+    const urlYear = this.urlParams$.pipe(
+      pluck('date'),
+      distinctUntilChanged(),
+      map((date: string) => {
+        return moment(date, 'YYYYMMDD').year();
+      })
+    );
+
+    this.calendarYear$ = merge(this.slideYear.asObservable(), urlYear).pipe(
+      shareReplay(1),
+    );
+
+    this.calendar$ = combineLatest(this.calendarYear$, this.urlParams$)
       .pipe(
         switchMap(([year, params]) => {
-          console.log('X');
           return this.facilityService.getFacilityHistory(params.provider, year).pipe(take(1));
         })
       );

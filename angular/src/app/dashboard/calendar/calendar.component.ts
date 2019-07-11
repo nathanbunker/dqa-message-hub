@@ -21,8 +21,12 @@ export class CalendarComponent implements OnInit {
 
   @Output()
   select: EventEmitter<Date>;
+  _calendarInfo: CalendarInfo;
   @Input()
-  calendarInfo: CalendarInfo;
+  set calendarInfo(info: CalendarInfo) {
+    this.setDataSeries(info);
+    this._calendarInfo = info;
+  }
   resizeTimer: any;
   calendarChart: GoogleChartInterface = {
     chartType: 'Calendar',
@@ -78,21 +82,22 @@ export class CalendarComponent implements OnInit {
     };
   }
 
-  setDataSeries() {
+  setDataSeries(calendarInfo: CalendarInfo) {
 
     this.calendarChart.dataTable = [['Date', 'Count']];
-    
-    if (!this.calendarInfo.messageHistory || this.calendarInfo.messageHistory.length < 1) {
-      this.calendarChart.dataTable.push([new Date(this.calendarInfo.year, 0, 1), 0]);
-    } else {
-      alert('['+this.calendarInfo.messageHistory+']');
+
+    if (!calendarInfo.messageHistory || calendarInfo.messageHistory.length < 1) {
+      this.calendarChart.dataTable.push([new Date(calendarInfo.year, 0, 1), 0]);
     }
 
-    this.calendarInfo.messageHistory.forEach((msgDate) => {
+    calendarInfo.messageHistory.forEach((msgDate) => {
       this.calendarChart.dataTable.push(
         [this.convertChartDateToLocalDate(msgDate.day), msgDate.count]
-      )
+      );
     });
+    this.calendarChart = {
+      ...this.calendarChart,
+    };
   }
 
   // So...  for some reason google charts sends the date back as if it were in UTC time...
@@ -117,7 +122,6 @@ export class CalendarComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setDataSeries();
   }
 
 
