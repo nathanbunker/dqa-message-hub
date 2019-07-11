@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageFilter, ReportingService } from '../../services/reporting.service';
-import { IMessageFilter, Messages, Report, VaccinationExpectedMap, AgeGroup } from '../report/model';
+import { IMessageFilter, Messages, Report, VaccinationExpectedMap, AgeGroup, CodesMap } from '../report/model';
 import { VaccinationsData } from '../report/vaccines/vaccines.component';
 
 export enum ProviderDashboardTab {
@@ -36,6 +36,7 @@ export class ProviderComponent implements OnInit {
   calendar$: Observable<CalendarInfo>;
 
   messageList$: Observable<Messages>;
+  codesReceivedList$: Observable<CodesMap>;
   report$: Observable<Report>;
 
   vaccinationExpected$: Observable<VaccinationExpectedMap>;
@@ -212,6 +213,13 @@ export class ProviderComponent implements OnInit {
           params.date,
           params.page - 1,
           10,
+          params.filter.filterAsString(),
+        );
+
+        this.codesReceivedList$ = this.reportService.getCodesReceivedList(
+          params.provider,
+          params.date,
+          params.date,
           params.filter.filterAsString(),
         );
       }),

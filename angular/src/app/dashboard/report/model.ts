@@ -55,10 +55,10 @@ export interface Issue {
 }
 
 export interface Codes {
-  codeCountList: CodeCountList[];
+  codeCount: CodeCount[];
 }
 
-export interface CodeCountList {
+export interface CodeCount {
   typeCode: string;
   typeName?: any;
   source?: any;
@@ -139,12 +139,6 @@ export interface VaccinationExpectedMap {
   };
 }
 
-export interface CodesMap {
-  map: {
-    [label: string]: CodeCountList[],
-  };
-}
-
 export interface VaccinationExpected {
   [ageGroup: string]: VaccinationExpectedData;
 }
@@ -168,3 +162,8 @@ export interface AgeGroup {
   order: number;
 }
 
+export interface CodesMap {
+  map: {
+    label: CodeCount[]
+  };
+}

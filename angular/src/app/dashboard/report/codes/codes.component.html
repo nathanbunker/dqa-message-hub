@@ -1,3 +1,43 @@
-<p>
-  codes works!
-</p>
+<div class="heading">
+  <h4>Codes Received</h4>
+</div>
+<div *ngIf="!codesList.map" style="width: 100%; text-align: center; font-size: 2em;">
+  <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon>
+</div>
+
+<div *ngFor="let codeTable of codesList.map | keyvalue">
+    <h4>{{codeTable.key}}</h4>
+    <ng-container *ngTemplateOutlet="codesReceivedTable; context: { $implicit: codesList }"></ng-container>
+
+<ng-template #codesReceivedTable let-rows>
+  <table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th style="width: 12%;">Code</th>
+        <th style="width: 50%;">Label</th>
+        <th style="width: 13%;">Status</th>
+        <th style="width: 13%;">Count</th>
+        <th style="width: 12%;">filter</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let codeReceived of codeTable.value">
+        <td>{{codeReceived.value}}</td>
+        <td>{{codeReceived.label}}</td>
+        <td>{{codeReceived.status}}</td>
+        <td>{{codeReceived.count}}</td>
+        <td>
+            <button
+            type="button"
+            class="btn btn-sm"
+            [class]="'btn btn-sm ' + (filters.detectionId === codeReceived.value ? 'btn-success': 'btn-default')"
+            (click)="filter(codeReceived.value)">
+              <fa-icon icon="filter"></fa-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</ng-template>
+
+</div>
