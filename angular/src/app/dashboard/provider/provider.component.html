@@ -64,14 +64,25 @@
         </td>
       </tr>
       <tr *ngIf="params.filter.vaccineGroupAge && params.filter.vaccineGroup">
+        <td style="width: 20%;">
+            <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('vaccineGroup', 'vaccineGroupAge')">
+              <fa-icon icon="times"></fa-icon>
+            </button>
+          <span style="color: gray;">Vaccine : </span>
+        </td>
+        <td style="vertical-align: middle; font-weight: bold;">
+            {{params.filter.vaccineGroup}} - {{params.filter.vaccineGroupAge}}
+        </td>
+      </tr>
+        <tr *ngIf="params.filter.codeType && params.filter.codeValue">
           <td style="width: 20%;">
-              <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('vaccineGroup', 'vaccineGroupAge')">
+              <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('codeType', 'codeValue')">
                 <fa-icon icon="times"></fa-icon>
               </button>
-            <span style="color: gray;">Vaccine : </span>
+            <span style="color: gray;">Code : </span>
           </td>
           <td style="vertical-align: middle; font-weight: bold;">
-              {{params.filter.vaccineGroup}} - {{params.filter.vaccineGroupAge}}
+              "{{params.filter.codeValue}}" - {{params.filter.codeType}}
           </td>
         </tr>
     </table>
@@ -90,7 +101,7 @@
     </ngb-tab>
     <ngb-tab [id]="tabsType.CODES" title="Codes">
       <ng-template ngbTabContent>
-        <app-codes [codes]="codesReceivedList$ | async" [filters]="params.filter" (filterBy)="filterBy($event, 'detectionId')"></app-codes>
+        <app-codes [codes]="codesReceivedList$ | async" [filters]="params.filter" (filterBy)="filterByAll($event)"></app-codes>
     </ng-template>
     </ngb-tab>
     <ngb-tab [id]="tabsType.VACCINES" title="Vaccines">
@@ -103,6 +114,7 @@
       </ng-template>
     </ngb-tab>
   </ngb-tabset>
+  
 </div>
 
 <ng-template #textFilter let-modal>

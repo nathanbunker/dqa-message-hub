@@ -30,8 +30,8 @@
             <button
             type="button"
             class="btn btn-sm"
-            [class]="'btn btn-sm ' + (filters.detectionId === codeReceived.value ? 'btn-success': 'btn-default')"
-            (click)="filter(codeReceived.value)">
+            [class]="'btn btn-sm ' + (filters.codeValue === codeReceived.value && filters.codeType === codeReceived.typeCode ? 'btn-success': 'btn-default')"
+            (click)="filter(codeReceived.value, codeReceived.typeCode)">
               <fa-icon icon="filter"></fa-icon>
           </button>
         </td>

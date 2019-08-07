@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
+import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
 
 const routes: Routes = [
   {
@@ -14,6 +15,15 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+  },
+  {
+    path: 'documentation',
+    children: [
+      {
+        path: 'detections',
+        component: DetectionDocComponent,
+      }
+    ]
   },
   {
     path: 'dashboard/:provider/date/:date',
@@ -36,7 +46,6 @@ const routes: Routes = [
     component: SettingsComponent,
   }
 ]
-
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule]

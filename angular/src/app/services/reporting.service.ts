@@ -113,6 +113,14 @@ export class MessageFilter {
     return this.filter.vaccineGroup;
   }
 
+  get codeType() {
+    return this.filter.codeType;
+  }
+
+  get codeValue() {
+    return this.filter.codeValue;
+  }
+
   clear(key: keyof IMessageFilter) {
     delete this.filter[key];
   }

@@ -12,7 +12,7 @@ export class CodesComponent implements OnInit {
   codesList = {} as CodesMap;
 
   @Output()
-  filterBy: EventEmitter<string>;
+  filterBy: EventEmitter<MessageFilter>;
   @Input()
   filters: MessageFilter;
 
@@ -20,16 +20,15 @@ export class CodesComponent implements OnInit {
   set codes(codes: CodesMap) {
     if (codes) {
       this.codesList = codes;
-      // console.log(this.codesList.map);
     }
   }
 
   constructor() {
-    this.filterBy = new EventEmitter<string>();
+    this.filterBy = new EventEmitter<MessageFilter>();
   }
 
-  filter(code: string) {
-    this.filterBy.emit(code);
+  filter(code: string, typeCode: string) {
+    this.filterBy.emit(MessageFilter.filterFromString('codeType::' + typeCode).merge('codeValue::' + code));
   }
 
   ngOnInit() {

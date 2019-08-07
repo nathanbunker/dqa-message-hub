@@ -112,6 +112,8 @@ export interface IMessageFilter {
   detectionId?: string;
   vaccineGroupAge?: string;
   vaccineGroup?: string;
+  codeType?: string;
+  codeValue?: string;
 }
 
 export interface Messages {

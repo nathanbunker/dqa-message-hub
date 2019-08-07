@@ -121,7 +121,7 @@ export class VaccinesComponent implements OnInit {
   }
 
   filter(vaccineGroup: string, ageGroup: string) {
-    this.filterBy.emit(this.filters.merge('vaccineGroupAge::' + ageGroup).merge('vaccineGroup::' + vaccineGroup));
+    this.filterBy.emit(MessageFilter.filterFromString('vaccineGroupAge::' + ageGroup).merge('vaccineGroup::' + vaccineGroup));
   }
 
   keyOf(obj: any): string[] {
