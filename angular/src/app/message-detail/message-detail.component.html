@@ -1,3 +1,68 @@
-<p>
-  message-detail works!
-</p>
+<div *ngIf="messageDetail$ | async as details">
+    <div class="row">
+        <div class="col-md-6"><h3>Message Information</h3></div>
+      </div>
+  <div class="row">
+    <div class="col-md-5">
+  <table class="table">
+    <tr>
+      <td class="col-md-3">Sender</td>
+      <td class="col-md-9">
+                {{details.providerKey}}
+      </td>
+    </tr>
+    <tr>
+      <td>Received Date</td>
+      <td>{{details.messageMetaData.received | date : 'yyyy-MM-dd HH:mm:ss'}}
+      </td>
+    </tr>
+    <tr>
+      <td>Patient Name</td>
+      <td>{{details.messageMetaData.patientName}}</td>
+    </tr>
+    <tr>
+      <td>CVX List</td>
+      <td>{{details.messageMetaData.cvxList}}</td>
+    </tr>
+    <tr>
+      <td>Control Id</td>
+      <td>{{details.messageMetaData.messageControlId}}</td>
+    </tr>
+    <tr>
+        <td>Errors</td>
+        <td>
+            <button class="btn btn-xs btn-success fakebtn" disabled
+            [ngClass]="{'btn-danger':details.messageMetaData.errorsCount>0, 'btn-info':details.messageMetaData.errorsCount == 0} "
+            style="cursor:default;">
+            {{details.messageMetaData.errorsCount}}
+            </button>
+        </td>
+      </tr>
+      <tr>
+          <td>Warnings</td>
+          <td>
+              <button class="btn btn-xs btn-success fakebtn" disabled
+              [ngClass]="{'btn-warning':details.messageMetaData.warningsCount > 0, 'btn-info':details.messageMetaData.warningsCount == 0} "
+              style="cursor:default;">
+              {{details.messageMetaData.warningsCount}}
+              </button>
+          </td>
+        </tr>
+  </table>
+  </div>
+</div>
+
+<div class="row" style="margin:10px;width:600px;padding:30px; border:1px solid orange">
+  <div class="col-md-12">
+  <h4>Dev View:</h4>
+  <button (click)="showJson=!showJson">Show Raw JSON</button>
+  <pre [hidden]="!showJson">{{details | json}}</pre>
+</div>
+</div>
+
+  <h2>Message Received</h2>
+  <app-hl7-view [hl7Text]='details.messageReceived' ></app-hl7-view>
+  <h2>Simulated ACK</h2>
+  <app-hl7-view [hl7Text]='details.messageResponse' ></app-hl7-view>
+
+</div>

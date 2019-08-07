@@ -20,7 +20,7 @@
           <tbody>
             <tr *ngFor="let message of messageList.messageList">
                 <td>
-                    <a [routerLink]="'message/' + message.messageControlId" >{{message.messageControlId}}</a>
+                    <a [routerLink]="'/message/' + message.id" >{{message.messageControlId}}</a>
                   </td>
                   <td>{{message.patientName}}</td>
                   <td>{{message.cvxList}}</td>

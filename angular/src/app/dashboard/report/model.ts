@@ -11,6 +11,15 @@ export interface Report {
   vaccineGroupCounts: any;
 }
 
+export interface MessageDetail {
+  messageMetaData: any;
+  providerKey: string;
+  messageReceived: string;
+  messageResponse: string;
+  detections: any[];
+  codes: any[];
+}
+
 export interface ScoreGroup {
   label: string;
   scores: Score[];

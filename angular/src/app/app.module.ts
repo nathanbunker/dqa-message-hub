@@ -42,6 +42,8 @@ import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Hl7Reference } from './hl7-reference';
+import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
 
 @NgModule({
   declarations: [
@@ -66,6 +68,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ProviderTypeaheadComponent,
     DatepickerComponent,
     ProviderComponent,
+    Hl7ViewComponent,
   ],
   imports: [
     BrowserModule,
@@ -77,9 +80,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     TableModule,
     FormsModule,
     BrowserAnimationsModule,
-    ToastrModule.forRoot({ positionClass: 'toast-top-right' })
+    ToastrModule.forRoot({ positionClass: 'toast-top-right' }),
   ],
-  providers: [DocumentationService, ReportingService, ProviderDashboardGuard],
+  providers: [DocumentationService, ReportingService, ProviderDashboardGuard, Hl7Reference],
   bootstrap: [AppComponent]
 })
 export class AppModule {
