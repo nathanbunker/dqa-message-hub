@@ -33,8 +33,7 @@ export class CalendarComponent implements OnInit {
     dataTable: [
       ['Date', 'Count'],
     ],
-    options:
-    {
+    options: {
       title: '',
       height: 250,
       calendar: {
@@ -51,7 +50,9 @@ export class CalendarComponent implements OnInit {
         }
       },
 
-      colorAxis: { colors: ['#9AF3BF', '#259253'] },
+      colorAxis: { 
+        colors: ['#9AF3BF', '#259253'],
+      },
       tooltip: { isHtml: true },
     }
   };
@@ -87,7 +88,22 @@ export class CalendarComponent implements OnInit {
     this.calendarChart.dataTable = [['Date', 'Count']];
 
     if (!calendarInfo.messageHistory || calendarInfo.messageHistory.length < 1) {
-      this.calendarChart.dataTable.push([new Date(calendarInfo.year, 0, 1), 0]);
+      this.calendarChart.dataTable.push([new Date(calendarInfo.year, 0, 1), NaN ]);
+      this.calendarChart.options = {
+        ...this.calendarChart.options,
+        colorAxis: { 
+          colors: ['#9AF3BF', '#259253'],
+          maxValue: 0,
+          minValue: 0,
+        },
+      };
+    } else {
+      this.calendarChart.options = {
+        ...this.calendarChart.options,
+        colorAxis: { 
+          colors: ['#9AF3BF', '#259253'],
+        },
+      };
     }
 
     calendarInfo.messageHistory.forEach((msgDate) => {
@@ -95,9 +111,12 @@ export class CalendarComponent implements OnInit {
         [this.convertChartDateToLocalDate(msgDate.day), msgDate.count]
       );
     });
+
     this.calendarChart = {
       ...this.calendarChart,
     };
+
+    console.log(this.calendarChart);
   }
 
   // So...  for some reason google charts sends the date back as if it were in UTC time...
