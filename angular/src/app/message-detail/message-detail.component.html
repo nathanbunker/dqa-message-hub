@@ -70,10 +70,10 @@
           </tr>
           </thead>
           <tr *ngFor="let d of details.detections" [ngClass]="{'detection-warn':d.severity=='W'}">
-            <td>{{d.location}}</td>
-            <td>{{d.originalFieldValue}}</td>
-            <td>{{d.description}}</td>
-            <td>{{d.severity}}</td>
+            <td style="color:#000000">{{d.location}}</td>
+            <td style="color:#000000">{{d.originalFieldValue}}</td>
+            <td style="color:#000000">{{d.description}}</td>
+            <td style="color:#000000">{{d.severity}}</td>
           </tr>
         </table>
       </div>
