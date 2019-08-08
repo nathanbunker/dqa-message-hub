@@ -7,6 +7,7 @@ import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
 import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
+import { MessageDetailComponent } from './message-detail/message-detail.component';
 
 const routes: Routes = [
   {
@@ -47,10 +48,15 @@ const routes: Routes = [
     ],
   },
   {
+    path: 'message/:messageId',
+    component: MessageDetailComponent,
+  },
+  {
     path: 'settings',
     component: SettingsComponent,
   }
-]
+];
+
 @NgModule({
   imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule]
