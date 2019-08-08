@@ -136,7 +136,7 @@ export class CalendarComponent implements OnInit {
       this.calendarDisplayYear = moment(
         this.searchOptions.date).year();
       this.resultsMetaData.page = 1;
-      this.select.emit(selectedDate)
+      this.select.emit(selectedDate);
     }
   }
 

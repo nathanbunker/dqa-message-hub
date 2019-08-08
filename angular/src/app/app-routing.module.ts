@@ -6,6 +6,7 @@ import { SettingsComponent } from './settings/settings.component';
 import { ProviderComponent } from './dashboard/provider/provider.component';
 import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
+import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
 
 const routes: Routes = [
@@ -23,6 +24,10 @@ const routes: Routes = [
       {
         path: 'detections',
         component: DetectionDocComponent,
+      },
+      {
+        path: 'codebase',
+        component: CodeDocComponent,
       }
     ]
   },
