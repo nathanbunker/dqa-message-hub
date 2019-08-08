@@ -1,13 +1,13 @@
 <div *ngIf="messageDetail$ | async as details">
     <div class="row">
-        <div class="col-md-6"><h3>Message Information</h3></div>
+        <div class="col-sm-auto"><h3>Message Information</h3></div>
       </div>
   <div class="row">
-    <div class="col-md-5">
+    <div class="col-sm-auto">
   <table class="table">
     <tr>
-      <td class="col-md-3">Sender</td>
-      <td class="col-md-9">
+      <td class="col-sm-auto">Sender</td>
+      <td class="col-sm-auto">
                 {{details.providerKey}}
       </td>
     </tr>
@@ -52,13 +52,42 @@
   </div>
 </div>
 
-<div class="row" style="margin:10px;width:600px;padding:30px; border:1px solid orange">
-  <div class="col-md-12">
+<div class="row" style="padding-bottom:30px;">
+  <div class="col-sm-12">
+    <div class="card" [ngClass]="{'bg-light':details.detections.length <= 0, 'bg-light':details.detections.length > 0}">
+      <div class="card-header">
+        <h3 class="card-title">Issues Detected</h3>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <th>Location</th>
+            <th>Value</th>
+            <th>Message</th>
+            <th>Severity</th>
+          </tr>
+          </thead>
+          <tr *ngFor="let d of details.detections" [ngClass]="{'detection-warn':d.severity=='W'}">
+            <td>{{d.location}}</td>
+            <td>{{d.originalFieldValue}}</td>
+            <td>{{d.description}}</td>
+            <td>{{d.severity}}</td>
+          </tr>
+        </table>
+      </div>
+      <div *ngIf="details.detections.length <= 0" class="bg-body">
+        No Errors or Warnings!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- <div class="row" style="margin:10px;width:600px;padding:30px; border:1px solid orange">
+  <div class="col-sm-12">
   <h4>Dev View:</h4>
   <button (click)="showJson=!showJson">Show Raw JSON</button>
   <pre [hidden]="!showJson">{{details | json}}</pre>
 </div>
-</div>
+</div> -->
 
   <h2>Message Received</h2>
   <app-hl7-view [hl7Text]='details.messageReceived' ></app-hl7-view>
@@ -66,3 +95,63 @@
   <app-hl7-view [hl7Text]='details.messageResponse' ></app-hl7-view>
 
 </div>
+
+<!-- <div class="row">
+  <div class="col-sm-6 ">
+    <div class="form-group has-feedback">
+      <label>Find in message: </label>
+      <input type="text" ngModel="filterText.$" class="form-control"
+             placeholder="type / click message"
+             ng-change="clearSearch();"/>
+
+      <span *ngIf="filterText?.$"
+            (click)="filterText.$ = '';hIdx=-1;"
+            class="glyphicon glyphicon-remove form-control-feedback"
+            style="cursor: pointer; pointer-events: all;"
+            uib-tooltip="clear">
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-1 resultsNav">
+    <div class="row" *ngFor="let segment of segmentList">
+      <div class="col-xs-12">
+        <button class="btn btn-default resultsBtn"
+                (click)="toggleTab($index+1);"
+                [ngClass]="{active: $index===current.segment-1}">
+          {{segment.name}}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-sm-11 results" style="min-height:450px;">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th class="col-sm-3">Value</th>
+        <th class="col-sm-1">Segment</th>
+        <th class="col-sm-2">Location</th>
+        <th class="col-sm-2">Field Repetition</th>
+        <th class="col-sm-4">Location Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr style="cursor:pointer;"
+          *ngFor="let part of filterData = (details.vxuParts | filter: filterText | filter : {segmentIndex:current.segment} : true)"
+          (click)="setHoverIndex(part)" [ngClass]="{'h7h':hIdx==part.valueIndex}">
+        <td class="valueText">{{part.value}}</td>
+        <td>{{part.segmentIndex}}</td>
+        <td>{{part.location}}</td>
+        <td>{{part.fieldRepetition}}</td>
+        <td>{{part.locationDescription}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row" style="height: 20px;margin-top:50px;">
+  &nbsp;
+</div> -->
