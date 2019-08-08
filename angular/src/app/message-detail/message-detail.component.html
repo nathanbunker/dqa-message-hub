@@ -1,5 +1,8 @@
-<div *ngIf="messageDetail$ | async as details">
-    <div class="row">
+<div class="container" style="padding-top: 20px;" *ngIf="messageDetail$ | async as details">
+    <a routerLink="/dashboard" (click)="goBack()">
+      <fa-icon icon="chevron-left"></fa-icon> Return to list
+    </a>
+    <div class="row" style="padding-top:40px;">
         <div class="col-sm-auto"><h3>Message Information</h3></div>
       </div>
   <div class="row">
@@ -54,16 +57,16 @@
 
 <div class="row" style="padding-bottom:30px;">
   <div class="col-sm-12">
-    <div class="card" [ngClass]="{'bg-light':details.detections.length <= 0, 'bg-light':details.detections.length > 0}">
+    <div class="card" [ngClass]="{'bg-light':details.detections.length <= 0, 'bg-light':details.detections.length > 0}" style="background-color:#fff!important; border-color:#a94442!important">
       <div class="card-header">
-        <h3 class="card-title">Issues Detected</h3>
+        <h3 class="card-title" style="color:#a94442">Issues Detected</h3>
         <table class="table table-striped">
           <thead>
           <tr>
-            <th>Location</th>
-            <th>Value</th>
-            <th>Message</th>
-            <th>Severity</th>
+            <th style="color:#a94442">Location</th>
+            <th style="color:#a94442">Value</th>
+            <th style="color:#a94442">Message</th>
+            <th style="color:#a94442">Severity</th>
           </tr>
           </thead>
           <tr *ngFor="let d of details.detections" [ngClass]="{'detection-warn':d.severity=='W'}">
@@ -91,6 +94,7 @@
 
   <h2>Message Received</h2>
   <app-hl7-view [hl7Text]='details.messageReceived' ></app-hl7-view>
+  <br />
   <h2>Simulated ACK</h2>
   <app-hl7-view [hl7Text]='details.messageResponse' ></app-hl7-view>
 
@@ -101,8 +105,8 @@
     <div class="form-group has-feedback">
       <label>Find in message: </label>
       <input type="text" ngModel="filterText.$" class="form-control"
-             placeholder="type / click message"
-             ng-change="clearSearch();"/>
+            placeholder="type / click message"
+            ng-change="clearSearch();"/>
 
       <span *ngIf="filterText?.$"
             (click)="filterText.$ = '';hIdx=-1;"

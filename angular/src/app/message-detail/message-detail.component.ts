@@ -4,6 +4,7 @@ import { tap } from 'rxjs/operators';
 import { MessageService } from '../services/message.service';
 import { MessageDetail } from '../dashboard/report/model';
 import { Observable } from 'rxjs';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-message-detail',
@@ -13,9 +14,12 @@ import { Observable } from 'rxjs';
 export class MessageDetailComponent implements OnInit {
   messageDetail$: Observable<MessageDetail>;
 
-  constructor(private route: ActivatedRoute, private messageApi: MessageService) {
+  constructor(private route: ActivatedRoute, private messageApi: MessageService, private location: Location) {
     console.log('constructor');
-    
+  }
+
+  goBack() {
+    this.location.back();
   }
 
   ngOnInit() {
