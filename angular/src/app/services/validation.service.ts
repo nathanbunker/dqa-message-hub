@@ -9,57 +9,67 @@ export class ValidationService {
 
   constructor(private $http: HttpClient) { }
 
+getExampleMessage(): Observable<MqeMessage> {
+  return this.$http.get<MqeMessage>('api/messages/json/example');
+}
 
-validateMessage(messageText: string): Observable<MqeMessageEvaluation> {
-    const form: FormData = new FormData();
-    form.append('submission', messageText);
-    return this.$http.post<MqeMessageEvaluation>('api/messages/json/notsaved', form);
+validateMessage(messageText: MqeMessage): Observable<MqeMessageEvaluation> {
+    // const form: FormData = new FormData();
+    // form.append('submission', messageText);
+    return this.$http.post<MqeMessageEvaluation>('api/messages/json/notsaved', messageText);
   }
 }
 
+export interface MqeMessage {
+  message: string;
+  user: string;
+  password: string;
+  sendingOrganization: string;
+}
+
 export interface MqeMessageEvaluation {
-  vxu: String,
-  ack: String,
+  vxu: string,
+  ack: string,
   mqeResponse: {
     "messageObjects": any,
     "validationResults": {
       "issues": any,
       "rulePassed": true,
-      "possible": String[],
-      "ruleClass": String,
-      "targetId": String,
-      "targetType": String,
+      "possible": string[],
+      "ruleClass": string,
+      "targetId": string,
+      "targetType": string,
       "validationDetections": MqeDetection[]
     }
   }
 }
 
 export interface MqeDetection {
-    "detection": String,
-    "positionId": String,
-    "valueReceived": String,
+    "detection": string,
+    "positionId": string,
+    "valueReceived": string,
     "hl7LocationList": any[],
-    "message": String,
+    "message": string,
     "error": boolean,
-    "source": String,
-    "severity": String,
-    "reportedMessage": String,
-    "diagnosticMessage": String,
+    "source": string,
+    "severity": string,
+    "reportedMessage": string,
+    "diagnosticMessage": string,
     "applicationErrorCode": {
-        "identifier": String,
-        "text": String,
-        "nameOfCodingSystem": String,
-        "alternateIdentifier": String,
-        "alternateText": String,
-        "nameOfAlternateCodingSystem": String
+        "identifier": string,
+        "text": string,
+        "nameOfCodingSystem": string,
+        "alternateIdentifier": string,
+        "alternateText": string,
+        "nameOfAlternateCodingSystem": string
     },
     "hl7ErrorCode": {
-        "identifier": String,
-        "text": String,
-        "nameOfCodingSystem": String,
-        "alternateIdentifier": String,
-        "alternateText": String,
-        "nameOfAlternateCodingSystem": String
+        "identifier": string,
+        "text": string,
+        "nameOfCodingSystem": string,
+        "alternateIdentifier": string,
+        "alternateText": string,
+        "nameOfAlternateCodingSystem": string
     }
 }
 
@@ -201,10 +211,10 @@ interface Vaccination {
   adminNdc: string;
   cvxDerived: string;
   adminDate: number;
-  adminDateString: string;
+  adminDatestring: string;
   adminDateEnd?: any;
-  adminDateEndString?: any;
-  systemEntryDateString?: any;
+  adminDateEndstring?: any;
+  systemEntryDatestring?: any;
   systemEntryDate?: any;
   administered: boolean;
   amount: string;
@@ -214,7 +224,7 @@ interface Vaccination {
   completion: string;
   enteredBy: Physician;
   expirationDate?: any;
-  expirationDateString?: any;
+  expirationDatestring?: any;
   facility: Facility2;
   facilityType: string;
   givenBy: Physician;
@@ -280,8 +290,8 @@ interface VaccinationVi {
   positionId: number;
   skipped: boolean;
   document: string;
-  publishedDateString: string;
-  presentedDateString: string;
+  publishedDatestring: string;
+  presentedDatestring: string;
   cvxCode: string;
   documentCode: string;
   publishedDate: number;
@@ -294,7 +304,7 @@ interface Observation {
   positionId: number;
   observationIdentifierDescription: string;
   observationValueDesc: string;
-  observationDateString: string;
+  observationDatestring: string;
   observationMethodCode: string;
   value: string;
   subId: string;
@@ -399,20 +409,20 @@ interface Patient {
   patientAddressList: PatientAddressList[];
   alias: Alias;
   birthDate: number;
-  birthDateString: string;
+  birthDatestring: string;
   birthMultipleInd: string;
   birthPlace: string;
   birthCounty: string;
-  systemEntryDateString: string;
+  systemEntryDatestring: string;
   systemEntryDate?: any;
   deathDate?: any;
-  deathDateString: string;
+  deathDatestring: string;
   deathIndicator: string;
   ethnicity: string;
   facility: Facility;
   financialEligibility: string;
   financialEligibilityDate?: any;
-  financialEligibilityDateString?: any;
+  financialEligibilityDatestring?: any;
   idMedicaid: IdMedicaid;
   idRegistry: IdMedicaid;
   idSsn: IdMedicaid;
@@ -656,7 +666,7 @@ interface MessageHeader {
   country: string;
   messageControl: string;
   messageDate: number;
-  messageDateString: string;
+  messageDatestring: string;
   messageProfile: string;
   messageStructure: string;
   messageTrigger: string;
