@@ -236,7 +236,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run-script prod</arguments>
+              <arguments>run-script build</arguments>
             </configuration>
             <phase>generate-resources</phase>
           </execution>

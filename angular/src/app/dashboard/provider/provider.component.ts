@@ -15,6 +15,7 @@ export enum ProviderDashboardTab {
   CODES = 'codes',
   DETECTIONS = 'detections',
   VACCINES = 'vaccines',
+  REPORT = 'report',
 }
 
 @Component({
@@ -79,7 +80,7 @@ export class ProviderComponent implements OnInit {
       take(1),
       tap((params) => {
         if (value) {
-          if(keep) {
+          if (keep) {
             this.filter.next(params.filter.merge(key + '::' + value).filterAsString());
           } else {
             this.filter.next(key + '::' + value);

@@ -18,6 +18,7 @@ public interface MessagesViewJpaRepository extends JpaRepository<MessageMetadata
 	static final String STATISTIC_FILTER = " and exists (select 1 from MessageDetection d where d.messageMetadata.id = mm.id and d.detectionId = :detectionId)))";
 	static final String CODE_FILTER = " and exists (select 1 from MessageCode c where c.messageMetadata.id = mm.id and c.codeValue = :codeValue and c.codeType = :codeType)))";
 	static final String CVX_FILTER = " and exists (select 1 from MessageVaccine v where v.messageMetadata.id = mm.id and v.vaccineCvx IN (:cvxList) and v.age >= :ageLow and v.age < :ageHigh)))";
+	static final String ONE = " limit 1 ";
 
 	@Query(value=BASE)
 	Page<MessageMetadata> findByProviderAndDate(@Param("providerKey") String providerKey, @Param("forDate") Date dateCreated, Pageable pager);

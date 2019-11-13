@@ -42,6 +42,8 @@ public class DatabaseController {
   private SenderMetricsService metricsSvc;
   @Autowired
   private SenderMetricsJpaRepository repo;
+  @Autowired
+  private CodeCollectionService codeCollectionService;
 
   private final CodeRepository codeRepo = CodeRepository.INSTANCE;
 
@@ -58,62 +60,7 @@ public class DatabaseController {
     logger.info("DatabaseController getCodesFor sender:" + providerKey + " dateStart: " + dateStart
         + " dateEnd: " + dateEnd);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
-    CodeCollection senderCodes = allDaysMetrics.getCodes();
-    Map<String, List<CollectionBucket>> map = new TreeMap<>();
-    for (CollectionBucket cb : senderCodes.getCodeCountList()) {
-      String s = cb.getTypeCode();
-      VxuField f = VxuField.getByName(s);
-      CodesetType t = f.getCodesetType();
-      if (t == null) {
-        throw new RuntimeException(
-            "well...  this is embarrasing. there's a field with no type: " + f);
-      }
-      cb.setSource(f.getHl7Locator());
-      cb.setTypeName(t.getDescription());
-      Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
-      if (c != null) {
-        if (c.getCodeStatus() != null && StringUtils.isNotBlank(c.getCodeStatus().getStatus())) {
-          String status = c.getCodeStatus().getStatus();
-          cb.setStatus(status);
-        } else {
-          cb.setStatus("Unrecognized");
-        }
-        String description = c.getLabel();
-        cb.setLabel(description);
-      } else {
-        cb.setStatus("Unrecognized");
-      }
-
-      List<CollectionBucket> list = map.get(cb.getTypeName());
-
-      if (list == null) {
-        list = new ArrayList<>();
-        list.add(cb);
-        map.put(cb.getTypeName(), list);
-      } else {
-        // we want to aggregate, and ignore the attributes, so we have to add them up,
-        // since they're separate in the database.
-        boolean found = false;
-        for (CollectionBucket bucket : list) {
-          if (bucket.getTypeName().equals(cb.getTypeName())
-              && bucket.getValue().equals(cb.getValue())
-              && bucket.getSource().equals(cb.getSource())) {
-            bucket.setCount(bucket.getCount() + cb.getCount());
-            found = true;
-          }
-        }
-
-        if (!found) {
-          list.add(cb);
-
-        }
-      }
-
-    }
-
-    CodeCollectionMap cm = new CodeCollectionMap();
-    cm.setMap(map);
-    return cm;
+    return codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
   }
 
   @RequestMapping(method = RequestMethod.GET,

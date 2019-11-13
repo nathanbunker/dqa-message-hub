@@ -71,6 +71,7 @@ export interface CodeCount {
   typeCode: string;
   typeName?: any;
   source?: any;
+  exampleMessage?: string;
   attribute: string;
   value: string;
   count: number;
@@ -84,6 +85,7 @@ export interface DetectionCount {
   hl7LocationList: Hl7LocationList[];
   hl7ErrorCode: Hl7ErrorCode;
   applicationErrorCode: Hl7ErrorCode;
+  exampleMessage?: string;
   count: number;
   source: string;
   diagnosticMessage: string;
@@ -177,4 +179,14 @@ export interface CodesMap {
   map: {
     label: CodeCount[]
   };
+}
+
+export interface ProviderReport {
+  provider: string;
+  startDate: number;
+  endDate: number;
+  numberOfMessage: number;
+  numberOfErrors: number;
+  errors: DetectionCount[];
+  codeIssues: CodeCount[];
 }

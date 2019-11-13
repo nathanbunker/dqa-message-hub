@@ -109,12 +109,13 @@
         <app-vaccines [data]="vaccinationTabData$ | async" [filters]="params.filter" (filterBy)="filterByAll($event)"></app-vaccines>
       </ng-template>
     </ngb-tab>
-    <ngb-tab id="report" title="report">
+    <ngb-tab [id]="tabsType.REPORT" title="Report">
       <ng-template ngbTabContent>
+        <app-report></app-report>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>
-  
+
 </div>
 
 <ng-template #textFilter let-modal>

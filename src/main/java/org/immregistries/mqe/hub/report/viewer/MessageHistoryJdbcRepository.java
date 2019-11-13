@@ -43,6 +43,12 @@ public class MessageHistoryJdbcRepository {
           + " and trunc(mv.input_time) >= :rangeStart "
           + " and trunc(mv.input_time) <= :rangeEnd ";
 
+  private static final String getFacilityMessageCount =
+          " SELECT COUNT (*) AS MSG_COUNT from MESSAGE_METADATA mv "
+                  + " where mv.provider = :providerIdentifier "
+                  + " and trunc(mv.input_time) >= :rangeStart "
+                  + " and trunc(mv.input_time) <= :rangeEnd ";
+
   private static final String getFacilityMessageHistoryMessageTextFilter =
       " and INSTR(UPPER(mv.message), UPPER(:messageSearchString)) > 1 ";
 
@@ -292,6 +298,32 @@ public class MessageHistoryJdbcRepository {
     }
 
     return fmcList;
+  }
+
+  @Cacheable("facilityMessageCount")
+  public int getFacilityMessageCount(final String providerIdentifier, Date rangeStart, Date rangeEnd) {
+
+    SqlParameterSource namedParameters = new MapSqlParameterSource()
+            .addValue("rangeEnd", rangeEnd)
+            .addValue("rangeStart", rangeStart)
+            .addValue("providerIdentifier", providerIdentifier);
+
+    List<MessageCounts> fmcList = new ArrayList<MessageCounts>();
+    ;
+
+    String query = getFacilityMessageCount;
+    LOGGER.debug("JDBC Query: " + query);
+
+    try {
+      return jdbcTemplate.queryForObject(query, namedParameters, new RowMapper<Integer>() {
+        public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+          return rs.getInt("MSG_COUNT");
+        }
+      });
+    } catch (EmptyResultDataAccessException er) {
+      LOGGER.warn("message history not found for interface id[" + providerIdentifier + "]");
+      return 0;
+    }
   }
 
   /**

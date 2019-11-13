@@ -16,7 +16,7 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -44,6 +44,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Hl7Reference } from './hl7-reference';
 import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
+import { ReportComponent } from './report/report.component';
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
     DatepickerComponent,
     ProviderComponent,
     Hl7ViewComponent,
+    ReportComponent,
   ],
   imports: [
     BrowserModule,
@@ -83,7 +85,8 @@ import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
     ToastrModule.forRoot({ positionClass: 'toast-top-right' }),
   ],
   providers: [DocumentationService, ReportingService, ProviderDashboardGuard, Hl7Reference],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  exports: [ReportComponent]
 })
 export class AppModule {
   constructor() {
@@ -97,10 +100,15 @@ export class AppModule {
       faDownload,
       faChevronRight,
       faChevronLeft,
+      faThumbsDown,
+      faThumbsUp,
       faChevronDown,
       faSearch,
       faFilter,
       faSpinner,
+      faEnvelope,
+      faSyringe,
+      faExclamationTriangle,
       faCog,
       faTimes,
     );

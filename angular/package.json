@@ -6,7 +6,7 @@
     "start": "ng serve --project mqe-hub-web --proxy-config proxy.conf.json",
     "dev": "ng build --project dev",
     "prod": "node --max_old_space_size=2048 ./node_modules/@angular/cli/bin/ng build --prod --no-progress --project prod ",
-    "build": "ng build",
+    "build": "ng build --base-href /mqe/ --deploy-url ngx/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"

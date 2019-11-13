@@ -19,7 +19,7 @@ public class DemoController {
 
   @RequestMapping(value = "/new")
   public String startNew() throws Exception {
-    return "public/module/index.html";
+    return "ngx/index.html";
     //Use the results to build an ACK using the MQE util project.
   }
 

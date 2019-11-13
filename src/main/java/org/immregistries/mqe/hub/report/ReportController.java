@@ -1,10 +1,14 @@
 package org.immregistries.mqe.hub.report;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hl7util.SeverityLevel;
+import org.immregistries.mqe.hub.report.viewer.*;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
@@ -13,7 +17,10 @@ import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
 import org.immregistries.mqe.validator.report.ScoreReportable;
 import org.immregistries.mqe.validator.report.VxuScoredReport;
+import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,6 +33,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReportController {
 
   private static final Log logger = LogFactory.getLog(ReportController.class);
+
+  @Autowired
+  MessageHistoryJdbcRepository repo;
+
+  @Autowired
+  MessagesViewJpaRepository mvRepo;
+
+  @Autowired
+  private CodeCollectionService codeCollectionService;
+
+  @Autowired
+  MessageRetrieverService messageRetreiver;
 
   @Autowired
   private Hl7MessageConsumer msgr;
@@ -66,17 +85,72 @@ public class ReportController {
   public VxuScoredReport getReportFor(@PathVariable("providerKey") String providerKey,
       @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
     logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
+    return this.getScoredReportAndOverrideDefaults(providerKey, date);
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/date/{date}")
+  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey,
+                                      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + date);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
+    VxuScoredReport report = this.getScoredReportAndOverrideDefaults(providerKey, date);
+    int numberOfMessages = repo.getFacilityMessageCount(providerKey, date, date);
+    CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
+    ProviderReport providerReport = new ProviderReport();
+    providerReport.setProvider(providerKey);
+    providerReport.setStartDate(date);
+    providerReport.setEndDate(date);
+    providerReport.setNumberOfMessage(numberOfMessages);
+    providerReport.setErrors(this.getErrors(providerKey, date, report));
+    providerReport.setCodeIssues(this.getCodeIssues(providerKey, date, codeCollectionMap.getCodes()));
+    providerReport.setNumberOfErrors(providerReport.getErrors().size());
+    return  providerReport;
+  }
+
+  private List<ScoreReportable> getErrors(String providerKey, Date date, VxuScoredReport report) {
+    List<ScoreReportable> errors = new ArrayList<>();
+    for(ScoreReportable detection: report.getDetectionCounts()) {
+      if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
+        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, date, detection.getMqeCode(), new PageRequest(1,1));
+        System.out.println(md.getNumberOfElements());
+        if(md != null && md.getNumberOfElements() > 0) {
+          detection.setExampleMessage(md.getContent().get(0).getMessage());
+        }
+        errors.add(detection);
+      }
+    }
+    return errors;
+  }
+
+  List<CollectionBucket> getCodeIssues(String providerKey, Date date, List<CollectionBucket> codes) {
+    List<CollectionBucket> codeIssues = new ArrayList<>();
+    for(CollectionBucket codeCount: codes) {
+      System.out.println(codeCount.getStatus());
+      if(!codeCount.getStatus().equals("Valid")) {
+        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, date, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
+        System.out.println(md.getNumberOfElements());
+        if(md != null && md.getNumberOfElements() > 0) {
+          codeCount.setExampleMessage(md.getContent().get(0).getMessage());
+        }
+        codeIssues.add(codeCount);
+      }
+    }
+    return codeIssues;
+  }
+
+  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date date) {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
-    	DetectionsSettings detectionSetting = detectionsSettingsRepo.findByGroupIdAndMqeCode(providerKey, score.getMqeCode());
-    	if (detectionSetting != null) {
-	    	SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
-	    	score.setSeverity(severity);
-    	}
+      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByGroupIdAndMqeCode(providerKey, score.getMqeCode());
+      if (detectionSetting != null) {
+        SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
+        score.setSeverity(severity);
+      }
     }
     return report;
   }
+
 
   private String testMessage =
       "MSH|^~\\&|||||20170301131228-0500||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|P|2.5.1|" +

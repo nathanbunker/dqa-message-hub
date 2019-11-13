@@ -1,0 +1,42 @@
+.report-header {
+  padding: 10px 20px;
+  color: white;
+}
+
+.integration-report {
+  background-color: #9cacb9;
+}
+
+.quality-issue {
+  background-color: orange;
+}
+
+.big-icon {
+  font-size: 3em;
+}
+
+.bigger-icon {
+  font-size: 3.5em;
+}
+
+.small-icon {
+  font-size: 2.5em;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.subtext {
+  color: gray;
+}
+
+.number-indicator {
+  font-weight: bold;
+  font-size: 3em;
+}
+
+.title-no-margin {
+  margin: 0;
+  text-align: center;
+}

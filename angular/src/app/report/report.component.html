@@ -1,0 +1,144 @@
+<div *ngIf="report">
+  <div class="report-header integration-report">
+    <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> MQE - Integration Report</h2>
+  </div>
+  <div>
+    <div class="row" style="padding: 10px;">
+      <h4 class="col-6 title-no-margin">{{report.provider}}</h4>
+      <h5 class="col-6 title-no-margin">{{report.startDate | date: 'MM/dd/yyyy'}} - {{report.endDate  | date: 'MM/dd/yyyy'}}</h5>
+    </div>
+    <div class="row">
+      <div class="col-6 text-center">
+        <fa-icon class="bigger-icon" icon="thumbs-down"></fa-icon>
+      </div>
+      <div class="col-2 text-center">
+        <fa-icon class="big-icon" icon="envelope"></fa-icon><br>
+        <span class="number-indicator">{{report.numberOfMessage}}</span><br>
+        <span class="subtext">Messages</span>
+      </div>
+      <div class="col-2 text-center">
+        <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
+        <span class="number-indicator">#</span><br>
+        <span class="subtext">Administered</span>
+      </div>
+      <div class="col-2 text-center">
+        <fa-icon class="big-icon" icon="exclamation-triangle"></fa-icon><br>
+        <span class="number-indicator">{{report.numberOfErrors}}</span><br>
+        <span class="subtext" >Errors</span>
+      </div>
+    </div>
+    <div class="row" style="padding: 20px;">
+      <div class="col-1">
+        <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : report.errors && report.errors.length > 0 }"></ng-container>
+      </div>
+      <div class="col-11">
+        <h3 style="font-weight: bold; margin-bottom: 20px;" >Quality Errors</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Location</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tr *ngFor="let item of report.errors">
+            <td>{{item.reportedMessage}}</td>
+            <td>
+              <span *ngFor="let location of item.hl7LocationList">
+                {{location.segmentId}}-{{location.fieldPosition}}
+              </span>
+            </td>
+            <td>
+              {{item.count}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row" style="padding: 20px;">
+      <div class="col-1">
+        <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : report.codeIssues && report.codeIssues.length > 0 }"></ng-container>
+      </div>
+      <div class="col-11">
+        <h3 style="font-weight: bold; margin-bottom: 20px;" >Code Issues</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Count</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tr *ngFor="let item of report.codeIssues">
+            <td>{{item.typeName}}</td>
+            <td>{{item.value}}</td>
+            <td>{{item.count}}</td>
+            <td>{{item.status}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <div class="row" style="padding: 20px;">
+      <div class="col-1">
+        <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : !!report.conformanceIssues && report.conformanceIssues.length > 0 }"></ng-container>
+      </div>
+      <div class="col-11">
+        <h3 style="font-weight: bold;" >HL7 Conformance Issues</h3>
+        <span class="subtext" style="margin-bottom: 20px;">* There may be repeats from Quality Issues</span>
+        <table class="table table-striped" *ngIf="report.conformanceIssues">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Location</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tr *ngFor="let item of report.conformanceIssues">
+            <td>{{item.reportedMessage}}</td>
+            <td>
+              <span *ngFor="let location of item.hl7LocationList">
+                {{location.segmentId}}-{{location.fieldPosition}}
+              </span>
+            </td>
+            <td>
+              {{item.count}}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="report-header quality-issue" style="margin-top: 10px;">
+    <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> MQE - Integration Report - Quality Issue </h2>
+  </div>
+  <div *ngFor="let error of report.errors" style="padding: 20px;">
+    <div class="row">
+      <h3 class="col-8" >{{ error.reportedMessage }}</h3>
+      <h3 class="col-4" style="text-align: end;" >
+        <span style="color: gray;">Field : </span>
+        {{ error.hl7LocationList[0].fieldLoc }}
+      </h3>
+    </div>
+    <div style="margin-top: 10px;">
+      <h5>Example</h5>
+    </div>
+    <div class="card" style="background-color: #efefef; word-break: break-all; padding: 10px; color: gray;">
+      {{ formatMessage(error.exampleMessage) }}
+    </div>
+    <div style="margin-top: 10px;">
+      <h5>Corrective Action : </h5>
+    </div>
+    <div style="margin-top: 10px;">
+      <h5>Why is this important</h5>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #thumbs let-condition>
+  <ng-container [ngSwitch]="condition">
+      <fa-icon *ngSwitchCase="true" class="small-icon" icon="thumbs-down"></fa-icon>
+      <fa-icon *ngSwitchCase="false" class="small-icon" icon="thumbs-up"></fa-icon>
+  </ng-container>
+</ng-template>
