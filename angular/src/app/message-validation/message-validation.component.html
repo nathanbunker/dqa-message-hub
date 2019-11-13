@@ -7,34 +7,34 @@
       <div class="row">
         <div class="form-group col-md-12">
 						<textarea id="Message" class="form-control" ng-trim="false"
-                      rows="10" ng-model="messageIn.message"></textarea>
+                      rows="10" [(ngModel)]="messageText"></textarea>
         </div>
       </div>
 
-      <button class="btn btn-primary" type="submit" ng-click="ok()">Submit</button>&nbsp;
-      <button class="btn btn-primary" type="submit" ng-click="getExample()">Example</button>
+      <button class="btn btn-primary" type="submit" (click)="submit()">Submit</button>&nbsp;
+      <button class="btn btn-primary" type="submit" (click)="getExample()">Example</button>
     </div>
   </div>
   <br/><br/><br/>
-  <div class="row">
-    <div class="col-md-12" ng-show="messageEvaluation.ack != null">
+  <div *ngIf="validationResult | async as vr" class="row">
+    <div class="col-md-12" *ngIf="vr.ack != null">
       <div class="heading row">
         <h4>Message ACK</h4>
       </div>
       <div class="text-primary text-center loading"
-           ng-if="messageEvaluation.ack == null">
-        <i class="fa fa-cog fa-spin fa-3x fa-fw"></i> <br/> <span>Validating
+           *ngIf="vr.ack == null">
+           <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon> <br/> <span>Validating
 						Message...</span>
       </div>
-      <div id="messageAck" ng-show="messageEvaluation != null">
+      <div id="messageAck" *ngIf="vr != null">
         <div class="row">
           <div class="col-md-12">
-            <pre>{{messageEvaluation.ack}}</pre>
+            <pre>{{vr.ack}}</pre>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-md-12" ng-show="messageEvaluation.ack != null">
+        <div class="col-md-12" *ngIf="vr.ack != null">
           <div class="heading row">
             <h4>MQE Evaluation</h4>
           </div>
@@ -51,12 +51,12 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
-              <tr ng-repeat="issue in rule.issues | filter:{ severity : 'ERROR'}">
+              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
+              <tr *ngFor="let issue of issueFilter(rule.issues, 'ERROR')">
                 <td>{{issue.applicationErrorCode.alternateText}}</td>
                 <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
                 <td>{{issue.severity}}</td>
-                <td><span ng-repeat="location in issue.hl7LocationList">
+                <td><span *ngFor="let location of issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
                 </td>
@@ -76,12 +76,12 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
-              <tr ng-repeat="issue in rule.issues | filter:{ severity : 'WARN'}">
+              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
+              <tr *ngFor="let issue of issueFilter(rule.issues, 'WARN')">
                 <td>{{issue.applicationErrorCode.alternateText}}</td>
                 <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
                 <td>{{issue.severity}}</td>
-                <td><span ng-repeat="location in issue.hl7LocationList">
+                <td><span *ngFor="let location of issue.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
                 </td>
@@ -101,13 +101,13 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
+              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
 
-              <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'INFO'}">
+              <tr *ngFor="let detection of issueFilter(rule.validationDetections, 'INFO')">
                 <td>{{detection.applicationErrorCode.alternateText}}</td>
                 <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
                 <td>{{detection.severity}}</td>
-                <td><span ng-repeat="location in detection.hl7LocationList">
+                <td><span *ngFor="let location of detection.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
                 </td>
@@ -127,13 +127,13 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody ng-repeat="rule in messageEvaluation.mqeResponse.validationResults">
+              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
 
-              <tr ng-repeat="detection in rule.validationDetections | filter:{ severity : 'ACCEPT'}">
+              <tr *ngFor="let detection of issueFilter(rule.validationDetections, 'ACCEPT')">
                 <td>{{detection.applicationErrorCode.alternateText}}</td>
                 <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
                 <td>{{detection.severity}}</td>
-                <td><span ng-repeat="location in detection.hl7LocationList">
+                <td><span *ngFor="let location of detection.hl7LocationList">
 									{{location.segmentId}}-{{location.fieldPosition}}
 								</span>
                 </td>

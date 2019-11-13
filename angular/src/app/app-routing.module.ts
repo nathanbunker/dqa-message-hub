@@ -8,6 +8,7 @@ import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
 import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
+import { MessageValidationComponent } from './message-validation/message-validation.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path: 'dashboard',
     component: DashboardComponent,
+  },
+  {
+    path: 'validation',
+    component: MessageValidationComponent,
   },
   {
     path: 'documentation',
