@@ -86,6 +86,8 @@ export interface DetectionCount {
   hl7ErrorCode: Hl7ErrorCode;
   applicationErrorCode: Hl7ErrorCode;
   exampleMessage?: string;
+  howToFix: string;
+  whyToFix: string;
   count: number;
   source: string;
   diagnosticMessage: string;
@@ -189,4 +191,37 @@ export interface ProviderReport {
   numberOfErrors: number;
   errors: DetectionCount[];
   codeIssues: CodeCount[];
+  countSummary: SummaryReport[];
+  siteIdentifiers: SiteIdentifier[];
+  commonMessage: string;
+  vaccinationCodes: CodeCount[];
+}
+
+export interface SummaryReport {
+  messages: {
+    errors: number;
+    warnings: number;
+    total: number;
+  };
+  patients: {
+    children: number;
+    adults: number;
+    total: number;
+  };
+  vaccinations: {
+    administered: number;
+    historical: number;
+    refusals: number;
+    deletes: number;
+    other: number;
+    total: number;
+  };
+}
+
+export interface SiteIdentifier {
+  location: string;
+  values: {
+    value: string;
+    count: number;
+  }[];
 }

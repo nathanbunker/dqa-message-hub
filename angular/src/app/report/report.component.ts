@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ProviderReport } from '../dashboard/report/model';
-import reportJson from '../../assets/exampleReport.json';
+// import reportJson from '../../assets/exampleReport.json';
 
 @Component({
   selector: 'app-report',
@@ -14,7 +14,7 @@ export class ReportComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.report = reportJson;
+    // this.report = reportJson;
   }
 
   formatMessage(text: string) {
