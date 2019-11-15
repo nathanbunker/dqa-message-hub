@@ -51,16 +51,28 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
-              <tr *ngFor="let issue of issueFilter(rule.issues, 'ERROR')">
-                <td>{{issue.applicationErrorCode.alternateText}}</td>
-                <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                <td>{{issue.severity}}</td>
-                <td><span *ngFor="let location of issue.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-								</span>
-                </td>
-              </tr>
+              <div *ngIf="errorArray.length == 0">
+                <tbody>
+                  <tr>
+                    <td>
+                      No Error Codes
+                    </td>
+                  </tr>
+                </tbody>
+              </div>
+              <div *ngIf="errorArray.length > 0">
+                <tbody *ngFor="let rule of errorArray">
+                    <tr *ngFor="let issue of rule">
+                      <td>{{issue.applicationErrorCode.alternateText}}</td>
+                      <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                      <td>{{issue.severity}}</td>
+                      <td><span *ngFor="let location of issue.hl7LocationList">
+                        {{location.segmentId}}-{{location.fieldPosition}}
+                      </span>
+                      </td>
+                    </tr>
+                </tbody>
+              </div>
             </table>
           </div>
           <div class="heading row">
@@ -76,16 +88,28 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
-              <tr *ngFor="let issue of issueFilter(rule.issues, 'WARN')">
-                <td>{{issue.applicationErrorCode.alternateText}}</td>
-                <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
-                <td>{{issue.severity}}</td>
-                <td><span *ngFor="let location of issue.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-								</span>
-                </td>
-              </tr>
+              <div *ngIf="warnArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Warning Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </div>
+              <div *ngIf="warnArray.length > 0">
+                  <tbody *ngFor="let rule of warnArray">
+                      <tr *ngFor="let issue of rule">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </div>
             </table>
           </div>
           <div class="heading row">
@@ -101,17 +125,28 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
-
-              <tr *ngFor="let detection of issueFilter(rule.validationDetections, 'INFO')">
-                <td>{{detection.applicationErrorCode.alternateText}}</td>
-                <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
-                <td>{{detection.severity}}</td>
-                <td><span *ngFor="let location of detection.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-								</span>
-                </td>
-              </tr>
+              <div *ngIf="infoArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Informational Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </div>
+              <div *ngIf="infoArray.length > 0">
+                  <tbody *ngFor="let rule of infoArray">
+                      <tr *ngFor="let detection of rule">
+                        <td>{{detection.applicationErrorCode.alternateText}}</td>
+                        <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{detection.severity}}</td>
+                        <td><span *ngFor="let location of detection.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </div>
             </table>
           </div>
           <div class="heading row">
@@ -127,17 +162,28 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <tbody *ngFor="let rule of vr.mqeResponse.validationResults">
-
-              <tr *ngFor="let detection of issueFilter(rule.validationDetections, 'ACCEPT')">
-                <td>{{detection.applicationErrorCode.alternateText}}</td>
-                <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
-                <td>{{detection.severity}}</td>
-                <td><span *ngFor="let location of detection.hl7LocationList">
-									{{location.segmentId}}-{{location.fieldPosition}}
-								</span>
-                </td>
-              </tr>
+              <div *ngIf="acceptArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Accepted Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </div>
+              <div *ngIf="acceptArray.length > 0">
+                  <tbody *ngFor="let rule of acceptArray">
+                      <tr *ngFor="let detection of rule">
+                        <td>{{detection.applicationErrorCode.alternateText}}</td>
+                        <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{detection.severity}}</td>
+                        <td><span *ngFor="let location of detection.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </div>
             </table>
           </div>
         </div>

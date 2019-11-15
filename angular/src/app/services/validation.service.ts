@@ -40,7 +40,7 @@ export interface MqeMessageEvaluation {
       "targetId": string,
       "targetType": string,
       "validationDetections": MqeDetection[]
-    }
+    } []
   }
 }
 
