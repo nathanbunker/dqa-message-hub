@@ -4,7 +4,7 @@
   </div>
   <div>
     <div class="row" style="padding: 10px;">
-      <h4 class="col-6 title-no-margin">{{report.provider}}</h4>
+      <h1 class="col-6 title-no-margin">{{report.provider}}</h1>
       <h5 class="col-6 title-no-margin">{{report.startDate | date: 'MM/dd/yyyy'}} - {{report.endDate  | date: 'MM/dd/yyyy'}}</h5>
     </div>
     <div class="row">
@@ -123,16 +123,220 @@
     <div style="margin-top: 10px;">
       <h5>Example</h5>
     </div>
-    <div class="card" style="background-color: #efefef; word-break: break-all; padding: 10px; color: gray;">
-      {{ formatMessage(error.exampleMessage) }}
-    </div>
+    <app-hl7-view [hl7Text]="error.exampleMessage" ></app-hl7-view>
     <div style="margin-top: 10px;">
       <h5>Corrective Action : </h5>
+      {{error.howToFix}}
     </div>
     <div style="margin-top: 10px;">
-      <h5>Why is this important</h5>
+      <h5>Why is this important : </h5>
+      {{error.whyToFix}}
     </div>
   </div>
+
+  <div class="report-header code-issue" style="margin-top: 10px;">
+    <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> Code Issue </h2>
+  </div>
+  <div *ngFor="let codeIssue of report.codeIssues" style="padding: 20px;">
+    <div class="row">
+      <h3 class="col-8" ><span style="color: gray;"> Type : </span>{{ codeIssue.typeName }}</h3>
+      <h3 class="col-4" style="text-align: end;" >
+        <span style="color: gray;">Value : </span>
+        {{ codeIssue.value }}
+      </h3>
+      <h3 class="col-4">
+        <span style="color: gray;">Field : </span>
+        {{ codeIssue.source }}
+      </h3>
+    </div>
+    <div style="margin-top: 10px;">
+      <h5>Example</h5>
+    </div>
+    <app-hl7-view [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
+  </div>
+
+  <div class="report-header summary-counts" style="margin-top: 10px;">
+    <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> MQE - Integration Report - Numbers </h2>
+  </div>
+  <div class="row" style="padding: 10px;">
+    <h1 class="col-6 title-no-margin">{{report.provider}}</h1>
+    <h5 class="col-6 title-no-margin">{{report.startDate | date: 'MM/dd/yyyy'}} - {{report.endDate  | date: 'MM/dd/yyyy'}}</h5>
+  </div>
+  <div class="row">
+    <div class="col-6 text-center" style="display: flex; flex-direction: column; justify-content: center;">
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="envelope"></fa-icon><br>
+      <span class="number-indicator">{{report.numberOfMessage}}</span><br>
+      <span class="subtext">Messages</span>
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
+      <span class="number-indicator">#</span><br>
+      <span class="subtext">Administered</span>
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="exclamation-triangle"></fa-icon><br>
+      <span class="number-indicator">{{report.numberOfErrors}}</span><br>
+      <span class="subtext" >Errors</span>
+    </div>
+  </div>
+  <div>
+    <div>
+      <h3 style="font-weight: bold; margin-bottom: 20px;" >By The Numbers</h3>
+    </div>
+    <div style="width: 100%; padding: 20px;">
+      <table style="border-spacing:0 10px; border-collapse:separate; float: right; min-width: 250px;">
+        <tr>
+          <td style="text-align: end;">
+            <h3 style="color: gray;" >Vaccinations <strong style="color: black; font-size: 0.8em;">34</strong></h3>
+          </td>
+          <td class="table-number-empty-cell"></td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Administered </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            4
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Historical </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            15
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Refusals </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            15
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Deletes </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            15
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Other </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            15
+          </td>
+        </tr>
+      </table>
+      <table style="border-spacing:0 10px; border-collapse:separate; min-width: 250px;">
+        <tr>
+          <td style="text-align: end;">
+            <h3 style="color: gray;" >Messages <strong style="color: black; font-size: 0.8em;">20</strong></h3>
+          </td>
+          <td class="table-number-empty-cell"></td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Errors </strong>
+          </td>
+          <td class="table-danger table-number">
+            4
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Warnings </strong>
+          </td>
+          <td class="table-warning table-number">
+            15
+          </td>
+        </tr>
+      </table>
+      <table style="border-spacing:0 10px; border-collapse:separate; min-width: 250px;">
+        <tr>
+          <td style="text-align: end;">
+            <h3 style="color: gray;" >Patients <strong style="color: black; font-size: 0.8em;">20</strong></h3>
+          </td>
+          <td class="table-number-empty-cell"></td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Children </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            4
+          </td>
+        </tr>
+        <tr>
+          <td class="table-number-label">
+            <strong style="color: gray;" > Adults </strong>
+          </td>
+          <td class="table-green-cell table-number">
+            15
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div style="width: 100%; padding: 20px;">
+      <table style="border-spacing:0 10px; border-collapse:separate;">
+        <tr>
+          <td><h3 style="color: gray;" >Site Identifiers</h3></td>
+        </tr>
+        <tr>
+          <td style="text-align: end;"><strong>MSH-4</strong></td>
+          <td style="padding: 10px;">1255-60-20</td>
+        </tr>
+        <tr>
+          <td style="text-align: end;"><strong>MSH-22</strong></td>
+          <td style="padding: 10px;" >1255-60-20</td>
+        </tr>
+        <tr>
+          <td style="text-align: end;"><strong>RXA-11.4</strong></td>
+          <td style="padding: 10px;">1255-60-20 (34), 1255-60-21 (2), 1255-60-22 (1)</td>
+        </tr>
+      </table>
+    </div>
+    <h3 style="color: gray;" >Common Message</h3>
+    <app-hl7-view [hl7Text]="" ></app-hl7-view>
+  </div>
+
+  <div class="report-header summary-counts" style="margin-top: 10px;">
+    <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> MQE - Integration Report - Vaccination </h2>
+  </div>
+  <div class="row" style="padding: 10px;">
+    <h1 class="col-6 title-no-margin">{{report.provider}}</h1>
+    <h5 class="col-6 title-no-margin">{{report.startDate | date: 'MM/dd/yyyy'}} - {{report.endDate  | date: 'MM/dd/yyyy'}}</h5>
+  </div>
+  <div class="row">
+    <div class="col-6 text-center" style="display: flex; flex-direction: column; justify-content: center;">
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="envelope"></fa-icon><br>
+      <span class="number-indicator">{{report.numberOfMessage}}</span><br>
+      <span class="subtext">Messages</span>
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
+      <span class="number-indicator">#</span><br>
+      <span class="subtext">Administered</span>
+    </div>
+    <div class="col-2 text-center">
+      <fa-icon class="big-icon" icon="exclamation-triangle"></fa-icon><br>
+      <span class="number-indicator">{{report.numberOfErrors}}</span><br>
+      <span class="subtext" >Errors</span>
+    </div>
+  </div>
+  <div style="width: 100%; padding: 20px;">
+    <h3 style="font-weight: bold;" >Administered Vaccines</h3>
+    <h3 style="font-weight: bold;" >Historical Vaccines</h3>
+  </div>
+
 </div>
 
 
