@@ -91,6 +91,7 @@ public class ReportController {
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/date/{date}")
   public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey,
                                       @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + date);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
     VxuScoredReport report = this.getScoredReportAndOverrideDefaults(providerKey, date);

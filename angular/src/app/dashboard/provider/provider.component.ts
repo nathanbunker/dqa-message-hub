@@ -146,6 +146,7 @@ export class ProviderComponent implements OnInit {
   }
 
   dateSelected(date: Date) {
+    console.log('Date: ' + date);
     this.urlParams$.pipe(
       take(1),
       tap((params) => {

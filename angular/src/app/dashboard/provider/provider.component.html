@@ -3,10 +3,27 @@
     <fa-icon icon="chevron-left"></fa-icon> Select Provider
   </a>
   <div class="row" style="padding-top:40px;">
-    <div class="col-md-8">
+    <div class="col-md-12">
       <h2 class="messageList-header">{{ params.provider }} </h2>
     </div>
   </div>
+  <div class="row justify-content-end" style="padding-top:40px;">
+    <div class="col-md-3">
+        <app-datepicker [dateString]="params.dateStart" (select)="dateSelected($event)"></app-datepicker>
+    </div>
+
+    <div class="col-md-1 text-center" style="font-size:1.5em;font-weight:bold;">
+      To
+    </div>
+
+    <div class="col-md-3 ">
+      <div class="row justify-content-end">
+        <app-datepicker [dateString]="params.dateEnd" (select)="dateSelected($event)"></app-datepicker>
+      </div>
+    </div>
+  </div>
+
+
   <div class="row">
     <div class="col-md-1" style="margin-top: 75px; margin-left: -120px;">
       <div style="height:73px">
