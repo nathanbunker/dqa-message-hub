@@ -1,10 +1,12 @@
 package org.immregistries.mqe.hub.report;
 
+import java.util.ArrayList;
 import org.immregistries.mqe.validator.report.ScoreReportable;
 import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 
 import java.util.Date;
 import java.util.List;
+import org.immregistries.mqe.validator.report.codes.VaccineCollection;
 
 public class ProviderReport {
 
@@ -13,8 +15,45 @@ public class ProviderReport {
     private Date endDate;
     private int numberOfMessage;
     private int numberOfErrors;
-    private List<ScoreReportable> errors;
-    private List<CollectionBucket> codeIssues;
+    private List<ScoreReportable> errors = new ArrayList<>();
+    private List<CollectionBucket> codeIssues = new ArrayList<>();
+    private ProviderSummaryReport countSummary = new ProviderSummaryReport();
+    private SiteIdentifiers siteIdentifiers = new SiteIdentifiers();
+    private String commonMessage;
+    private List<CollectionBucket> vaccinationCodes = new ArrayList<>();
+
+    public ProviderSummaryReport getCountSummary() {
+        return countSummary;
+    }
+
+    public void setCountSummary(ProviderSummaryReport countSummary) {
+        this.countSummary = countSummary;
+    }
+
+    public SiteIdentifiers getSiteIdentifiers() {
+        return siteIdentifiers;
+    }
+
+    public void setSiteIdentifiers(SiteIdentifiers siteIdentifiers) {
+        this.siteIdentifiers = siteIdentifiers;
+    }
+
+    public String getCommonMessage() {
+        return commonMessage;
+    }
+
+    public void setCommonMessage(String commonMessage) {
+        this.commonMessage = commonMessage;
+    }
+
+    public List<CollectionBucket> getVaccinationCodes() {
+        return vaccinationCodes;
+    }
+
+    public void setVaccinationCodes(
+        List<CollectionBucket> vaccinationCodes) {
+        this.vaccinationCodes = vaccinationCodes;
+    }
 
     public String getProvider() {
         return provider;
