@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.core.util.DateUtility;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.SeverityLevel;
@@ -64,6 +65,9 @@ public class Hl7MessageConsumer {
     String message = messageSubmission.getMessage();
 
     String sender = validator.getSendingFacility(message);
+    if (StringUtils.isBlank(sender)) {
+      sender = "Unspecified";
+    }
 
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
     
@@ -134,10 +138,9 @@ public class Hl7MessageConsumer {
   }
   
 
-public Hl7MessageHubResponse processMessageAndSaveMetrics(
-      Hl7MessageSubmission messageSubmission) {
+public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
-	submitMessageToIIS(messageSubmission);
+    submitMessageToIIS(messageSubmission);
     MqeMessageServiceResponse dqr = response.getMqeResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
@@ -219,6 +222,7 @@ public Hl7MessageHubResponse processMessageAndSaveMetrics(
     	Date date = mv.getAdminDate();
     	Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
     	int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
+    	mm.setPatientAge(age);
     	String cvx = mv.getCvxDerived();
     	String key = cvx+":"+age;
     	MessageVaccine v = map.get(key);

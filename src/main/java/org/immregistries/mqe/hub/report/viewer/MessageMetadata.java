@@ -33,6 +33,8 @@ public class MessageMetadata {
   @Lob
   private String response;
 
+  private int patientAge;
+
   @javax.persistence.Temporal(TemporalType.TIMESTAMP)
   private Date inputTime;
 
@@ -47,6 +49,14 @@ public class MessageMetadata {
   
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageVaccine> vaccines = new ArrayList<>();
+
+  public int getPatientAge() {
+    return patientAge;
+  }
+
+  public void setPatientAge(int patientAge) {
+    this.patientAge = patientAge;
+  }
 
   public List<MessageCode> getCodes() {
     return codes;
