@@ -31,12 +31,16 @@ export class Hl7ViewComponent implements OnChanges {
     this.testThings = this.parseLines(this.hl7Text);
   }
 
-parseLines(message: string) {
+  parseLines(message: string) {
     const lines: string[] = this.hl7Text.split(/[\n\r]{1,2}/);
     const parts: HL7Part[][] = [];
     let segIdx = 0;
     let textIdx = 0;
-    lines.forEach(line => { if (line.length > 0) {parts.push(this.parseLine(line, segIdx++, textIdx)); textIdx += (line.length + 1);}});
+    lines.forEach(line => {
+      if (line.length > 0) {
+        parts.push(this.parseLine(line, segIdx++, textIdx)); textIdx += (line.length + 1);
+      }
+    });
     return parts;
   }
 
