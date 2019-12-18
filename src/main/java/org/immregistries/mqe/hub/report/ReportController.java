@@ -169,7 +169,7 @@ public class ReportController {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
-      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByGroupIdAndMqeCode(providerKey, score.getMqeCode());
+      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(providerKey, score.getMqeCode());
       if (detectionSetting != null) {
         SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
         score.setSeverity(severity);

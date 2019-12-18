@@ -6,17 +6,20 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "SENDER_METRICS", indexes = { @Index(name = "IDX_SENDER_METRICS_X1", columnList = "SENDER, metricsDate") })
+@Table(name = "SENDER_METRICS", indexes = { @Index(name = "IDX_SENDER_METRICS_X1", columnList = "sender_sender_id, metricsDate") })
 public class SenderMetrics {
 
   @Id
@@ -25,7 +28,10 @@ public class SenderMetrics {
   @Column(name = "SENDER_METRICS_ID")
   private long id;
 
-  private String sender;
+
+  @NotNull
+  @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
+  private Sender sender;
 
   @javax.persistence.Temporal(TemporalType.DATE)
   private Date metricsDate;
@@ -53,11 +59,11 @@ public class SenderMetrics {
     this.id = id;
   }
 
-  public String getSender() {
+  public Sender getSender() {
     return sender;
   }
 
-  public void setSender(String sender) {
+  public void setSender(Sender sender) {
     this.sender = sender;
   }
 

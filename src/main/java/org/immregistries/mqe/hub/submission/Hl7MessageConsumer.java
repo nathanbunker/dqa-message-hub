@@ -3,7 +3,6 @@ package org.immregistries.mqe.hub.submission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,8 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
+import org.immregistries.mqe.hub.report.Sender;
+import org.immregistries.mqe.hub.report.SenderJpaRepository;
 import org.immregistries.mqe.hub.report.SenderMetricsService;
 import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
@@ -22,7 +23,6 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
-import org.immregistries.mqe.hub.settings.DetectionProperties;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.util.validation.MqeDetection;
@@ -37,14 +37,20 @@ import org.immregistries.mqe.validator.report.codes.CodeCollection;
 import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
 import org.immregistries.mqe.vxu.MqeVaccination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 //import org.immregistries.mqe.nist.validator.connector.Assertion;
 //import org.immregistries.mqe.nist.validator.connector.NISTValidator;
 
 @Service
 public class Hl7MessageConsumer {
+  
+  private static final Logger logger = LoggerFactory.getLogger(Hl7MessageConsumer.class);
 
   @Autowired
   private NistValidatorService nistValidatorService;
@@ -61,28 +67,54 @@ public class Hl7MessageConsumer {
   @Autowired
   private IISGateway iisGatewayService;
 
+  private static final HashMap<String, HashMap<String, SeverityLevel>> severityOverrides = new HashMap<>();
+
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
 
+//    StopWatch stopWatch = new StopWatch();
+//    stopWatch.start();
     String sender = validator.getSendingFacility(message);
     if (StringUtils.isBlank(sender)) {
       sender = "Unspecified";
     }
-
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
-    
-    // probably don't need this - try removing in next sprint
-    retrieveDetectionOverrides(sender); 
-    HashMap<String, String> detectionsOverride = new HashMap<String, String>();
-    //
-    
-    //force serial processing...
-    MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
+//    stopWatch.stop();
+//    logger.warn("nistValidatorHandler.validate: " + stopWatch.getTotalTimeMillis());
 
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
+    HashMap<String, SeverityLevel> so = severityOverrides.get(sender);
+    if (so == null) {
+      so = retrieveDetectionOverrides(sender);
+      severityOverrides.put(sender, so);
+    }
+//    new HashMap<String, String>();
+//    stopWatch.stop();
+//    logger.warn("retrieveDetectionOverrides: " + stopWatch.getTotalTimeMillis());
+
+
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
+    //force serial processing...
+    MqeMessageServiceResponse validationResults = validator.processMessage(message);
+//    stopWatch.stop();
+//    logger.warn("validator.processMessage: " + stopWatch.getTotalTimeMillis());
+
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
     // apply sender level detection overrides
-    applySenderDetectionOverrides(sender, validationResults);
-    
+    applySenderDetectionOverrides(so, validationResults);
+//    stopWatch.stop();
+//    logger.warn("applySenderDetectionOverrides: " + stopWatch.getTotalTimeMillis());
+
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
     String ack = makeAckFromValidationResults(validationResults, nistReportableList);
+//    stopWatch.stop();
+//    logger.warn("makeAckFromValidationResults: " + stopWatch.getTotalTimeMillis());
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
@@ -92,37 +124,32 @@ public class Hl7MessageConsumer {
     return response;
   }
 
-  private void applySenderDetectionOverrides(String sender, MqeMessageServiceResponse validationResults) {
+  private void applySenderDetectionOverrides(HashMap<String, SeverityLevel> overrides, MqeMessageServiceResponse validationResults) {
 	List<ValidationRuleResult> results = validationResults.getValidationResults();
 	for (ValidationRuleResult res : results) {
 		for (ValidationReport report : res.getValidationDetections()) {
-			DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(sender, report.getDetection().getMqeMqeCode());
-			if (setting != null) {
-				report.setSeverityLevel(SeverityLevel.findByLabel(setting.getSeverity()));
+		  SeverityLevel slOverride = overrides.get(report.getDetection().getMqeMqeCode());
+			if (slOverride != null) {
+				report.setSeverityLevel(slOverride);
 			}
 		}
 	}
 }
 
 // Possibly use sender facility to gather sender's detection config
-  private HashMap<String, String> retrieveDetectionOverrides(String sender) {
-	  HashMap<String, String> detectionsOverride = new HashMap<String, String>();
-	  if (sender == null) {
-		  return detectionsOverride;
-	  }
-	
-	for (Detection detection : Detection.values()) {
-		String mqeCode = detection.getMqeMqeCode();
-		SeverityLevel defaultSeverityLevel = getDefaultSeverityByCode(sender, mqeCode);
-		if (defaultSeverityLevel != null) {
-			detectionsOverride.put(mqeCode, defaultSeverityLevel.getLabel());
-		}
-	}	
-	
-	if (detectionsOverride.isEmpty()) {
-		Detection.resetDetectionSeverityToDefault();
-	}
-	
+  @Cacheable("detectionOverrides")
+  public HashMap<String, SeverityLevel> retrieveDetectionOverrides(String sender) {
+    HashMap<String, SeverityLevel> detectionsOverride = new HashMap<>();
+
+    if (sender != null) {
+      List<DetectionsSettings> settings = detectionsSettingsRepo.findByDetectionGroupName("sender");
+      for (DetectionsSettings ds : settings) {
+        String code = ds.getMqeCode();
+        String severity = ds.getSeverity();
+        SeverityLevel sl = SeverityLevel.valueOf(severity);
+        detectionsOverride.put(code, sl);
+      }
+    }
 	return detectionsOverride;
 }
  
@@ -130,7 +157,7 @@ public class Hl7MessageConsumer {
   private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
 	  SeverityLevel severityLevel = null;
 	  
-	  DetectionsSettings ds = detectionsSettingsRepo.findByGroupIdAndMqeCode(detectionProp, mqeCode);
+	  DetectionsSettings ds = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp, mqeCode);
 	  if (ds != null) {
 		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
 	  }
@@ -139,14 +166,33 @@ public class Hl7MessageConsumer {
   
 
 public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
+//  StopWatch stopWatch = new StopWatch();
+//  stopWatch.start();
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
+//  stopWatch.stop();
+//  logger.warn("processMessage: " + stopWatch.getTotalTimeMillis());
+
+//  stopWatch = new StopWatch();
+//  stopWatch.start();
     submitMessageToIIS(messageSubmission);
+//  stopWatch.stop();
+//  logger.warn("submitMessageToIIS: " + stopWatch.getTotalTimeMillis());
+
     MqeMessageServiceResponse dqr = response.getMqeResponse();
     Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
+
+//  stopWatch = new StopWatch();
+//  stopWatch.start();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
+//  stopWatch.stop();
+//  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
+//  stopWatch = new StopWatch();
+//  stopWatch.start();
     MessageMetadata mm = this
         .saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
             response.getSender(), sentDate, response);
+//  stopWatch.stop();
+//  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
 
     return response;
   }
@@ -173,15 +219,28 @@ public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission m
 //    return sentDate;
 //  }
 
+  @Autowired
+  SenderJpaRepository senderRepo;
+
   private MessageMetadata saveMessageForSender(String message, String ack, String sender,
       Date sentDate, Hl7MessageHubResponse response) {
     MessageMetadata mm = new MessageMetadata();
+
+    Sender s = senderRepo.findByName(sender);
+
+    if (s==null) {
+      s = new Sender();
+      s.setName(sender);
+      s.setCreatedDate(new Date());
+      senderRepo.save(s);
+    }
+
     //for demo day, let's make a random date in the last month.
     mm.setInputTime(sentDate);
     message = message.replaceAll("\\n\\r", "\\r");
     mm.setMessage(message);
     mm.setResponse(ack);
-    mm.setProvider(sender);
+    mm.setSender(s);
 
     for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
       for (ValidationReport vr : rr.getValidationDetections()) {

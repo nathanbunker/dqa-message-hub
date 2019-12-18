@@ -1,9 +1,6 @@
 package org.immregistries.mqe.hub.cfg;
 
-import java.util.HashSet;
-
 import javax.annotation.PostConstruct;
-
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.settings.DetectionProperties;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
@@ -40,6 +37,9 @@ public class MqeMessageHubApplicationProperties {
   
   @Autowired
   private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+
+  @Autowired
+	DetectionProperties detectionProp;
 
   private MqeServiceConnectionStatus nistValidatorConnectionStatus = MqeServiceConnectionStatus.ENABLED;
   private String nistValidatorUrl = "http://localhost:8756/hl7v2ws//services/soap/MessageValidationV2";
@@ -127,11 +127,8 @@ public class MqeMessageHubApplicationProperties {
   public void postInit() {
 	  
 	initializeDatabaseProperties();
-	  
-    DetectionProperties detectionProp = DetectionProperties.INSTANCE;
-    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings()); 
+    detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings());
     updateDetectionsInMemory(detectionProp);
-	  
   }
 
   private void updateDetectionsInMemory(DetectionProperties detectionProp) {
@@ -149,7 +146,7 @@ public class MqeMessageHubApplicationProperties {
   private SeverityLevel getDefaultSeverityByCode(DetectionProperties detectionProp, String mqeCode) {
 	  SeverityLevel severityLevel = null;
 	  
-	  DetectionsSettings ds = detectionsSettingsRepo.findByGroupIdAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
+	  DetectionsSettings ds = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
 	  if (ds != null) {
 		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
 	  }

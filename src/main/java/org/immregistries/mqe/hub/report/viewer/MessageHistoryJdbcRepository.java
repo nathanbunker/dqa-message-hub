@@ -38,14 +38,17 @@ public class MessageHistoryJdbcRepository {
    * Beginning of the parts:
    */
   private static final String getFacilityMessageHistoryBEGIN =
-      " SELECT COUNT (*) AS MSG_COUNT, TRUNC (mv.input_time) AS day from MESSAGE_METADATA mv "
-          + " where mv.provider = :providerIdentifier "
+      " SELECT COUNT (*) AS MSG_COUNT, TRUNC (mv.input_time) AS day "
+          + " from MESSAGE_METADATA mv "
+          + " join sender s on s.sender_id = mv.sender_sender_id "
+          + " where s.name = :providerIdentifier "
           + " and trunc(mv.input_time) >= :rangeStart "
           + " and trunc(mv.input_time) <= :rangeEnd ";
 
   private static final String getFacilityMessageCount =
           " SELECT COUNT (*) AS MSG_COUNT from MESSAGE_METADATA mv "
-                  + " where mv.provider = :providerIdentifier "
+                  + " join SENDER s on s.sender_id = mv.sender_sender_id "
+                  + " where s.name = :providerIdentifier "
                   + " and trunc(mv.input_time) >= :rangeStart "
                   + " and trunc(mv.input_time) <= :rangeEnd ";
 
