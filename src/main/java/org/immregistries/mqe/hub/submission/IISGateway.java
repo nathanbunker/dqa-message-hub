@@ -147,7 +147,6 @@ public class IISGateway {
 
       HttpEntity<MultiValueMap<String, String>> request =
           new HttpEntity<MultiValueMap<String, String>>(map, headers);
-      System.out.println("--> connecting to this URL: " + iisgatewayUrl);
       ResponseEntity<String> result =
           restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
       return result.getBody();
