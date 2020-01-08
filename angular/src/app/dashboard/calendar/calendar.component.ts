@@ -134,6 +134,11 @@ export class CalendarComponent implements OnInit {
     } else {
       // fill empty calendar
       this.fillInEmptyDates(yearStart, yearEnd);
+      this.calendarChart.dataTable.push([
+        yearStart.toDate(),
+        NaN,
+        this.getTooltip(yearStart, false, NaN, false),
+      ]);
     }
 
     this.calendarChart = {
@@ -146,7 +151,7 @@ export class CalendarComponent implements OnInit {
   fillInEmptyDates(start: moment.Moment, end: moment.Moment) {
     const dates = this.getAllDates(start, end);
     for (const date of dates) {
-      this.pushToCalendar(date, NaN);
+      this.pushToCalendar(date);
     }
   }
 
