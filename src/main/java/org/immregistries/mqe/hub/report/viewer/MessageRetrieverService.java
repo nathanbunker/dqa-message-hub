@@ -36,7 +36,7 @@ public class MessageRetrieverService {
 
   private final MessageParser parser = new MessageParserHL7();
 
-  public MessageListContainer getMessages(String providerKey, Date dateCreated,
+  public MessageListContainer getMessages(String providerKey, Date dateStart, Date dateEnd,
       ViewerFilter filters, int pageNumber, int itemsCount) {
     LOGGER.info("getMessages");
     //Decide which method to call based on what gets sent in:
@@ -47,23 +47,23 @@ public class MessageRetrieverService {
 
     if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
       mvpage = mvRepo
-          .findByProviderAndDateAndMessageText(providerKey, dateCreated, filters.getMessageText(),
+          .findByProviderAndDateAndMessageText(providerKey, dateStart, dateEnd, filters.getMessageText(),
               pager);
     } else if (!filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
-      mvpage = mvRepo.findByDetectionId(providerKey, dateCreated, filters.getDetectionId(), pager);
+      mvpage = mvRepo.findByDetectionId(providerKey, dateStart, dateEnd, filters.getDetectionId(), pager);
     } else if (filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
-      mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateCreated, filters.getDetectionId(), filters.getMessageText(), pager);
+      mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateStart, dateEnd, filters.getDetectionId(), filters.getMessageText(), pager);
     } else if (filters.isCodeTypeFilter() && filters.isCodeValueFilter()) {
-      mvpage = mvRepo.findByCodeValue(providerKey, dateCreated, filters.getCodeValue(), filters.getCodeType(), pager);
+      mvpage = mvRepo.findByCodeValue(providerKey, dateStart, dateEnd, filters.getCodeValue(), filters.getCodeType(), pager);
     } else if (filters.isVaccineGroupFilter()) {
     	VaccineReportConfig vaccineReportConfig =
     	        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
     	List<String> cvxs = vaccineReportConfig.getCvxListForVaccineReportGroup(filters.getVaccineGroup());
     	AgeCategory ages = vaccineReportConfig.getAgeCategoryForLabel(filters.getVaccineGroupAge());
-    	mvpage = mvRepo.findByVaccine(providerKey, dateCreated, cvxs, ages.getAgeHigh(), ages.getAgeLow(), pager);
+    	mvpage = mvRepo.findByVaccine(providerKey, dateStart, dateEnd, cvxs, ages.getAgeHigh(), ages.getAgeLow(), pager);
     } else {
       LOGGER.info("getMessages NO FILTER");
-      mvpage = mvRepo.findByProviderAndDate(providerKey, dateCreated, pager);
+      mvpage = mvRepo.findByProviderAndDate(providerKey, dateStart, dateEnd, pager);
     }
 
     long totalElements = 0;

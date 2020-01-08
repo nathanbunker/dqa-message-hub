@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { MessageFilter, ReportingService } from '../../services/reporting.service';
-import { IMessageFilter, Messages, Report, VaccinationExpectedMap, AgeGroup, CodesMap } from '../report/model';
+import { IMessageFilter, Messages, Report, VaccinationExpectedMap, AgeGroup, CodesMap, ProviderReport } from '../report/model';
 import { VaccinationsData } from '../report/vaccines/vaccines.component';
 
 export enum ProviderDashboardTab {
@@ -18,6 +18,22 @@ export enum ProviderDashboardTab {
   REPORT = 'report',
 }
 
+export enum DateElectionDecision {
+  PROCEED,
+  RESET,
+  NONE,
+}
+
+export enum DateType {
+  START = 0,
+  END = 1,
+}
+
+export interface DateRange {
+  start?: moment.Moment;
+  end?: moment.Moment;
+}
+
 @Component({
   selector: 'app-provider',
   templateUrl: './provider.component.html',
@@ -26,7 +42,8 @@ export enum ProviderDashboardTab {
 export class ProviderComponent implements OnInit {
 
   urlParams$: Observable<{
-    date: string;
+    dateStart: string;
+    dateEnd: string;
     provider: string;
     filter: MessageFilter;
     tab: ProviderDashboardTab;
@@ -34,6 +51,7 @@ export class ProviderComponent implements OnInit {
   }>;
   filter: ReplaySubject<string>;
 
+  dateSequence: DateType;
   calendar$: Observable<CalendarInfo>;
   messageList$: Observable<Messages>;
   codesReceivedList$: Observable<CodesMap>;
@@ -41,6 +59,7 @@ export class ProviderComponent implements OnInit {
   vaccinationExpected$: Observable<VaccinationExpectedMap>;
   vaccinations$: Observable<VaccinationExpectedMap>;
   vaccinationTabData$: Observable<VaccinationsData>;
+  providerReport$: Observable<ProviderReport>;
   vaccinationReportGroupList$: Observable<string[]>;
   ageGroups$: Observable<AgeGroup[]>;
   calendarYear$: Observable<number>;
@@ -67,6 +86,11 @@ export class ProviderComponent implements OnInit {
       detections: {},
     };
     this.slideYear = new Subject<number>();
+    this.dateSequence = 0;
+  }
+
+  forwardDateSequence() {
+    this.dateSequence = (this.dateSequence + 1) % 2;
   }
 
   openFilterDialog(content: TemplateRef<any>) {
@@ -145,17 +169,104 @@ export class ProviderComponent implements OnInit {
     ).subscribe();
   }
 
-  dateSelected(date: Date) {
-    console.log('Date: ' + date);
+  dateChange(str: string, type: DateType) {
+    const date = moment(str, 'YYYYMMDD');
+    this.electDate(date, type).pipe(
+      take(1),
+      tap((decision) => {
+        if (decision === DateElectionDecision.PROCEED) {
+          this.goToDate(type === DateType.START ? {
+            start: date,
+          } : {
+              end: date,
+            });
+          this.forwardDateSequence();
+        } else if (decision === DateElectionDecision.RESET) {
+          this.goToDate({
+            start: date,
+            end: date,
+          });
+        }
+      }),
+    ).subscribe();
+  }
+
+  goToDate(range: DateRange) {
     this.urlParams$.pipe(
       take(1),
       tap((params) => {
-        this.router.navigate(['../..', moment(date).format('YYYYMMDD'), params.tab], {
+        const start = range.start ? range.start.format('YYYYMMDD') : params.dateStart;
+        const end = range.end ? range.end.format('YYYYMMDD') : params.dateEnd;
+
+        this.router.navigate([
+          '../../..',
+          start,
+          end,
+          params.tab
+        ], {
           queryParamsHandling: 'preserve',
           relativeTo: this.route,
         });
       })
     ).subscribe();
+  }
+
+  dateSelected(date: Date) {
+    const selectedDate = moment(date);
+    this.electDate(selectedDate, this.dateSequence).pipe(
+      take(1),
+      tap((decision) => {
+        if (this.dateSequence === DateType.START) {
+          if (decision === DateElectionDecision.PROCEED || decision === DateElectionDecision.RESET) {
+            this.goToDate({
+              start: selectedDate,
+              end: selectedDate,
+            });
+            this.forwardDateSequence();
+          }
+        } else if (this.dateSequence === DateType.END) {
+          if (decision === DateElectionDecision.PROCEED) {
+            this.goToDate({
+              end: selectedDate,
+            });
+            this.forwardDateSequence();
+          } else if (decision === DateElectionDecision.RESET) {
+            this.goToDate({
+              start: selectedDate,
+              end: selectedDate,
+            });
+          }
+        }
+      })
+    ).subscribe();
+  }
+
+  electDate(date: moment.Moment, type: DateType): Observable<DateElectionDecision> {
+    return this.urlParams$.pipe(
+      take(1),
+      map((params) => {
+        const urlEndDate = moment(params.dateEnd, 'YYYYMMDD');
+        const urlStartDate = moment(params.dateStart, 'YYYYMMDD');
+        if (type === DateType.START) {
+          if (urlStartDate.isSame(date)) {
+            return DateElectionDecision.NONE;
+          } else if (urlEndDate.isAfter(date)) {
+            return DateElectionDecision.PROCEED;
+          } else {
+            return DateElectionDecision.RESET;
+          }
+        } else if (type === DateType.END) {
+          if (urlEndDate.isSame(date)) {
+            return DateElectionDecision.NONE;
+          } else if (urlStartDate.isBefore(date)) {
+            return DateElectionDecision.PROCEED;
+          } else {
+            return DateElectionDecision.RESET;
+          }
+        }
+        return DateElectionDecision.NONE;
+      })
+    );
   }
 
   switchTab(tabChangeEvent) {
@@ -174,7 +285,8 @@ export class ProviderComponent implements OnInit {
     ).pipe(
       map(([params, query]) => {
         return {
-          date: params.date as string,
+          dateStart: params.dateStart as string,
+          dateEnd: params.dateEnd as string,
           provider: params.provider as string,
           filter: MessageFilter.filterFromString(query.filters ? query.filters : ''),
           page: query.page ? query.page as number : 1,
@@ -185,7 +297,7 @@ export class ProviderComponent implements OnInit {
 
     this.urlParams$.pipe(
       tap((params) => {
-        this.report$ = this.reportService.getReport(params.provider, params.date).pipe(
+        this.report$ = this.reportService.getReport(params.provider, params.dateStart, params.dateEnd).pipe(
           tap((report) => {
             for (const detection of report.detectionCounts) {
               this.filterDisplay
@@ -195,9 +307,10 @@ export class ProviderComponent implements OnInit {
         );
 
         this.ageGroups$ = this.reportService.getAgeCategoryList(params.provider);
-        this.vaccinationExpected$ = this.reportService.getVaccinationsExpected(params.provider, params.date);
-        this.vaccinations$ = this.reportService.getVaccination(params.provider, params.date);
+        this.vaccinationExpected$ = this.reportService.getVaccinationsExpected(params.provider, params.dateStart, params.dateEnd);
+        this.vaccinations$ = this.reportService.getVaccination(params.provider, params.dateStart, params.dateEnd);
         this.vaccinationReportGroupList$ = this.reportService.getVaccinationReportGroupList(params.provider);
+        this.providerReport$ = this.reportService.getProviderReport(params.provider, params.dateStart, params.dateEnd);
         this.vaccinationTabData$ = combineLatest(
           this.ageGroups$,
           this.vaccinationExpected$,
@@ -215,7 +328,8 @@ export class ProviderComponent implements OnInit {
 
         this.messageList$ = this.reportService.getMessageList(
           params.provider,
-          params.date,
+          params.dateStart,
+          params.dateEnd,
           params.page - 1,
           10,
           params.filter.filterAsString(),
@@ -223,8 +337,8 @@ export class ProviderComponent implements OnInit {
 
         this.codesReceivedList$ = this.reportService.getCodesReceivedList(
           params.provider,
-          params.date,
-          params.date,
+          params.dateStart,
+          params.dateEnd,
           params.filter.filterAsString(),
         );
       }),
@@ -246,7 +360,7 @@ export class ProviderComponent implements OnInit {
 
 
     const urlYear = this.urlParams$.pipe(
-      pluck('date'),
+      pluck('dateStart'),
       distinctUntilChanged(),
       map((date: string) => {
         return moment(date, 'YYYYMMDD').year();

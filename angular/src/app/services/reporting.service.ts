@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Messages, IMessageFilter, Report, CodesMap, AgeGroup, VaccinationExpectedMap } from '../dashboard/report/model';
+import { Messages, IMessageFilter, Report, CodesMap, AgeGroup, VaccinationExpectedMap, ProviderReport } from '../dashboard/report/model';
 
 @Injectable({
   providedIn: 'root'
@@ -10,32 +10,45 @@ export class ReportingService {
 
   constructor(private http: HttpClient) { }
 
-  getMessageList(provider: string, date: string, page: number, itemsPerPage: number, filter?: string): Observable<Messages> {
-    return this.http.get<Messages>('api/messages/' + provider + '/date/' + date + '/messages/' + itemsPerPage + '/page/' + page + '/', {
-      params: {
-        filters: filter || '',
-      }
-    });
+  // DO BACK
+  getMessageList(
+    provider: string,
+    dateStart: string,
+    dateEnd: string,
+    page: number,
+    itemsPerPage: number,
+    filter?: string): Observable<Messages> {
+    return this.http.get<Messages>(
+      'api/messages/' + provider + '/date/' + dateStart + '/' + dateEnd + '/messages/' + itemsPerPage + '/page/' + page + '/',
+      {
+        params: {
+          filters: filter || '',
+        }
+      });
+  }
+
+  getProviderReport(provider: string, dateStart: string, dateEnd: string): Observable<ProviderReport> {
+    return this.http.get<ProviderReport>('api/report/complete/' + provider + '/start/' + dateStart + '/end/' + dateEnd);
   }
 
   getVaccinationReportGroupList(provider: string): Observable<string[]> {
     return this.http.get<string[]>('api/codes/vaccineReportGroupList/' + provider);
   }
 
-  getVaccinationsExpected(provider: string, date: string): Observable<VaccinationExpectedMap> {
-    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinationsExpected/' + provider + '/' + date + '/' + date);
+  getVaccinationsExpected(provider: string, dateStart: string, dateEnd: string): Observable<VaccinationExpectedMap> {
+    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinationsExpected/' + provider + '/' + dateStart + '/' + dateEnd);
   }
 
   getAgeCategoryList(provider: string): Observable<AgeGroup[]> {
     return this.http.get<AgeGroup[]>('api/codes/ageCategoryList/' + provider);
   }
 
-  getVaccination(provider: string, date: string): Observable<VaccinationExpectedMap> {
-    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinations/' + provider + '/' + date + '/' + date);
+  getVaccination(provider: string, dateStart: string, dateEnd: string): Observable<VaccinationExpectedMap> {
+    return this.http.get<VaccinationExpectedMap>('api/codes/vaccinations/' + provider + '/' + dateStart + '/' + dateEnd);
   }
 
-  getReport(provider: string, date: string): Observable<Report> {
-    return this.http.get<Report>('api/report/' + provider + '/date/' + date + '/');
+  getReport(provider: string, dateStart: string, dateEnd: string): Observable<Report> {
+    return this.http.get<Report>('api/report/' + provider + '/date/' + dateStart + '/' + dateEnd);
   }
 
   getCodesReceivedList(provider: string, dateStart: string, dateEnd: string, filter?: string): Observable<CodesMap> {

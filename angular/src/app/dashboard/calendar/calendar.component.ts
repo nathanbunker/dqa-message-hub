@@ -11,28 +11,46 @@ import * as moment from 'moment';
 })
 export class CalendarComponent implements OnInit {
 
-  searchOptions: {
-    date: Date
-  };
-  resultsMetaData: {
-    page: number
-  };
-  calendarDisplayYear: number;
+  start: moment.Moment;
+  end: moment.Moment;
+  activity: CalendarInfo;
+  chartData = [];
+  selectedColors = { colors: ['#a2c0f3', '#9AF3BF'] };
+  heatmapColors = { colors: ['#9AF3BF', '#259253'] };
+
+  @Input()
+  set startDate(date: string) {
+    this.start = moment(date, 'YYYYMMDD');
+    this.calendarChart.options.colorAxis = this.selectedColors;
+  }
+
+  @Input()
+  set endDate(date: string) {
+    this.end = moment(date, 'YYYYMMDD');
+    this.calendarChart.options.colorAxis = this.selectedColors;
+  }
+
+  @Input()
+  set calendarInfo(info: CalendarInfo) {
+    this.activity = info;
+    this.populateCalendar();
+  }
 
   @Output()
   select: EventEmitter<Date>;
-  _calendarInfo: CalendarInfo;
-  @Input()
-  set calendarInfo(info: CalendarInfo) {
-    this.setDataSeries(info);
-    this._calendarInfo = info;
-  }
-  resizeTimer: any;
-  calendarChart: GoogleChartInterface = {
+  header = [
+    'Date',
+    'Count',
+    {
+      id: 'tooltip',
+      type: 'string',
+      role: 'tooltip',
+      'p': { 'html': true }
+    }
+  ];
+  calendarChart = {
     chartType: 'Calendar',
-    dataTable: [
-      ['Date', 'Count'],
-    ],
+    dataTable: [],
     options: {
       title: '',
       height: 250,
@@ -49,74 +67,114 @@ export class CalendarComponent implements OnInit {
           strokeWidth: 1
         }
       },
-
-      colorAxis: { 
-        colors: ['#9AF3BF', '#259253'],
-      },
+      legend: 'none',
+      colorAxis: this.heatmapColors,
       tooltip: { isHtml: true },
-    }
-  };
-
-  myChartObject = {
-    type: 'Calendar', data: {
-      'cols': [
-        { id: 'Date', label: 'Day', type: 'date' },
-        { id: 'count', label: 'Slices', type: 'number' },
-        {
-          id: 'tooltip',
-          type: 'string',
-          role: 'tooltip',
-          'p': { 'html': true }
-        }
-      ],
-      'rows': []
     }
   };
 
   constructor() {
     this.select = new EventEmitter<Date>();
-    this.searchOptions = {
-      date: null,
-    };
-    this.resultsMetaData = {
-      page: 1,
-    };
   }
 
-  setDataSeries(calendarInfo: CalendarInfo) {
+  getTooltip(date: moment.Moment, activity: boolean, count: number, selected: boolean) {
+    return '<div>' +
+      '<span>' + date.format('MM · DD · YYYY') + '</span>' +
+      '<span>' + (activity ? ('RECEIVED : ' + count) : ('NO ACTIVITY')) + '</span>' +
+      (selected ? '<span> SELECTED </span>' : '') +
+      '</div>';
+  }
 
-    this.calendarChart.dataTable = [['Date', 'Count']];
+  populateCalendar() {
+    // Clear Chart Data
+    this.calendarChart.dataTable = [
+      this.header,
+    ];
+    // Initialize year variables
+    const yearStart = moment(this.activity.year + '0101', 'YYYYMMDD');
+    const yearEnd = moment(this.activity.year + '1231', 'YYYYMMDD');
 
-    if (!calendarInfo.messageHistory || calendarInfo.messageHistory.length < 1) {
-      this.calendarChart.dataTable.push([new Date(calendarInfo.year, 0, 1), NaN ]);
-      this.calendarChart.options = {
-        ...this.calendarChart.options,
-        colorAxis: { 
-          colors: ['#9AF3BF', '#259253'],
-          maxValue: 0,
-          minValue: 0,
-        },
-      };
+    // start cursor at the beginning of the year
+    let cursor = moment(this.activity.year + '0101', 'YYYYMMDD');
+    let firstDate = true;
+
+    // If we have data for the year
+    if (this.activity.messageHistory && this.activity.messageHistory.length > 0) {
+
+      // for each piece of data
+      for (const data of this.activity.messageHistory) {
+        const date = moment(data.day, 'YYYY-MM-DD');
+        const value = data.count;
+
+        // if the date is after star of the year
+        if (yearStart.isBefore(date) && firstDate) {
+          firstDate = false;
+          // populate start of the year node
+          this.pushToCalendar(yearStart);
+        }
+
+        // if the date is after previous populated date
+        const days = cursor.diff(date, 'days');
+        if (days < 1) {
+          // fill the empty space between date and previous
+          this.fillInEmptyDates(moment(cursor).add(1, 'days'), moment(date).subtract(1, 'days'));
+        }
+
+        // fill the current date
+        this.pushToCalendar(date, value);
+
+        // advance cursor to next date
+        cursor = date;
+      }
+
+      // if last populate date is not the end of year date then populate empty space between last date and year end
+      if (cursor.isBefore(yearEnd)) {
+        this.fillInEmptyDates(moment(cursor).add(1, 'days'), yearEnd);
+      }
     } else {
-      this.calendarChart.options = {
-        ...this.calendarChart.options,
-        colorAxis: { 
-          colors: ['#9AF3BF', '#259253'],
-        },
-      };
+      // fill empty calendar
+      this.fillInEmptyDates(yearStart, yearEnd);
     }
-
-    calendarInfo.messageHistory.forEach((msgDate) => {
-      this.calendarChart.dataTable.push(
-        [this.convertChartDateToLocalDate(msgDate.day), msgDate.count]
-      );
-    });
 
     this.calendarChart = {
       ...this.calendarChart,
     };
 
     console.log(this.calendarChart);
+  }
+
+  fillInEmptyDates(start: moment.Moment, end: moment.Moment) {
+    const dates = this.getAllDates(start, end);
+    for (const date of dates) {
+      this.pushToCalendar(date, NaN);
+    }
+  }
+
+  pushToCalendar(date: moment.Moment, count?: number) {
+    const selected = this.start && this.end && date.isBetween(this.start, this.end, 'day', '[]');
+    const tooltip = this.getTooltip(date, count && count > 0, count, selected);
+    const rangeValue = (selected ? -100 + (count >= 1 ? 140 : 0) : (count >= 1 ? 100 : null));
+
+    this.calendarChart.dataTable.push(
+      [
+        date.toDate(),
+        rangeValue,
+        tooltip,
+      ]
+    );
+  }
+
+  getAllDates(_start: moment.Moment, _end: moment.Moment): moment.Moment[] {
+    const dates: moment.Moment[] = [
+      _start.clone(),
+    ];
+
+    while (_start.isBefore(_end)) {
+      _start.add(1, 'days');
+      dates.push(_start.clone());
+    }
+
+    return dates;
   }
 
   // So...  for some reason google charts sends the date back as if it were in UTC time...
@@ -128,32 +186,14 @@ export class CalendarComponent implements OnInit {
   }
 
   handleChartClick(selectedItem) {
-    console.log('handleChartClick');
-    console.log(selectedItem);
-    if (selectedItem) {
+    if (selectedItem && selectedItem.selectedRowValues[0]) {
       const selectedDate = this.convertChartDateToLocalDate(selectedItem.selectedRowValues[0]);
-      this.searchOptions.date = selectedDate;
-      this.calendarDisplayYear = moment(
-        this.searchOptions.date).year();
-      this.resultsMetaData.page = 1;
       this.select.emit(selectedDate);
     }
   }
 
   ngOnInit() {
   }
-
-
-
-
-  // onResized($event) {
-  //   clearTimeout(this.resizeTimer);
-  //   this.resizeTimer = setTimeout(function() {
-  //     console.log("div is resized...");
-  //     console.log(this.calendarChart);
-  //     //force a redraw
-  //         }, 500);
-  // }
 }
 
 export interface CalendarInfo {

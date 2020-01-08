@@ -50,10 +50,11 @@ public class MessageRestController {
   @Autowired
   private DetectionsSettingsJpaRepository detectionsSettingsRepo;
 
-  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}/messages/{messages}/page/{page}")
+  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}/messages/{messages}/page/{page}")
   public MessageListContainer jsonMessagesGetter(HttpServletRequest request,
       @PathVariable("providerKey") String providerKey,
-      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
       @PathVariable("page") int pageNumber, @PathVariable("messages") int itemsCount,
       String filters) {
 
@@ -61,7 +62,7 @@ public class MessageRestController {
 
     ViewerFilter vf = new ViewerFilter(filters);
 
-    MessageListContainer container = messageRetreiver.getMessages(providerKey, date, vf, pageNumber, itemsCount);
+    MessageListContainer container = messageRetreiver.getMessages(providerKey, dateStart, dateEnd, vf, pageNumber, itemsCount);
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
             .getTotalPages() + " current page: " + container.getPageNumber());

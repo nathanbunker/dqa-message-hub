@@ -81,38 +81,40 @@ public class ReportController {
     return report;
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}")
-  public VxuScoredReport getReportFor(@PathVariable("providerKey") String providerKey,
-      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
-    logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
-    return this.getScoredReportAndOverrideDefaults(providerKey, date);
+  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}")
+  public VxuScoredReport getReportFor(
+          @PathVariable("providerKey") String providerKey,
+          @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+          @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+    logger.info("ReportController get report! sender:" + providerKey + " date: " + dateStart + " end: " + dateEnd);
+    return this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd);
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/date/{date}")
-  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey,
-                                      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+//  @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/date/{date}")
+//  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey,
+//                                      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+//
+//    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + date);
+//    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
+//    VxuScoredReport report = this.getScoredReportAndOverrideDefaults(providerKey, date);
+//    int numberOfMessages = repo.getFacilityMessageCount(providerKey, date, date);
+//    CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
+//    ProviderReport providerReport = new ProviderReport();
+//    providerReport.setProvider(providerKey);
+//    providerReport.setStartDate(date);
+//    providerReport.setEndDate(date);
+//    providerReport.setNumberOfMessage(numberOfMessages);
+//    providerReport.setErrors(this.getErrors(providerKey, date, report));
+//    providerReport.setCodeIssues(this.getCodeIssues(providerKey, date, codeCollectionMap.getCodes()));
+//    providerReport.setNumberOfErrors(providerReport.getErrors().size());
+//    return  providerReport;
+//  }
 
-    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + date);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
-    VxuScoredReport report = this.getScoredReportAndOverrideDefaults(providerKey, date);
-    int numberOfMessages = repo.getFacilityMessageCount(providerKey, date, date);
-    CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
-    ProviderReport providerReport = new ProviderReport();
-    providerReport.setProvider(providerKey);
-    providerReport.setStartDate(date);
-    providerReport.setEndDate(date);
-    providerReport.setNumberOfMessage(numberOfMessages);
-    providerReport.setErrors(this.getErrors(providerKey, date, report));
-    providerReport.setCodeIssues(this.getCodeIssues(providerKey, date, codeCollectionMap.getCodes()));
-    providerReport.setNumberOfErrors(providerReport.getErrors().size());
-    return  providerReport;
-  }
-
-  private List<ScoreReportable> getErrors(String providerKey, Date date, VxuScoredReport report) {
+  private List<ScoreReportable> getErrors(String providerKey, Date dateStart, Date dateEnd, VxuScoredReport report) {
     List<ScoreReportable> errors = new ArrayList<>();
     for(ScoreReportable detection: report.getDetectionCounts()) {
       if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
-        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, date, detection.getMqeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, dateStart, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           detection.setExampleMessage(md.getContent().get(0).getMessage());
@@ -123,12 +125,12 @@ public class ReportController {
     return errors;
   }
 
-  List<CollectionBucket> getCodeIssues(String providerKey, Date date, List<CollectionBucket> codes) {
+  List<CollectionBucket> getCodeIssues(String providerKey, Date dateStart, Date dateEnd, List<CollectionBucket> codes) {
     List<CollectionBucket> codeIssues = new ArrayList<>();
     for(CollectionBucket codeCount: codes) {
       System.out.println(codeCount.getStatus());
       if(!codeCount.getStatus().equals("Valid")) {
-        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, date, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, dateStart, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           codeCount.setExampleMessage(md.getContent().get(0).getMessage());
@@ -139,8 +141,8 @@ public class ReportController {
     return codeIssues;
   }
 
-  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date date) {
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
+  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date dateStart, Date dateEnd) {
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
       DetectionsSettings detectionSetting = detectionsSettingsRepo.findByGroupIdAndMqeCode(providerKey, score.getMqeCode());

@@ -9,7 +9,7 @@
   </div>
   <div class="row justify-content-end" style="padding-top:40px;">
     <div class="col-md-3">
-        <app-datepicker [dateString]="params.dateStart" (select)="dateSelected($event)"></app-datepicker>
+        <app-datepicker [dateString]="params.dateStart" (dateStringChange)="dateChange($event, 0)"></app-datepicker>
     </div>
 
     <div class="col-md-1 text-center" style="font-size:1.5em;font-weight:bold;">
@@ -18,7 +18,7 @@
 
     <div class="col-md-3 ">
       <div class="row justify-content-end">
-        <app-datepicker [dateString]="params.dateEnd" (select)="dateSelected($event)"></app-datepicker>
+        <app-datepicker [dateString]="params.dateEnd" (dateStringChange)="dateChange($event, 1)"></app-datepicker>
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
     </div>
     <div class="col-md-11">
       <div *ngIf="calendar$ | async as calendar">
-        <app-calendar [calendarInfo]="calendar" (select)="dateSelected($event)"></app-calendar>
+        <app-calendar [calendarInfo]="calendar" [startDate]="params.dateStart" [endDate]="params.dateEnd" (select)="dateSelected($event)"></app-calendar>
       </div>
     </div>
   </div>
@@ -128,7 +128,7 @@
     </ngb-tab>
     <ngb-tab [id]="tabsType.REPORT" title="Report">
       <ng-template ngbTabContent>
-        <app-report></app-report>
+        <app-report [data]="providerReport$ | async"></app-report>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>

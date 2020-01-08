@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
   constructor(private facilityService: FacilityService, private router: Router) { }
 
   dateSelected(date: Date) {
-    this.router.navigate(['dashboard', this.chosenFacility, 'date', moment(date).format('YYYYMMDD')], {
+    this.router.navigate(['dashboard', this.chosenFacility, 'date', moment(date).format('YYYYMMDD'), moment(date).format('YYYYMMDD')], {
       queryParams: {
         page: 1,
       }

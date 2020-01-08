@@ -37,7 +37,7 @@ const routes: Routes = [
     ]
   },
   {
-    path: 'dashboard/:provider/date/:date',
+    path: 'dashboard/:provider/date/:dateStart/:dateEnd',
     children: [
       {
         path: '',
