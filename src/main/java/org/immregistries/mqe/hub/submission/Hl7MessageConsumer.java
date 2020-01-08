@@ -175,7 +175,8 @@ public class Hl7MessageConsumer {
 
 
     if (iisGatewayService.isIisgatewayEnable()) {
-      if (!messageSubmission.getUser().equals("")) {
+      if (messageSubmission != null && messageSubmission.getUser() != null
+          && !messageSubmission.getUser().equals("")) {
         if (!iisGatewayService.isIisgatewayFilterErrorsEnable()
             || hasNoErrors(response.getMqeResponse().getValidationResults())) {
           //  stopWatch = new StopWatch();
