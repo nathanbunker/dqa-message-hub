@@ -11,11 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import org.immregistries.mqe.hub.report.Sender;
 
 @Entity
 @Table(name = "MESSAGE_METADATA")
@@ -33,11 +35,14 @@ public class MessageMetadata {
   @Lob
   private String response;
 
+  private int patientAge;
+
   @javax.persistence.Temporal(TemporalType.TIMESTAMP)
   private Date inputTime;
 
   @NotNull
-  private String provider;
+  @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+  private Sender sender;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageDetection> detections = new ArrayList<>();
@@ -47,6 +52,14 @@ public class MessageMetadata {
   
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageVaccine> vaccines = new ArrayList<>();
+
+  public int getPatientAge() {
+    return patientAge;
+  }
+
+  public void setPatientAge(int patientAge) {
+    this.patientAge = patientAge;
+  }
 
   public List<MessageCode> getCodes() {
     return codes;
@@ -89,12 +102,12 @@ public List<MessageDetection> getDetections() {
     this.message = message;
   }
 
-  public String getProvider() {
-    return provider;
+  public Sender getSender() {
+    return sender;
   }
 
-  public void setProvider(String provider) {
-    this.provider = provider;
+  public void setSender(Sender sender) {
+    this.sender = sender;
   }
 
   public long getId() {

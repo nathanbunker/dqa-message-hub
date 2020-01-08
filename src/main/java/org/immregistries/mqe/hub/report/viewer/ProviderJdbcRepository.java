@@ -36,7 +36,7 @@ public class ProviderJdbcRepository {
    * Get message errors for this message.
    */
   private static final String getProviders =
-      " select distinct provider as name from message_metadata";
+      " select distinct name from SENDER";
 
   @Cacheable("facilitiesList")
   public List<String> getActiveFacilities() {
@@ -58,7 +58,7 @@ public class ProviderJdbcRepository {
    * Get message errors for this message.
    */
   private static final String getAuthorizedTransferInterfaces =
-      " select distinct provider as name from message_metadata";
+      " select distinct name from sender";
 
   @Cacheable("facilitiesList")
   public List<String> getActiveAuthorizedFacilities(String ssUserId) {

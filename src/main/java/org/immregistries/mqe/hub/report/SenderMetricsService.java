@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.immregistries.mqe.vxu.VxuField;
@@ -24,7 +23,7 @@ public class SenderMetricsService {
   private static final Logger logger = LoggerFactory.getLogger(SenderMetricsService.class);
 
   @Autowired
-  SenderMetricsJpaRepository senderRepo;
+  SenderMetricsJpaRepository senderMetricsRepo;
   @Autowired
   CodeCountJpaRepository codeRepo;
   @Autowired
@@ -32,8 +31,8 @@ public class SenderMetricsService {
 
   public void saveMetrics(SenderMetrics metrics) {
     logger.info("Metrics: " + metrics);
-    senderRepo.save(metrics);
-    //senderRepo.flush();
+    senderMetricsRepo.save(metrics);
+    //senderMetricsRepo.flush();
   }
 
   public MqeMessageMetrics getMetricsFor(String sender, Date day) {
@@ -46,8 +45,8 @@ public class SenderMetricsService {
       sender = "MQE";
     }
 
-    SenderMetrics metrics = senderRepo
-        .findBySenderAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(sender, dayStart,
+    SenderMetrics metrics = senderMetricsRepo
+        .findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(sender, dayStart,
             dayEnd);
     logger.info("Metrics found for " + sender + " dayStart: " + dayStart + " dayEnd: " + dayEnd);
     logger.info("Metrics: " + metrics);
@@ -90,13 +89,26 @@ public class SenderMetricsService {
     return out;
   }
 
+  @Autowired
+  SenderJpaRepository senderRepo;
+
   public SenderMetrics addToSenderMetrics(String sender, Date day,
       MqeMessageMetrics incomingMetrics) {
-    SenderMetrics metrics = senderRepo.findBySenderAndMetricsDate(sender, day);
+    SenderMetrics metrics = senderMetricsRepo.findBySenderNameAndMetricsDate(sender, day);
+
+    Sender s = senderRepo.findByName(sender);
+
+    if (s==null) {
+      s = new Sender();
+      s.setName(sender);
+      s.setCreatedDate(new Date());
+      senderRepo.save(s);
+    }
+
 
     if (metrics == null) {
       metrics = new SenderMetrics();
-      metrics.setSender(sender);
+      metrics.setSender(s);
       metrics.setMetricsDate(day);
     }
 
@@ -190,8 +202,8 @@ public class SenderMetricsService {
 
     saveMetrics(metrics);
     logger.info("Metrics: " + metrics);
-    senderRepo.save(metrics);
-    //senderRepo.flush();
+    senderMetricsRepo.save(metrics);
+    //senderMetricsRepo.flush();
 
     return metrics;
   }

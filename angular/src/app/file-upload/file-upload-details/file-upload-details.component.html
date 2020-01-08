@@ -32,7 +32,7 @@
         [type]="fileUploadInfo?.status === 'exception' ? 'danger' : fileUploadInfo?.status === 'finished' ? 'success' : 'info'">
       </ngb-progressbar>
       <div *ngIf="fileUploadInfo?.status === 'started'">
-        ({{ (((fileUploadInfo?.numberUnProcessed * fileUploadInfo?.averageElapsed) / 1000) | number: '1.2') }}s
+        ({{ (((fileUploadInfo?.numberUnProcessed * fileUploadInfo?.averageElapsed)) | duration) }}
         estimated remaining)
       </div>
     </div>

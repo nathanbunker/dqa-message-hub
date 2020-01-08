@@ -13,12 +13,6 @@ public class DemoController {
 
   @RequestMapping(value = "/")
   public String startOld() throws Exception {
-    return "app/demo-app.html";
-    //Use the results to build an ACK using the MQE util project.
-  }
-
-  @RequestMapping(value = "/new")
-  public String startNew() throws Exception {
     return "ngx/index.html";
     //Use the results to build an ACK using the MQE util project.
   }

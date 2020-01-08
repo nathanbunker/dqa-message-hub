@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import javax.persistence.EntityManager;
 import org.immregistries.mqe.hl7util.test.MessageGenerator;
 import org.immregistries.mqe.hub.report.FileResponse;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -83,6 +85,9 @@ public class MessageInputController {
     return ack;
   }
 
+  @Autowired
+  EntityManager em;
+
   @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
   public String urlEncodedHttpFormPost(String MESSAGEDATA, String USERID, String PASSWORD,
@@ -98,11 +103,28 @@ public class MessageInputController {
     messageSubmission.setPassword(PASSWORD);
     messageSubmission.setFacilityCode(FACILITYID);
 
+//    StopWatch stopWatch = new StopWatch();
+//    stopWatch.start();
     if (isQBP(MESSAGEDATA)) {
       return iisGatewayService.queryIIS(messageSubmission);
     }
+//    stopWatch.stop();
+//    logger.warn("iisGatewayService: " + stopWatch.getTotalTimeMillis());
 
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
     String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+//    stopWatch.stop();
+//    logger.warn("processMessageAndSaveMetrics: " + stopWatch.getTotalTimeMillis());
+
+//    stopWatch = new StopWatch();
+//    stopWatch.start();
+    em.flush();
+    em.clear();
+//    stopWatch.stop();
+//    logger.warn("EntityManager.clear.flush: " + stopWatch.getTotalTimeMillis());
+
+
     return ack;
   }
 

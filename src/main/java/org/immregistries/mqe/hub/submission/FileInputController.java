@@ -20,6 +20,7 @@ import org.immregistries.mqe.hub.rest.MessageInputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -235,9 +236,11 @@ public class FileInputController {
           sender = "Unspecified";
         }
 
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, sender);
-
+        stopWatch.stop();
+        logger.warn("urlEncodedHttpFormPost: " + stopWatch.getTotalTimeMillis());
         fileUpload.getHl7Messages().set(idx, null);
 
         //If the ack ends with a line break, remove it.

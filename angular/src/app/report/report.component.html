@@ -123,7 +123,7 @@
     <div style="margin-top: 10px;">
       <h5>Example</h5>
     </div>
-    <app-hl7-view [hl7Text]="error.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="error.exampleMessage" [hl7Text]="error.exampleMessage" ></app-hl7-view>
     <div style="margin-top: 10px;">
       <h5>Corrective Action : </h5>
       {{error.howToFix}}
@@ -152,7 +152,7 @@
     <div style="margin-top: 10px;">
       <h5>Example</h5>
     </div>
-    <app-hl7-view [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="codeIssue.exampleMessage" [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">
@@ -189,7 +189,9 @@
       <table style="border-spacing:0 10px; border-collapse:separate; float: right; min-width: 250px;">
         <tr>
           <td style="text-align: end;">
-            <h3 style="color: gray;" >Vaccinations <strong style="color: black; font-size: 0.8em;">34</strong></h3>
+            <h3 style="color: gray;" >Vaccinations <strong style="color: black; font-size: 0.8em;">
+              {{report.countSummary?.vaccinations?.total}}
+            </strong></h3>
           </td>
           <td class="table-number-empty-cell"></td>
         </tr>
@@ -198,7 +200,7 @@
             <strong style="color: gray;" > Administered </strong>
           </td>
           <td class="table-green-cell table-number">
-            4
+            {{report.countSummary?.vaccinations?.administered}}
           </td>
         </tr>
         <tr>
@@ -206,7 +208,7 @@
             <strong style="color: gray;" > Historical </strong>
           </td>
           <td class="table-green-cell table-number">
-            15
+            {{report.countSummary?.vaccinations?.historical}}
           </td>
         </tr>
         <tr>
@@ -214,7 +216,7 @@
             <strong style="color: gray;" > Refusals </strong>
           </td>
           <td class="table-green-cell table-number">
-            15
+            {{report.countSummary?.vaccinations?.refusals}}
           </td>
         </tr>
         <tr>
@@ -222,7 +224,7 @@
             <strong style="color: gray;" > Deletes </strong>
           </td>
           <td class="table-green-cell table-number">
-            15
+            {{report.countSummary?.vaccinations?.deletes}}
           </td>
         </tr>
         <tr>
@@ -230,14 +232,16 @@
             <strong style="color: gray;" > Other </strong>
           </td>
           <td class="table-green-cell table-number">
-            15
+            {{report.countSummary?.vaccinations?.other}}
           </td>
         </tr>
       </table>
       <table style="border-spacing:0 10px; border-collapse:separate; min-width: 250px;">
         <tr>
           <td style="text-align: end;">
-            <h3 style="color: gray;" >Messages <strong style="color: black; font-size: 0.8em;">20</strong></h3>
+            <h3 style="color: gray;" >Messages <strong style="color: black; font-size: 0.8em;">
+              {{report.countSummary?.messages?.total}}
+            </strong></h3>
           </td>
           <td class="table-number-empty-cell"></td>
         </tr>
@@ -246,7 +250,7 @@
             <strong style="color: gray;" > Errors </strong>
           </td>
           <td class="table-danger table-number">
-            4
+            {{report.countSummary?.messages?.errors}}
           </td>
         </tr>
         <tr>
@@ -254,14 +258,16 @@
             <strong style="color: gray;" > Warnings </strong>
           </td>
           <td class="table-warning table-number">
-            15
+            {{report.countSummary?.messages?.warnings}}
           </td>
         </tr>
       </table>
       <table style="border-spacing:0 10px; border-collapse:separate; min-width: 250px;">
         <tr>
           <td style="text-align: end;">
-            <h3 style="color: gray;" >Patients <strong style="color: black; font-size: 0.8em;">20</strong></h3>
+            <h3 style="color: gray;" >Patients <strong style="color: black; font-size: 0.8em;">
+              {{report.countSummary?.patients?.total}}
+            </strong></h3>
           </td>
           <td class="table-number-empty-cell"></td>
         </tr>
@@ -270,7 +276,7 @@
             <strong style="color: gray;" > Children </strong>
           </td>
           <td class="table-green-cell table-number">
-            4
+            {{report.countSummary?.patients?.children}}
           </td>
         </tr>
         <tr>
@@ -278,7 +284,7 @@
             <strong style="color: gray;" > Adults </strong>
           </td>
           <td class="table-green-cell table-number">
-            15
+            {{report.countSummary?.patients?.adults}}
           </td>
         </tr>
       </table>
@@ -288,22 +294,18 @@
         <tr>
           <td><h3 style="color: gray;" >Site Identifiers</h3></td>
         </tr>
-        <tr>
-          <td style="text-align: end;"><strong>MSH-4</strong></td>
-          <td style="padding: 10px;">1255-60-20</td>
-        </tr>
-        <tr>
-          <td style="text-align: end;"><strong>MSH-22</strong></td>
-          <td style="padding: 10px;" >1255-60-20</td>
-        </tr>
-        <tr>
-          <td style="text-align: end;"><strong>RXA-11.4</strong></td>
-          <td style="padding: 10px;">1255-60-20 (34), 1255-60-21 (2), 1255-60-22 (1)</td>
+        <tr *ngFor="let identifier of report.siteIdentifiers">
+          <td style="text-align: end;"><strong>{{identifier.location}}</strong></td>
+          <td style="padding: 10px;">
+            <ng-container *ngFor="let value of identifier.values">
+              {{value.value}} ({{value.count}})
+            </ng-container>
+          </td>
         </tr>
       </table>
     </div>
     <h3 style="color: gray;" >Common Message</h3>
-    <app-hl7-view [hl7Text]="" ></app-hl7-view>
+    <app-hl7-view  *ngIf="report.commonMessage" [hl7Text]="report.commonMessage" ></app-hl7-view>
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">

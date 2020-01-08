@@ -191,7 +191,7 @@ export interface ProviderReport {
   numberOfErrors: number;
   errors: DetectionCount[];
   codeIssues: CodeCount[];
-  countSummary?: SummaryReport[];
+  countSummary?: SummaryReport;
   siteIdentifiers?: SiteIdentifier[];
   commonMessage?: string;
   vaccinationCodes?: CodeCount[];

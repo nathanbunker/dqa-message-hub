@@ -45,6 +45,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Hl7Reference } from './hl7-reference';
 import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
 import { ReportComponent } from './report/report.component';
+import { DurationPipe } from './pipes/duration.pipe';
 
 @NgModule({
   declarations: [
@@ -71,6 +72,7 @@ import { ReportComponent } from './report/report.component';
     ProviderComponent,
     Hl7ViewComponent,
     ReportComponent,
+    DurationPipe,
   ],
   imports: [
     BrowserModule,

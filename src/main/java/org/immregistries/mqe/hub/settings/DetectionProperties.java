@@ -6,24 +6,34 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashSet;
+import javax.annotation.PostConstruct;
+import org.immregistries.mqe.hub.report.SeverityGroup;
+import org.immregistries.mqe.hub.report.SeverityGroupJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public enum DetectionProperties {
-  INSTANCE;
+@Component
+public class DetectionProperties {
   private final Logger LOGGER = LoggerFactory.getLogger(DetectionProperties.class);
-  
+
+  @Autowired
+  SeverityGroupJpaRepository sgRepo;
+
   private final String propertyFileName = "detections.properties";
   public final String GROUP_PROPERTY = "GROUP_ID";
   public final String DEFAULT_GROUP = "DEFAULT";
   MqeProperties prop = new MqeProperties();
   private HashSet<DetectionsSettings> allPropertySettings = new HashSet<DetectionsSettings>();
-  
-  DetectionProperties() {
+
+  @PostConstruct
+  private void init() {
     loadProps();
   }
-  
+
   private void loadPropertiesFromFile() throws IOException {
 	  InputStream inputStream = getInputStreamForProperties();
 	  if (inputStream == null) {
@@ -31,7 +41,7 @@ public enum DetectionProperties {
 	  }
 	  
 	  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-	  
+
 	  try {
 		  String currentLine = reader.readLine();
 		  String currentGroup = "";
@@ -44,7 +54,14 @@ public enum DetectionProperties {
 				  if (GROUP_PROPERTY.contentEquals(propName)) {
 					  currentGroup = propVal;
 				  } else {
-					  DetectionsSettings ds = new DetectionsSettings(currentGroup, propName, propVal);
+            SeverityGroup sg = sgRepo.findByName(currentGroup);
+            if (sg==null) {
+              sg = new SeverityGroup();
+              sg.setName(currentGroup);
+              sg.setCreatedDate(new Date());
+              sgRepo.save(sg);
+            }
+					  DetectionsSettings ds = new DetectionsSettings(sg, propName, propVal);
 					  allPropertySettings.add(ds);
 				  }
 			  }

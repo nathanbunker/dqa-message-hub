@@ -78,10 +78,11 @@ export class CalendarComponent implements OnInit {
   }
 
   getTooltip(date: moment.Moment, activity: boolean, count: number, selected: boolean) {
-    return '<div>' +
-      '<span>' + date.format('MM · DD · YYYY') + '</span>' +
-      '<span>' + (activity ? ('RECEIVED : ' + count) : ('NO ACTIVITY')) + '</span>' +
-      (selected ? '<span> SELECTED </span>' : '') +
+    return '<div style="width: 200px; padding: 5px; text-align: center;">' +
+      '<span style="font-weight: bold; font-size: 20px; text-align: center;">' + date.format('MM · DD · YYYY') + '</span><br>' +
+      '<span style="font-weight: 500; font-size: 18px; text-align: center; margin-top: 5px;">' +
+      (activity ? ('RECEIVED ' + count) : ('NO ACTIVITY')) + '</span><br>' +
+      (selected ? '<span style="font-size: 15px; text-align: center; margin-top: 5px;" > (SELECTED) </span>' : '') +
       '</div>';
   }
 
