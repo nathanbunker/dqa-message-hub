@@ -28,13 +28,45 @@ public class IISGateway {
   @Value("${iisgateway.enable}")
   private boolean iisgatewayEnable = false;
   
+  @Value("${iisgateway.query.enable}")
+  private boolean iisgatewayQueryEnable = true;
+  
+  @Value("${iisgateway.filterErrors.enable}")
+  private boolean iisgatewayFilterErrorsEnable = true;
+  
+  @Value("${iisgateway.returnAck.mqe.enable}")
+  private boolean iisgatewayReturnAckMqeEnable = true;
+  
+  @Value("${iisgateway.returnAck.iis.enable}")
+  private boolean iisgatewayReturnAckIisEnable = true;
+  
   @Value("${iisgateway.url}")
-  private String iisgatewayUrl = "http://localhost/iis-kernel/pop";
+  private String iisgatewayUrl = "http://florence.immregistries.org/iis-sandbox/pop";
   //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
+
+  public boolean isIisgatewayEnable() {
+    return iisgatewayEnable;
+  }
+
+  public boolean isIisgatewayQueryEnable() {
+    return iisgatewayQueryEnable;
+  }
+
+  public boolean isIisgatewayFilterErrorsEnable() {
+    return iisgatewayFilterErrorsEnable;
+  }
+
+  public boolean isIisgatewayReturnAckMqeEnable() {
+    return iisgatewayReturnAckMqeEnable;
+  }
+
+  public boolean isIisgatewayReturnAckIisEnable() {
+    return iisgatewayReturnAckIisEnable;
+  }
 
   public String queryIIS(Hl7MessageSubmission messageSubmission) {
 
-    if (iisgatewayEnable) {
+    if (iisgatewayEnable && iisgatewayQueryEnable && !messageSubmission.getUser().equals("")) {
       RestTemplate restTemplate = new RestTemplate();
 
       HttpHeaders headers = new HttpHeaders();
@@ -100,7 +132,7 @@ public class IISGateway {
     }
   }
 
-  public void sendVXU(Hl7MessageSubmission messageSubmission) {
+  public String sendVXU(Hl7MessageSubmission messageSubmission) {
     if (iisgatewayEnable) {
       RestTemplate restTemplate = new RestTemplate();
 
@@ -115,10 +147,12 @@ public class IISGateway {
 
       HttpEntity<MultiValueMap<String, String>> request =
           new HttpEntity<MultiValueMap<String, String>>(map, headers);
+      System.out.println("--> connecting to this URL: " + iisgatewayUrl);
       ResponseEntity<String> result =
           restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
-      return;
+      return result.getBody();
     }
+    return null;
   }
 
 
