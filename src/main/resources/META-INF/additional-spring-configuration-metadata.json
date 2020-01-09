@@ -28,5 +28,20 @@
     "name": "iisgateway.returnAck.iis.enable",
     "type": "java.lang.String",
     "description": "Indicate true/false if the ACK returned by the IIS should be returned. If the MQE ACK is also enabled then MQE will build a basic MQE ACK and then include additional ERR segments returned by the IIS. "
+  },
+  {
+    "name": "tomcat.ajp.port",
+    "type": "java.lang.String",
+    "description": "The port number that AJP adapter should start on. "
+  },
+  {
+    "name": "tomcat.ajp.remoteauthentication",
+    "type": "java.lang.String",
+    "description": "Whether remote authentication is required. "
+  },
+  {
+    "name": "tomcat.ajp.enabled",
+    "type": "java.lang.String",
+    "description": "True will enable the AJP adapter. "
   }
 ]}
