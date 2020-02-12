@@ -51,7 +51,7 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <div *ngIf="errorArray.length == 0">
+              <ng-container *ngIf="errorArray.length == 0">
                 <tbody>
                   <tr>
                     <td>
@@ -59,8 +59,8 @@
                     </td>
                   </tr>
                 </tbody>
-              </div>
-              <div *ngIf="errorArray.length > 0">
+              </ng-container>
+              <ng-container *ngIf="errorArray.length > 0">
                 <tbody *ngFor="let rule of errorArray">
                     <tr *ngFor="let issue of rule">
                       <td>{{issue.applicationErrorCode.alternateText}}</td>
@@ -72,7 +72,7 @@
                       </td>
                     </tr>
                 </tbody>
-              </div>
+              </ng-container>
             </table>
           </div>
           <div class="heading row">
@@ -88,7 +88,7 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <div *ngIf="warnArray.length == 0">
+              <ng-container *ngIf="warnArray.length == 0">
                   <tbody>
                     <tr>
                       <td>
@@ -96,8 +96,8 @@
                       </td>
                     </tr>
                   </tbody>
-              </div>
-              <div *ngIf="warnArray.length > 0">
+              </ng-container>
+              <ng-container *ngIf="warnArray.length > 0">
                   <tbody *ngFor="let rule of warnArray">
                       <tr *ngFor="let issue of rule">
                         <td>{{issue.applicationErrorCode.alternateText}}</td>
@@ -109,7 +109,7 @@
                         </td>
                       </tr>
                   </tbody>
-              </div>
+              </ng-container>
             </table>
           </div>
           <div class="heading row">
@@ -125,7 +125,7 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <div *ngIf="infoArray.length == 0">
+              <ng-container *ngIf="infoArray.length == 0">
                   <tbody>
                     <tr>
                       <td>
@@ -133,8 +133,8 @@
                       </td>
                     </tr>
                   </tbody>
-              </div>
-              <div *ngIf="infoArray.length > 0">
+              </ng-container>
+              <ng-container *ngIf="infoArray.length > 0">
                   <tbody *ngFor="let rule of infoArray">
                       <tr *ngFor="let detection of rule">
                         <td>{{detection.applicationErrorCode.alternateText}}</td>
@@ -146,7 +146,7 @@
                         </td>
                       </tr>
                   </tbody>
-              </div>
+              </ng-container>
             </table>
           </div>
           <div class="heading row">
@@ -162,7 +162,7 @@
                 <th class="col-md-5">Location</th>
               </tr>
               </thead>
-              <div *ngIf="acceptArray.length == 0">
+              <ng-container *ngIf="acceptArray.length == 0">
                   <tbody>
                     <tr>
                       <td>
@@ -170,8 +170,8 @@
                       </td>
                     </tr>
                   </tbody>
-              </div>
-              <div *ngIf="acceptArray.length > 0">
+              </ng-container>
+              <ng-container *ngIf="acceptArray.length > 0">
                   <tbody *ngFor="let rule of acceptArray">
                       <tr *ngFor="let detection of rule">
                         <td>{{detection.applicationErrorCode.alternateText}}</td>
@@ -183,7 +183,7 @@
                         </td>
                       </tr>
                   </tbody>
-              </div>
+              </ng-container>
             </table>
           </div>
         </div>

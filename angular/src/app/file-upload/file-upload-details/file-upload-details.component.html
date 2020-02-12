@@ -15,7 +15,7 @@
       <div style="padding-top:5px;padding-bottom:5px;" *ngIf="fileUploadInfo?.status === 'finished'">
         {{fileUploadInfo?.numberProcessed}} messages<br />
         ({{fileUploadInfo?.averageElapsed}} ms avg)<br />
-        Elapsed - {{fileUploadInfo?.elapsedTimeMs}}<br />
+        Elapsed - {{fileUploadInfo?.elapsedTimeMs | duration}}<br />
       </div>
       <div style="padding-top:5px;padding-bottom:5px;" *ngIf="fileUploadInfo?.status === 'deleting'">
         {{fileUploadInfo?.numberProcessed}} messages<br />
