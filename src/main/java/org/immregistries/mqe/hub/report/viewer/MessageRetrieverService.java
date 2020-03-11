@@ -43,7 +43,7 @@ public class MessageRetrieverService {
     List<MessageMetadata> messages = new ArrayList<>();
     Page<MessageMetadata> mvpage = null;
 
-    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "id");
+    Pageable pager = PageRequest.of(pageNumber, itemsCount, Sort.Direction.ASC, "id");
 
     if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
       mvpage = mvRepo

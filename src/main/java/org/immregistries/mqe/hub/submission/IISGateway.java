@@ -44,6 +44,26 @@ public class IISGateway {
   private String iisgatewayUrl = "http://florence.immregistries.org/iis-sandbox/pop";
   //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
 
+  public String getIisgatewayUrl() {
+    return iisgatewayUrl;
+  }
+
+
+  @Value("${iisgateway.method}")
+  private String iisgatewayMethod = "post";
+
+  public static final String METHOD_POST = "POST";
+  public static final String METHOD_SOAP = "SOAP";
+
+  public boolean isIisgatewayMethodSoap() {
+    return iisgatewayMethod.equalsIgnoreCase(METHOD_SOAP);
+  }
+
+  public String getIisgatewayMethod() {
+    return iisgatewayMethod;
+  }
+
+  
   public boolean isIisgatewayEnable() {
     return iisgatewayEnable;
   }
@@ -67,22 +87,28 @@ public class IISGateway {
   public String queryIIS(Hl7MessageSubmission messageSubmission) {
 
     if (iisgatewayEnable && iisgatewayQueryEnable && !messageSubmission.getUser().equals("")) {
-      RestTemplate restTemplate = new RestTemplate();
+      if (isIisgatewayMethodSoap()) {
+        SubmitSingleMessageClient ssm = new SubmitSingleMessageClient();
+        return ssm.submit(messageSubmission);
+      } else {
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setAccept(Arrays.asList(MediaType.APPLICATION_FORM_URLENCODED));
+        RestTemplate restTemplate = new RestTemplate();
 
-      MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-      map.add("MESSAGEDATA", messageSubmission.getMessage());
-      map.add("FACILITYID", messageSubmission.getFacilityCode());
-      map.add("PASSWORD", messageSubmission.getPassword());
-      map.add("USERID", messageSubmission.getUser());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_FORM_URLENCODED));
 
-      HttpEntity<MultiValueMap<String, String>> request =
-          new HttpEntity<MultiValueMap<String, String>>(map, headers);
-      ResponseEntity<String> result =
-          restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
-      return result.getBody();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("MESSAGEDATA", messageSubmission.getMessage());
+        map.add("FACILITYID", messageSubmission.getFacilityCode());
+        map.add("PASSWORD", messageSubmission.getPassword());
+        map.add("USERID", messageSubmission.getUser());
+
+        HttpEntity<MultiValueMap<String, String>> request =
+            new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        ResponseEntity<String> result =
+            restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
+        return result.getBody();
+      }
     } else {
       String ackType = "AR";
       String severityLevel = "E";
@@ -134,22 +160,30 @@ public class IISGateway {
 
   public String sendVXU(Hl7MessageSubmission messageSubmission) {
     if (iisgatewayEnable) {
-      RestTemplate restTemplate = new RestTemplate();
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setAccept(Arrays.asList(MediaType.APPLICATION_FORM_URLENCODED));
+      String response = null;
+      if (isIisgatewayMethodSoap()) {
+        SubmitSingleMessageClient ssm = new SubmitSingleMessageClient();
+        return ssm.submit(messageSubmission);
+      } else {
+        RestTemplate restTemplate = new RestTemplate();
 
-      MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
-      map.add("MESSAGEDATA", messageSubmission.getMessage());
-      map.add("FACILITYID", messageSubmission.getFacilityCode());
-      map.add("PASSWORD", messageSubmission.getPassword());
-      map.add("USERID", messageSubmission.getUser());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_FORM_URLENCODED));
 
-      HttpEntity<MultiValueMap<String, String>> request =
-          new HttpEntity<MultiValueMap<String, String>>(map, headers);
-      ResponseEntity<String> result =
-          restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
-      return result.getBody();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        map.add("MESSAGEDATA", messageSubmission.getMessage());
+        map.add("FACILITYID", messageSubmission.getFacilityCode());
+        map.add("PASSWORD", messageSubmission.getPassword());
+        map.add("USERID", messageSubmission.getUser());
+
+        HttpEntity<MultiValueMap<String, String>> request =
+            new HttpEntity<MultiValueMap<String, String>>(map, headers);
+        ResponseEntity<String> result =
+            restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
+        response = result.getBody();
+      }
+      return response;
     }
     return null;
   }

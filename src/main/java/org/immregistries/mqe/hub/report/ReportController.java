@@ -138,7 +138,7 @@ public class ReportController {
     List<ScoreReportable> errors = new ArrayList<>();
     for(ScoreReportable detection: report.getDetectionCounts()) {
       if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
-        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, date, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, date, dateEnd, detection.getMqeCode(), PageRequest.of(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           detection.setExampleMessage(md.getContent().get(0).getMessage());
@@ -154,7 +154,7 @@ public class ReportController {
     for(CollectionBucket codeCount: codes) {
       System.out.println(codeCount.getStatus());
       if(!codeCount.getStatus().equals("Valid")) {
-        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), PageRequest.of(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           codeCount.setExampleMessage(md.getContent().get(0).getMessage());

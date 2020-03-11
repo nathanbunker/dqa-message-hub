@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,6 +35,10 @@ public class MessageInputController {
   public static boolean isQBP(String message) {
 
     try {
+      if (message == null || message.equals(""))
+      {
+        return false;
+      }
       BufferedReader in = new BufferedReader(new StringReader(message));
       String line;
       try {
