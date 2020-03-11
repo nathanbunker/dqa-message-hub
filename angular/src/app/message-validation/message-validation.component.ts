@@ -12,13 +12,18 @@ export class MessageValidationComponent implements OnInit {
 
   exampleMessage: MqeMessage;
   exampleMessageSubscription: Subscription;
-  messageText: string;
+  messageText: MqeMessage = {
+    message: '',
+	user: '',
+	password: '',
+	sendingOrganization: ''
+  };
   validationResult: Observable<MqeMessageEvaluation>;
 
-  warnArray: DetectionCount[][] = [];
-  errorArray: DetectionCount[][] = [];
-  infoArray: DetectionCount[][] = [];
-  acceptArray: DetectionCount[][] = [];
+  warnArray: DetectionCount[] = [];
+  errorArray: DetectionCount[] = [];
+  infoArray: DetectionCount[] = [];
+  acceptArray: DetectionCount[] = [];
 
   constructor(private validationService: ValidationService) { }
 
@@ -26,13 +31,17 @@ export class MessageValidationComponent implements OnInit {
     this.exampleMessageSubscription = this.validationService.getExampleMessage().subscribe(
       (message) => {
         this.exampleMessage = message;
-        this.messageText = message.message;
+        this.messageText = message;
       }
     );
   }
 
   submit() {
-    this.validationResult = this.validationService.validateMessage(this.exampleMessage);
+    this.warnArray = [];
+    this.errorArray = [];
+    this.infoArray = [];
+    this.acceptArray = [];
+    this.validationResult = this.validationService.validateMessage(this.messageText);
 
     this.validationResult.forEach(
       (rule) => {
@@ -48,13 +57,13 @@ export class MessageValidationComponent implements OnInit {
     );
   }
 
-  issueFilter(issues: DetectionCount[], severity: string, resultArray: DetectionCount[][]) {
+  issueFilter(issues: DetectionCount[], severity: string, resultArray: DetectionCount[]) {
     if (!issues) {
       return [];
     } else if (issues.length === 0) {
       return [];
     } else {
-      resultArray.push(issues.filter(
+      resultArray.push(...issues.filter(
         (issue) => issue.severity === severity
       ));
       return resultArray;

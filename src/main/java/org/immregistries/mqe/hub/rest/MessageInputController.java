@@ -215,6 +215,9 @@ public class MessageInputController {
       if (ack != null) {
         ack = ack.replaceAll("[\\r]+", "\n");
       }
+      else {
+        ack = "Error: Could not retrieve ACK.";
+      }
       response.setAck(ack);
       logger.info("ACK: \n" + ack);
       return response;

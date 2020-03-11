@@ -7,7 +7,7 @@
       <div class="row">
         <div class="form-group col-md-12">
 						<textarea id="Message" class="form-control" ng-trim="false"
-                      rows="10" [(ngModel)]="messageText"></textarea>
+                      rows="10" [(ngModel)]="messageText.message"></textarea>
         </div>
       </div>
 
@@ -39,7 +39,7 @@
             <h4>MQE Evaluation</h4>
           </div>
           <div class="heading row">
-            <h5>Errors</h5>
+            <h5>Errors ({{errorArray.length}})</h5>
           </div>
           <div id="errorFindings">
             <table class="table">
@@ -61,8 +61,8 @@
                 </tbody>
               </ng-container>
               <ng-container *ngIf="errorArray.length > 0">
-                <tbody *ngFor="let rule of errorArray">
-                    <tr *ngFor="let issue of rule">
+                <tbody>
+                    <tr *ngFor="let issue of errorArray">
                       <td>{{issue.applicationErrorCode.alternateText}}</td>
                       <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
                       <td>{{issue.severity}}</td>
@@ -76,7 +76,7 @@
             </table>
           </div>
           <div class="heading row">
-            <h5>Warnings</h5>
+            <h5>Warnings ({{warnArray.length}})</h5>
           </div>
           <div id="warnFindings">
             <table class="table">
@@ -98,8 +98,8 @@
                   </tbody>
               </ng-container>
               <ng-container *ngIf="warnArray.length > 0">
-                  <tbody *ngFor="let rule of warnArray">
-                      <tr *ngFor="let issue of rule">
+                  <tbody>
+                      <tr *ngFor="let issue of warnArray">
                         <td>{{issue.applicationErrorCode.alternateText}}</td>
                         <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
                         <td>{{issue.severity}}</td>
@@ -113,7 +113,7 @@
             </table>
           </div>
           <div class="heading row">
-            <h5>Informational</h5>
+            <h5>Informational ({{infoArray.length}})</h5>
           </div>
           <div id="infoFindings">
             <table class="table">
@@ -135,12 +135,12 @@
                   </tbody>
               </ng-container>
               <ng-container *ngIf="infoArray.length > 0">
-                  <tbody *ngFor="let rule of infoArray">
-                      <tr *ngFor="let detection of rule">
-                        <td>{{detection.applicationErrorCode.alternateText}}</td>
-                        <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
-                        <td>{{detection.severity}}</td>
-                        <td><span *ngFor="let location of detection.hl7LocationList">
+                  <tbody>
+                      <tr *ngFor="let issue of infoArray">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
                           {{location.segmentId}}-{{location.fieldPosition}}
                         </span>
                         </td>
@@ -150,7 +150,7 @@
             </table>
           </div>
           <div class="heading row">
-            <h5>Accept</h5>
+            <h5>Accept ({{acceptArray.length}})</h5>
           </div>
           <div id="acceptFindings">
             <table class="table">
@@ -172,12 +172,12 @@
                   </tbody>
               </ng-container>
               <ng-container *ngIf="acceptArray.length > 0">
-                  <tbody *ngFor="let rule of acceptArray">
-                      <tr *ngFor="let detection of rule">
-                        <td>{{detection.applicationErrorCode.alternateText}}</td>
-                        <td>{{detection.applicationErrorCode.alternateIdentifier}}</td>
-                        <td>{{detection.severity}}</td>
-                        <td><span *ngFor="let location of detection.hl7LocationList">
+                  <tbody>
+                      <tr *ngFor="let issue of acceptArray">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
                           {{location.segmentId}}-{{location.fieldPosition}}
                         </span>
                         </td>
@@ -191,3 +191,7 @@
     </div>
   </div>
 </div>
+<div *ngIf="!validationResult; else errorMessage"></div>
+<ng-template #errorMessage>
+      <pre>Error</pre>
+</ng-template>
