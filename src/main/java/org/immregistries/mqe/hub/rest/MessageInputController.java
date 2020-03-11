@@ -35,6 +35,9 @@ public class MessageInputController {
 
   public static boolean isQBP(String message) {
 
+    if (message == null || message.equals("")) {
+      return false;
+    }
     try {
       BufferedReader in = new BufferedReader(new StringReader(message));
       String line;
@@ -103,26 +106,26 @@ public class MessageInputController {
     messageSubmission.setPassword(PASSWORD);
     messageSubmission.setFacilityCode(FACILITYID);
 
-//    StopWatch stopWatch = new StopWatch();
-//    stopWatch.start();
+    //    StopWatch stopWatch = new StopWatch();
+    //    stopWatch.start();
     if (isQBP(MESSAGEDATA)) {
       return iisGatewayService.queryIIS(messageSubmission);
     }
-//    stopWatch.stop();
-//    logger.warn("iisGatewayService: " + stopWatch.getTotalTimeMillis());
+    //    stopWatch.stop();
+    //    logger.warn("iisGatewayService: " + stopWatch.getTotalTimeMillis());
 
-//    stopWatch = new StopWatch();
-//    stopWatch.start();
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
     String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
-//    stopWatch.stop();
-//    logger.warn("processMessageAndSaveMetrics: " + stopWatch.getTotalTimeMillis());
+    //    stopWatch.stop();
+    //    logger.warn("processMessageAndSaveMetrics: " + stopWatch.getTotalTimeMillis());
 
-//    stopWatch = new StopWatch();
-//    stopWatch.start();
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
     em.flush();
     em.clear();
-//    stopWatch.stop();
-//    logger.warn("EntityManager.clear.flush: " + stopWatch.getTotalTimeMillis());
+    //    stopWatch.stop();
+    //    logger.warn("EntityManager.clear.flush: " + stopWatch.getTotalTimeMillis());
 
 
     return ack;

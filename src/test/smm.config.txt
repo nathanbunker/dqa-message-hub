@@ -1,0 +1,10 @@
+-----------------------------------------
+Connection
+Label: MQE
+Type: POST
+URL: http://localhost:8756/mqe/api/messages/form-standard
+User Id: Mercy
+Password: PASSWORD_HIDDEN_BY_SMM|3poC1CxmnZhbuTdGr1Y5rQ==
+Facility Id: Mercy Healthcare
+Ack Type: DEFAULT
+Transfer Type: NEAR_REAL_TIME_LINK

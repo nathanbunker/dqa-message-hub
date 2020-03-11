@@ -5,6 +5,11 @@
     "description": "Indicates if query will be enabled. When enabled queries can be passed through AART. "
   },
   {
+    "name": "iisgateway.method",
+    "type": "java.lang.String",
+    "description": "What time of end point method should be used: post | soap "
+  },
+  {
     "name": "iisgateway.url",
     "type": "java.lang.String",
     "description": "The URL where the IIS HL7 end point is at. "
