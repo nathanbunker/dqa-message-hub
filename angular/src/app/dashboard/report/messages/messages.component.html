@@ -13,7 +13,7 @@
             <th style="width: 16%;">Message Control ID</th>
             <th style="width: 16%;">Patient Name</th>
             <th style="width: 36%;">CVX or NDC</th>
-            <th style="width: 16%;">Message Received Date</th>
+            <th style="width: 16%;">Message Date</th>
             <th style="width: 16%;">Warnings/Errors</th>
           </tr>
           </thead>
@@ -24,7 +24,7 @@
                   </td>
                   <td>{{message.patientName}}</td>
                   <td>{{message.cvxList}}</td>
-                  <td>{{message.received | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
+                  <td>{{message.messageTime | date : 'yyyy-MM-dd HH:mm:ss'}}</td>
                   <td>
                     <span style="min-width: 27px;float: right;">
                     <button *ngIf="message.errorsCount > 0" class="btn btn-sm btn-danger"

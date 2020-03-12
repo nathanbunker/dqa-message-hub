@@ -40,6 +40,9 @@ public class MessageMetadata {
   @javax.persistence.Temporal(TemporalType.TIMESTAMP)
   private Date inputTime;
 
+  @javax.persistence.Temporal(TemporalType.TIMESTAMP)
+  private Date messageTime;
+
   @NotNull
   @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
   private Sender sender;
@@ -92,6 +95,14 @@ public List<MessageDetection> getDetections() {
 
   public void setInputTime(Date inputTime) {
     this.inputTime = inputTime;
+  }
+
+  public Date getMessageTime() {
+    return messageTime;
+  }
+
+  public void setMessageTime(Date messageTime) {
+    this.messageTime = messageTime;
   }
 
   public String getMessage() {

@@ -156,8 +156,7 @@ public class Hl7MessageConsumer {
   private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
     SeverityLevel severityLevel = null;
 
-    DetectionsSettings ds =
-        detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp, mqeCode);
+    DetectionsSettings ds = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp, mqeCode);
     if (ds != null) {
       severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
     }
@@ -165,8 +164,7 @@ public class Hl7MessageConsumer {
   }
 
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(
-      Hl7MessageSubmission messageSubmission) {
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
     //  StopWatch stopWatch = new StopWatch();
     //  stopWatch.start();
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
@@ -198,8 +196,8 @@ public class Hl7MessageConsumer {
     }
 
     MqeMessageServiceResponse dqr = response.getMqeResponse();
-    Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
-
+    Date messageDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
+    Date sentDate = new Date();
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
     this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
@@ -208,7 +206,7 @@ public class Hl7MessageConsumer {
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
     MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(),
-        response.getAck(), response.getSender(), sentDate, response);
+        response.getAck(), response.getSender(), sentDate, messageDate, response);
     //  stopWatch.stop();
     //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
 
@@ -253,8 +251,9 @@ public class Hl7MessageConsumer {
   SenderJpaRepository senderRepo;
 
   private MessageMetadata saveMessageForSender(String message, String ack, String sender,
-      Date sentDate, Hl7MessageHubResponse response) {
+      Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
     MessageMetadata mm = new MessageMetadata();
+
 
     Sender s = senderRepo.findByName(sender);
 
@@ -267,6 +266,7 @@ public class Hl7MessageConsumer {
 
     //for demo day, let's make a random date in the last month.
     mm.setInputTime(sentDate);
+    mm.setMessageTime(messageDate);
     message = message.replaceAll("\\n\\r", "\\r");
     mm.setMessage(message);
     mm.setResponse(ack);

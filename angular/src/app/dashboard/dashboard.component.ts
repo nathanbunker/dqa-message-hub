@@ -35,8 +35,10 @@ export class DashboardComponent implements OnInit {
   newFacility(facilityName) {
     console.log(facilityName);
     console.log('Using above line as facility');
+    const year = new Date().getFullYear();
+    console.log('Year: ' + year);
     this.chosenFacility = facilityName;
-    this.year1 = this.facilityService.getFacilityHistory(this.chosenFacility, 2019);
-    this.year2 = this.facilityService.getFacilityHistory(this.chosenFacility, 2018);
+    this.year1 = this.facilityService.getFacilityHistory(this.chosenFacility, year);
+    this.year2 = this.facilityService.getFacilityHistory(this.chosenFacility, year - 1);
   }
 }

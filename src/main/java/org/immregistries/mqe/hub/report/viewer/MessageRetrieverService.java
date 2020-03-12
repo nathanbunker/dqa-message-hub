@@ -43,7 +43,7 @@ public class MessageRetrieverService {
     List<MessageMetadata> messages = new ArrayList<>();
     Page<MessageMetadata> mvpage = null;
 
-    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "id");
+    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "messageTime");
 
     if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
       mvpage = mvRepo
@@ -100,6 +100,7 @@ public class MessageRetrieverService {
 
     item.setId(mv.getId());
     item.setReceived(mv.getInputTime());
+    item.setMessageTime(mv.getMessageTime());
 //		item.setMcirError("Y".equals(mv.getTransferErrorFl()));
 
     HL7MessageMap map = parser.getMessagePartMap(mv.getMessage());

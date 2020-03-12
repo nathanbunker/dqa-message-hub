@@ -16,24 +16,25 @@
     </div>
   </div>
   <br/><br/><br/>
-  <div *ngIf="validationResult | async as vr" class="row">
-    <div class="col-md-12" *ngIf="vr.ack != null">
-      <div class="heading row">
-        <h4>Message ACK</h4>
+
+  <ng-template #loading>
+    <div class="text-primary text-center loading" *ngIf="submitted">
+      <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon> <br/> <span>Validating Message...</span>
+    </div>
+  </ng-template>
+
+  <div *ngIf="validationResult | async as vr; else loading" class="row">
+    
+    <div class="" *ngIf="vr.ack != null">
+      <div class="col-md-12">
+        <h4>VXU</h4>
+        <app-hl7-view [hl7Text]='vr.vxu'></app-hl7-view>
+        <br />
+        <h4>ACK</h4>
+        <app-hl7-view [hl7Text]='vr.ack'></app-hl7-view>
       </div>
-      <div class="text-primary text-center loading"
-           *ngIf="vr.ack == null">
-           <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon> <br/> <span>Validating
-						Message...</span>
-      </div>
-      <div id="messageAck" *ngIf="vr != null">
-        <div class="row">
-          <div class="col-md-12">
-            <pre>{{vr.ack}}</pre>
-          </div>
-        </div>
-      </div>
-      <div class="row">
+    </div>
+    <div class="row">
         <div class="col-md-12" *ngIf="vr.ack != null">
           <div class="heading row">
             <h4>MQE Evaluation</h4>
@@ -53,9 +54,9 @@
               </thead>
               <ng-container *ngIf="errorArray.length == 0">
                 <tbody>
-                  <tr>
+                  <tr *ngIf="errorArray.length == 0 && false" >
                     <td>
-                      No Error Codes
+                      No Error Codes.  
                     </td>
                   </tr>
                 </tbody>
@@ -190,8 +191,7 @@
       </div>
     </div>
   </div>
-</div>
-<div *ngIf="!validationResult; else errorMessage"></div>
+<!-- <div *ngIf="!validationResult; else errorMessage"></div>
 <ng-template #errorMessage>
       <pre>Error</pre>
-</ng-template>
+</ng-template> -->

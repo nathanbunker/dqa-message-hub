@@ -14,9 +14,9 @@ export class MessageValidationComponent implements OnInit {
   exampleMessageSubscription: Subscription;
   messageText: MqeMessage = {
     message: '',
-	user: '',
-	password: '',
-	sendingOrganization: ''
+    user: '',
+    password: '',
+    sendingOrganization: ''
   };
   validationResult: Observable<MqeMessageEvaluation>;
 
@@ -24,6 +24,7 @@ export class MessageValidationComponent implements OnInit {
   errorArray: DetectionCount[] = [];
   infoArray: DetectionCount[] = [];
   acceptArray: DetectionCount[] = [];
+  submitted: boolean;
 
   constructor(private validationService: ValidationService) { }
 
@@ -42,6 +43,7 @@ export class MessageValidationComponent implements OnInit {
     this.infoArray = [];
     this.acceptArray = [];
     this.validationResult = this.validationService.validateMessage(this.messageText);
+    this.submitted = true;
 
     this.validationResult.forEach(
       (rule) => {

@@ -63,6 +63,7 @@ public class MessageRestController {
     ViewerFilter vf = new ViewerFilter(filters);
 
     MessageListContainer container = messageRetreiver.getMessages(providerKey, dateStart, dateEnd, vf, pageNumber, itemsCount);
+
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
             .getTotalPages() + " current page: " + container.getPageNumber());

@@ -81,6 +81,12 @@ public class FileInputController {
 
       if (!line.matches(FHS_BHS_REGEX)) {
         if (line.matches(MSH_REGEX)) {
+          /* replace any white space at the beginning of the line.
+           * This will eliminate issues with unusual message separators.
+           * We were seeing "VT" and "FS" - vertical tab and file separator
+           */
+          line = line.replaceAll("^\\s+MSH", "MSH");
+
           if (oneMessage.length() <= 0) {
             oneMessage.append(line);
           } else {

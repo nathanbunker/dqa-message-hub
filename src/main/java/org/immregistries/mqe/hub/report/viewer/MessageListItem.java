@@ -9,6 +9,7 @@ public class MessageListItem {
   private String messageControlId;
   private String cvxList;
   private Date received;
+  private Date messageTime;
   @JsonIgnore
   private String messageReceived;
   private String ackStatus;
@@ -30,6 +31,14 @@ public class MessageListItem {
 
   public void setWarningsCount(int warningsCount) {
     this.warningsCount = warningsCount;
+  }
+
+  public Date getMessageTime() {
+    return messageTime;
+  }
+
+  public void setMessageTime(Date messageTime) {
+    this.messageTime = messageTime;
   }
 
   /**

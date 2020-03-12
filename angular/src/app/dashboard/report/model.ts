@@ -142,6 +142,7 @@ export interface MessageList {
   messageControlId: string;
   cvxList: string;
   received: number;
+  messageTime: number;
   ackStatus: string;
   patientName: string;
   errorsCount: number;
