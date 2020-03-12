@@ -1,0 +1,57 @@
+<div class="container" style="height: 100%;">
+  <div style="margin-top: 200px;">
+    <div class="card col-4 offset-4">
+      <article class="card-body">
+        <h4 class="card-title mb-4 mt-1">Sign in</h4>
+        <hr>
+        <ng-container *ngIf="message$ | async as message">
+          <div *ngIf="message.isDefined" class="alert alert-primary" [ngClass]="{
+            'alert-success' : message.status === 'SUCCESS',
+            'alert-danger' : message.status === 'ERROR',
+            'alert-warning' : message.status === 'WARNING'
+          }">
+            {{message.message}}
+          </div>
+          <p class="text-warning text-center" ></p>
+        </ng-container>
+        <form [formGroup]="loginForm" >
+          <div class="form-group">
+            <input formControlName="username" class="form-control" [ngClass]="{ 'is-invalid' : !loginForm.controls.username.valid && loginForm.controls.username.touched }" placeholder="Username" type="text">
+            <div class="invalid-feedback" *ngIf="loginForm.controls.username.errors?.required">
+              Username is required
+            </div>
+            <div class="invalid-feedback" *ngIf="loginForm.controls.username.errors?.minlength">
+              Username should be at least {{loginForm.controls.username.errors.minlength.requiredLength}} characters
+            </div>
+          </div>
+          <div class="form-group">
+            <input formControlName="facilityId" class="form-control" [ngClass]="{ 'is-invalid' : !loginForm.controls.facilityId.valid && loginForm.controls.facilityId.touched }" placeholder="Facility" type="text">
+            <div class="invalid-feedback" *ngIf="loginForm.controls.facilityId.errors?.required">
+              Facility Id is required
+            </div>
+            <div class="invalid-feedback" *ngIf="loginForm.controls.facilityId.errors?.minlength">
+              Facility Id should be at least {{loginForm.controls.facilityId.errors.minlength.requiredLength}} characters
+            </div>
+          </div>
+          <div class="form-group">
+            <input formControlName="password" class="form-control" [ngClass]="{ 'is-invalid' : !loginForm.controls.password.valid && loginForm.controls.password.touched }" placeholder="password" type="password">
+            <div class="invalid-feedback" *ngIf="loginForm.controls.password.errors?.required">
+              Password is required
+            </div>
+            <div class="invalid-feedback" *ngIf="loginForm.controls.password.errors?.minlength">
+              Password should be at least {{loginForm.controls.password.errors.minlength.requiredLength}} characters
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <button (click)="login()" type="submit" class="btn btn-primary btn-block" [disabled]="!loginForm.valid"> Login  </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </article>
+    </div>
+  </div>
+</div>
+

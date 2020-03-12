@@ -8,6 +8,10 @@ textarea {
     overflow-x: auto;
 }
 
+html, body {
+  height: 100%;
+}
+
 .heading {
     /* border-bottom: 1px solid #aaa; */
     letter-spacing: 3px;

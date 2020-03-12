@@ -34,7 +34,7 @@ public class MqeMessageHubApplicationConfig extends SpringBootServletInitializer
     return applicationBuilder.sources(MqeMessageHubApplicationConfig.class);
   }
 
-  //https://github.com/shekhargulati/spring-boot-maven-angular-starter/blob/master/backend/src/main/java/com/shekhargulati/app/Application.java#L29
+
   @Bean
   public WebMvcConfigurer corsConfigurer() {
     return new WebMvcConfigurerAdapter() {

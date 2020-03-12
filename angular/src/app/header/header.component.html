@@ -1,8 +1,8 @@
 <div style="background-color: grey; height: 100px; color: white; padding-bottom: 20px;">
     <div class="container">
         <div class="row" >
-            <div class="col-md-8">
-                <div class="dropdown" >
+            <div class="col-md-8" *ngIf="isLogged()">
+                <div class="dropdown">
                     <button class="dropbtn" ng-click="hideMenu = !hideMenu" style="padding-top: 20px; height: 100px; padding-bottom: 19px;">
                         <fa-icon icon="sliders-h"></fa-icon>
                         MQE Menu
@@ -17,8 +17,13 @@
                         <a class="dropdown-item" routerLink="settings">Settings</a>
                         <a class="dropdown-item" routerLink="documentation/detections">Detections Documentation</a>
                         <a class="dropdown-item" routerLink="documentation/codebase">Code Base Documentation</a>
+                        <hr />
+                        <a class="dropdown-item" style="color: black;" (click)="logout()">Logout</a>
                     </div>
                 </div>
+            </div>
+            <div *ngIf="!isLogged()" style="width: 100%; padding-top: 20px; height: 100px; padding-bottom: 19px; text-align: center;">
+              <h2 style=" margin-bottom: 0">Welcome to MQE</h2>
             </div>
         </div>
     </div>

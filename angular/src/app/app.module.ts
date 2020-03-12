@@ -2,7 +2,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { TableModule } from 'primeng/table';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { HeaderComponent } from './header/header.component';
@@ -34,7 +34,7 @@ import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
 import { DocumentationService } from './services/documentation.service';
 import { ReportingService } from './services/reporting.service';
@@ -46,6 +46,9 @@ import { Hl7Reference } from './hl7-reference';
 import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
 import { ReportComponent } from './report/report.component';
 import { DurationPipe } from './pipes/duration.pipe';
+import { LoginComponent } from './login/login.component';
+import { AuthenticatedGuard, NotAuthenticatedGuard } from './services/auth-guard.service';
+import { AuthInterceptor } from './services/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -73,6 +76,7 @@ import { DurationPipe } from './pipes/duration.pipe';
     Hl7ViewComponent,
     ReportComponent,
     DurationPipe,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -84,9 +88,18 @@ import { DurationPipe } from './pipes/duration.pipe';
     TableModule,
     FormsModule,
     BrowserAnimationsModule,
+    ReactiveFormsModule,
     ToastrModule.forRoot({ positionClass: 'toast-top-right' }),
   ],
-  providers: [DocumentationService, ReportingService, ProviderDashboardGuard, Hl7Reference],
+  providers: [
+    DocumentationService,
+    ReportingService,
+    ProviderDashboardGuard,
+    Hl7Reference,
+    AuthenticatedGuard,
+    NotAuthenticatedGuard,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
   bootstrap: [AppComponent],
   exports: [ReportComponent]
 })
