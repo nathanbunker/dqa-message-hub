@@ -21,3 +21,5 @@ node
 \.vscode/
 
 angular/package-lock\.json
+
+.DS_Store
