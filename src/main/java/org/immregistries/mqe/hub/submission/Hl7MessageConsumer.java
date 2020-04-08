@@ -12,6 +12,7 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
+import org.immregistries.mqe.hl7util.parser.HL7Reader;
 import org.immregistries.mqe.hub.report.Sender;
 import org.immregistries.mqe.hub.report.SenderJpaRepository;
 import org.immregistries.mqe.hub.report.SenderMetricsService;
@@ -174,6 +175,31 @@ public class Hl7MessageConsumer {
     //  logger.warn("processMessage: " + stopWatch.getTotalTimeMillis());
 
 
+    sendToIisGatewayIfEnabled(messageSubmission, response);
+
+    if (!iisGatewayService.isIisgatewayEnable()
+        || iisGatewayService.isIisgatewayPersistDataEnable()) {
+      MqeMessageServiceResponse dqr = response.getMqeResponse();
+      Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
+
+      //  stopWatch = new StopWatch();
+      //  stopWatch.start();
+      this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
+      //  stopWatch.stop();
+      //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
+      //  stopWatch = new StopWatch();
+      //  stopWatch.start();
+      MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(),
+          response.getAck(), response.getSender(), sentDate, response);
+      //  stopWatch.stop();
+      //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
+    }
+
+    return response;
+  }
+
+  public void sendToIisGatewayIfEnabled(Hl7MessageSubmission messageSubmission,
+      Hl7MessageHubResponse response) {
     if (iisGatewayService.isIisgatewayEnable()) {
       if (messageSubmission != null && messageSubmission.getUser() != null
           && !messageSubmission.getUser().equals("")) {
@@ -187,7 +213,42 @@ public class Hl7MessageConsumer {
               if (!iisGatewayService.isIisgatewayReturnAckMqeEnable()) {
                 response.setAck(responseMessageFromIIS);
               } else {
-                // TODO read the ACK, pull out requirements and add them to the items that were detected so they will show in the ACK
+                String additionalERRsegments = "";
+                HL7Reader readerIIS = new HL7Reader(responseMessageFromIIS);
+                String ackCodeIis = "AA";
+                if (readerIIS.advanceToSegment("MSA")) {
+                  ackCodeIis = readerIIS.getValue(1);
+                }
+                while (readerIIS.advanceToSegment("ERR")) {
+                  String errorCode = readerIIS.getValue(4);
+                  if (ackCodeIis.equals("AA") && (errorCode.equals("E") || errorCode.equals("W"))) {
+                    ackCodeIis = "AE";
+                  }
+                  additionalERRsegments += readerIIS.getOriginalSegment() + "\r";
+                }
+
+                String ack = new String();
+                HL7Reader readerMQE = new HL7Reader(response.getAck());
+                while (readerMQE.advance()) {
+                  if (readerMQE.getSegmentName().equals("MSA")) {
+                    String ackCodeMqe = readerMQE.getValue(1);
+                    if (ackCodeMqe.equals("AA") && !ackCodeIis.equals("AA")) {
+                      ackCodeMqe = ackCodeIis;
+                    }
+                    ack += "MSA|" + ackCodeMqe + "|" + readerMQE.getValue(2) + "|\r";
+                  } else {
+                    ack += readerMQE.getOriginalSegment() + "\r";
+                  }
+                }
+                if (ackCodeIis.equals("AA")) {
+                  ack +=
+                      "ERR|||0^Message Accepted^HL70357|I||||Message was forwarded to IIS and was accepted|\r";
+                } else if (ackCodeIis.equals("AA")) {
+                  ack +=
+                      "ERR|||207^Application Internal Error^HL70357|I||||Message was forwarded to IIS and but it was not accepted|\r";
+                }
+                ack += additionalERRsegments;
+                response.setAck(ack);
               }
             }
           }
@@ -196,23 +257,6 @@ public class Hl7MessageConsumer {
         }
       }
     }
-
-    MqeMessageServiceResponse dqr = response.getMqeResponse();
-    Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
-
-    //  stopWatch = new StopWatch();
-    //  stopWatch.start();
-    this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
-    //  stopWatch.stop();
-    //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
-    //  stopWatch = new StopWatch();
-    //  stopWatch.start();
-    MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(),
-        response.getAck(), response.getSender(), sentDate, response);
-    //  stopWatch.stop();
-    //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
-
-    return response;
   }
 
   private static boolean hasNoErrors(List<ValidationRuleResult> validationRuleResultList) {

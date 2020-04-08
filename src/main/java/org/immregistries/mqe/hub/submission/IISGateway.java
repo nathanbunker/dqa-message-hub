@@ -40,14 +40,12 @@ public class IISGateway {
   @Value("${iisgateway.returnAck.iis.enable}")
   private boolean iisgatewayReturnAckIisEnable = true;
   
+  @Value("${iisgateway.persistData.enable}")
+  private boolean iisgatewayPersistDataEnable = true;
+  
   @Value("${iisgateway.url}")
   private String iisgatewayUrl = "http://florence.immregistries.org/iis-sandbox/pop";
   //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
-
-  public String getIisgatewayUrl() {
-    return iisgatewayUrl;
-  }
-
 
   @Value("${iisgateway.method}")
   private String iisgatewayMethod = "post";
@@ -59,6 +57,18 @@ public class IISGateway {
     return iisgatewayMethod.equalsIgnoreCase(METHOD_SOAP);
   }
 
+  public String getIisgatewayUrl() {
+    return iisgatewayUrl;
+  }
+  
+  public boolean isIisgatewayPersistDataEnable() {
+    return iisgatewayPersistDataEnable;
+  }
+  
+  public void setIisgatewayPersistDataEnable(boolean iisgatewayPersistDataEnable) {
+    this.iisgatewayPersistDataEnable = iisgatewayPersistDataEnable;
+  }
+  
   public String getIisgatewayMethod() {
     return iisgatewayMethod;
   }
@@ -176,6 +186,7 @@ public class IISGateway {
         map.add("FACILITYID", messageSubmission.getFacilityCode());
         map.add("PASSWORD", messageSubmission.getPassword());
         map.add("USERID", messageSubmission.getUser());
+        
 
         HttpEntity<MultiValueMap<String, String>> request =
             new HttpEntity<MultiValueMap<String, String>>(map, headers);

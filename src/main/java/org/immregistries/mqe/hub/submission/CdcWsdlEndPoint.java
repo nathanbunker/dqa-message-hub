@@ -8,6 +8,7 @@ import org.immregistries.mqe.cdc_wsdl.ObjectFactory;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageRequestType;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageResponseType;
 import org.immregistries.mqe.hub.rest.MessageInputController;
+import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
@@ -51,7 +52,7 @@ public class CdcWsdlEndPoint {
     messageSubmission.setFacilityCode(request.getValue().getFacilityID());
 
     SubmitSingleMessageResponseType response = new SubmitSingleMessageResponseType();
-    String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    String ack =  messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
     response.setReturn(ack);
     ObjectFactory of = new ObjectFactory();
     return of.createSubmitSingleMessageResponse(response);
