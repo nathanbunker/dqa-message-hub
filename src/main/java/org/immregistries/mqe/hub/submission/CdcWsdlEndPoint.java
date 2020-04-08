@@ -1,6 +1,10 @@
 package org.immregistries.mqe.hub.submission;
 
 import javax.persistence.EntityManager;
+import javax.xml.bind.JAXBElement;
+import org.immregistries.mqe.cdc_wsdl.ConnectivityTestRequestType;
+import org.immregistries.mqe.cdc_wsdl.ConnectivityTestResponseType;
+import org.immregistries.mqe.cdc_wsdl.ObjectFactory;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageRequestType;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageResponseType;
 import org.immregistries.mqe.hub.rest.MessageInputController;
@@ -9,10 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
+import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
 
 @Endpoint
 public class CdcWsdlEndPoint {
-  private static final String NAMESPACE_URI = "http://spring.io/guides/gs-producing-web-service";
+  private static final String NAMESPACE_URI = "urn:cdc:iisb:2011";
 
 
   @Autowired
@@ -24,26 +29,31 @@ public class CdcWsdlEndPoint {
   @Autowired
   EntityManager em;
 
-  // @PayloadRoot(namespace = "", localPart = "");
-  public SubmitSingleMessageResponseType submitSingleMessage(
-      @RequestPayload SubmitSingleMessageRequestType request) {
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "connectivityTest")
+  @ResponsePayload
+  public JAXBElement<ConnectivityTestResponseType> connectivityTest(
+      @RequestPayload JAXBElement<ConnectivityTestRequestType> request) {
+    ConnectivityTestResponseType response = new ConnectivityTestResponseType();
+    response.setReturn("You said: " + request.getValue().getEchoBack());
+    ObjectFactory of = new ObjectFactory();
+    return of.createConnectivityTestResponse(response);
+  }
+
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "submitSingleMessage")
+  @ResponsePayload
+  public JAXBElement<SubmitSingleMessageResponseType> submitSingleMessage(
+      @RequestPayload JAXBElement<SubmitSingleMessageRequestType> request) {
+
     Hl7MessageSubmission messageSubmission = new Hl7MessageSubmission();
-    messageSubmission.setMessage(request.getHl7Message());
-    messageSubmission.setUser(request.getUsername());
-    messageSubmission.setPassword(request.getPassword());
-    messageSubmission.setFacilityCode(request.getFacilityID());
+    messageSubmission.setMessage(request.getValue().getHl7Message());
+    messageSubmission.setUser(request.getValue().getUsername());
+    messageSubmission.setPassword(request.getValue().getPassword());
+    messageSubmission.setFacilityCode(request.getValue().getFacilityID());
 
     SubmitSingleMessageResponseType response = new SubmitSingleMessageResponseType();
-    if (MessageInputController.isQBP(request.getHl7Message())) {
-      response.setReturn(iisGatewayService.queryIIS(messageSubmission));
-    } else {
-      String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
-
-      em.flush();
-      em.clear();
-      response.setReturn(ack);
-    }
-    return response;
-
+    String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    response.setReturn(ack);
+    ObjectFactory of = new ObjectFactory();
+    return of.createSubmitSingleMessageResponse(response);
   }
 }

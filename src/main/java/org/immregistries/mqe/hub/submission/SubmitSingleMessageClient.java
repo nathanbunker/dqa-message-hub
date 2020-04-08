@@ -1,5 +1,7 @@
 package org.immregistries.mqe.hub.submission;
 
+import javax.xml.bind.JAXBElement;
+import org.immregistries.mqe.cdc_wsdl.ObjectFactory;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageRequestType;
 import org.immregistries.mqe.cdc_wsdl.SubmitSingleMessageResponseType;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
@@ -20,11 +22,16 @@ public class SubmitSingleMessageClient extends WebServiceGatewaySupport {
     request.setFacilityID(messageSubmission.getFacilityCode());
     request.setPassword(messageSubmission.getPassword());
     request.setUsername(messageSubmission.getUser());
+    
+    ObjectFactory of = new ObjectFactory();
+    JAXBElement<SubmitSingleMessageRequestType> requestJ = of.createSubmitSingleMessage(request);
+    
 
     // iisGatewayService.getIisgatewayUrl()
-    SubmitSingleMessageResponseType response =
-        (SubmitSingleMessageResponseType) getWebServiceTemplate()
-            .marshalSendAndReceive("http://florence.immregistries.org/iis-sandbox/soap", request);
+    JAXBElement<SubmitSingleMessageResponseType> responseJ = 
+        (JAXBElement<SubmitSingleMessageResponseType>) getWebServiceTemplate()
+            .marshalSendAndReceive("http://florence.immregistries.org/iis-sandbox/soap", requestJ);
+    SubmitSingleMessageResponseType response = responseJ.getValue();
     if (response != null) {
       return response.getReturn();
     }
