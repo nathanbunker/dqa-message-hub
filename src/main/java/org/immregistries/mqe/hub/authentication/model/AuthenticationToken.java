@@ -16,6 +16,13 @@ public class AuthenticationToken extends AbstractAuthenticationToken {
         this.password = password;
     }
 
+    public AuthenticationToken(String username, String facilityId) {
+        super((Collection)null);
+        this.user = new UserId(username, facilityId);
+        this.setAuthenticated(true);
+    }
+
+
     @Override
     public String getCredentials() {
         return password;
@@ -44,6 +51,10 @@ public class AuthenticationToken extends AbstractAuthenticationToken {
         if (!super.equals(o)) return false;
         AuthenticationToken that = (AuthenticationToken) o;
         return user.equals(that.user);
+    }
+
+    public void setUser(UserId user) {
+        this.user = user;
     }
 
     @Override

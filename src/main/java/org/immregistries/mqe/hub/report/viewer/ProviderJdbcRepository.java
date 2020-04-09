@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -60,6 +61,11 @@ public class ProviderJdbcRepository {
   private static final String getAuthorizedTransferInterfaces =
       " select distinct name from sender";
 
+  private static final String getAuthorizedTransferInterfacesForUser =
+          " select distinct s.name " +
+                  "from SENDER_METRICS sm " +
+                  "join SENDER s on s.sender_id = sm.sender_sender_id where sm.username = :ssUserId";
+
   @Cacheable("facilitiesList")
   public List<String> getActiveAuthorizedFacilities(String ssUserId) {
     SqlParameterSource namedParameters = new MapSqlParameterSource()
@@ -70,6 +76,24 @@ public class ProviderJdbcRepository {
     try {
       List<String> rows = jdbcTemplate
           .query(getAuthorizedTransferInterfaces, namedParameters, getFacilityRowMapper());
+      facilityList.addAll(rows);
+      LOGGER.info("facilities found: " + facilityList.size());
+    } catch (EmptyResultDataAccessException er) {
+      LOGGER.warn("facilities not found for query: " + getProviders);
+    }
+
+    return facilityList;
+  }
+
+  public List<String> getActiveAuthorizedFacilitiesForUser(String ssUserId) {
+    SqlParameterSource namedParameters = new MapSqlParameterSource()
+            .addValue("ssUserId", ssUserId);
+
+    List<String> facilityList = new ArrayList<String>();
+    LOGGER.debug("JDBC Query: " + getAuthorizedTransferInterfacesForUser);
+    try {
+      List<String> rows = jdbcTemplate
+              .query(getAuthorizedTransferInterfacesForUser, namedParameters, getFacilityRowMapper());
       facilityList.addAll(rows);
       LOGGER.info("facilities found: " + facilityList.size());
     } catch (EmptyResultDataAccessException er) {

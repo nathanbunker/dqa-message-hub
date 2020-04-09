@@ -8,6 +8,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import javax.persistence.EntityManager;
 import org.immregistries.mqe.hl7util.test.MessageGenerator;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.FileResponse;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
@@ -77,11 +78,11 @@ public class MessageInputController {
   private IISGateway iisGatewayService;
 
   @RequestMapping(value = "in", method = RequestMethod.POST)
-  public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission)
+  public Hl7MessageHubResponse scoreMessageAndPersist(@RequestBody Hl7MessageSubmission submission, AuthenticationToken token)
       throws Exception {
     logger.info("ReportController scoreMessage demo!");
     logger.info("processing this message: [" + submission.getMessage() + "]");
-    Hl7MessageHubResponse ack = msgr.processMessageAndSaveMetrics(submission);
+    Hl7MessageHubResponse ack = msgr.processMessageAndSaveMetrics(submission, token.getPrincipal().getUsername());
     return ack;
   }
 
@@ -90,7 +91,11 @@ public class MessageInputController {
 
   @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
-  public String urlEncodedHttpFormPost(String MESSAGEDATA, String USERID, String PASSWORD,
+  public String urlEncodedHttpFormPost(String MESSAGEDATA, AuthenticationToken token) throws Exception {
+    return this.urlEncodedHttpFormPostInner(MESSAGEDATA, token.getPrincipal().getUsername(), token.getCredentials(), token.getPrincipal().getFacilityId());
+  }
+
+  public String urlEncodedHttpFormPostInner(String MESSAGEDATA, String USERID, String PASSWORD,
       String FACILITYID) throws Exception {
 
     String response = "hl7 message interface endpoint! message: " + MESSAGEDATA + " user: " + USERID
@@ -113,7 +118,7 @@ public class MessageInputController {
 
 //    stopWatch = new StopWatch();
 //    stopWatch.start();
-    String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission, USERID).getAck();
 //    stopWatch.stop();
 //    logger.warn("processMessageAndSaveMetrics: " + stopWatch.getTotalTimeMillis());
 
@@ -169,7 +174,7 @@ public class MessageInputController {
   }
 
   @RequestMapping(value = "json", method = RequestMethod.POST)
-  public Hl7MessageHubResponse jsonFormPost(@RequestBody Hl7MessageSubmission submission) {
+  public Hl7MessageHubResponse jsonFormPost(@RequestBody Hl7MessageSubmission submission, AuthenticationToken token) {
     logger.info("hl7 message interface endpoint! message: " + submission.getMessage() + " user: "
         + submission.getUser() + " password: " + submission.getPassword() + " facilityId: "
         + submission.getFacilityCode());
@@ -177,7 +182,7 @@ public class MessageInputController {
     String vxu = submission.getMessage();
 
     if (vxu != null) {
-      Hl7MessageHubResponse response = messageConsumer.processMessageAndSaveMetrics(submission);
+      Hl7MessageHubResponse response = messageConsumer.processMessageAndSaveMetrics(submission, token.getPrincipal().getUsername());
       vxu = vxu.replaceAll("[\\r]+", "\n");
       response.setVxu(vxu);
 

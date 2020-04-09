@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hl7util.SeverityLevel;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.viewer.*;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
@@ -67,7 +68,7 @@ public class ReportController {
   }
 
   @RequestMapping(value = "/message", method = RequestMethod.POST)
-  public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission)
+  public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission, AuthenticationToken token)
       throws Exception {
     logger.info("ReportController scoreMessage demo! sender:" + submission.getFacilityCode());
     String submitter = submission.getFacilityCode();
@@ -76,34 +77,34 @@ public class ReportController {
       submission.setFacilityCode("MQE");
     }
 
-    msgr.processMessageAndSaveMetrics(submission);
+    msgr.processMessageAndSaveMetrics(submission, token.getPrincipal().getUsername());
 
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date());
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date(), token.getPrincipal().getUsername());
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     return report;
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}")
   public VxuScoredReport getReportFor(@PathVariable("providerKey") String providerKey,
-      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date date,  @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date date,  @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
-    return this.getScoredReportAndOverrideDefaults(providerKey, date, dateEnd);
+    return this.getScoredReportAndOverrideDefaults(providerKey, date, dateEnd, token.getPrincipal().getUsername());
   }
 
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
-  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart);
-    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd);
-    int numberOfMessages = repo.getFacilityMessageCount(providerKey, dateStart, dateStart);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, token.getPrincipal().getUsername());
+    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
+    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, token.getPrincipal().getUsername());
     CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
     ProviderReport providerReport = new ProviderReport();
     providerReport.setProvider(providerKey);
     providerReport.setStartDate(dateStart);
     providerReport.setEndDate(dateStart);
     providerReport.setNumberOfMessage(numberOfMessages);
-    providerReport.setErrors(this.getErrors(providerKey, dateStart, dateEnd, vxuScoredReport));
-    providerReport.setCodeIssues(this.getCodeIssues(providerKey, dateStart, dateEnd, codeCollectionMap.getCodes()));
+    providerReport.setErrors(this.getErrors(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, vxuScoredReport));
+    providerReport.setCodeIssues(this.getCodeIssues(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, codeCollectionMap.getCodes()));
     providerReport.setNumberOfErrors(providerReport.getErrors().size());
 
     /* new data */
@@ -134,11 +135,11 @@ public class ReportController {
     return  providerReport;
   }
 
-  private List<ScoreReportable> getErrors(String providerKey, Date date, Date dateEnd, VxuScoredReport report) {
+  private List<ScoreReportable> getErrors(String providerKey, String username, Date date, Date dateEnd, VxuScoredReport report) {
     List<ScoreReportable> errors = new ArrayList<>();
     for(ScoreReportable detection: report.getDetectionCounts()) {
       if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
-        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(providerKey, date, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(username, providerKey, date, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           detection.setExampleMessage(md.getContent().get(0).getMessage());
@@ -149,12 +150,12 @@ public class ReportController {
     return errors;
   }
 
-  List<CollectionBucket> getCodeIssues(String providerKey, Date date, Date dateEnd, List<CollectionBucket> codes) {
+  List<CollectionBucket> getCodeIssues(String providerKey, String username, Date date, Date dateEnd, List<CollectionBucket> codes) {
     List<CollectionBucket> codeIssues = new ArrayList<>();
     for(CollectionBucket codeCount: codes) {
       System.out.println(codeCount.getStatus());
       if(!codeCount.getStatus().equals("Valid")) {
-        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
+        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(username, providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
         System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           codeCount.setExampleMessage(md.getContent().get(0).getMessage());
@@ -165,8 +166,8 @@ public class ReportController {
     return codeIssues;
   }
 
-  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date dateStart, Date dateEnd) {
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date dateStart, Date dateEnd, String username) {
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, username);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
       DetectionsSettings detectionSetting = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(providerKey, score.getMqeCode());

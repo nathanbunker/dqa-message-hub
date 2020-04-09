@@ -26,12 +26,12 @@ public class UserAuthenticationSuccessHandler implements AuthenticationSuccessHa
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication auth) throws IOException, ServletException {
 
-    if(!(auth instanceof AuthenticationToken)) {
-			throw new ServletException();
-		}
+        if(!(auth instanceof AuthenticationToken)) {
+            throw new ServletException();
+        }
 
-    logger.warn("Logged in.  Time out in " + timeOutMinutes + " minutes");
-    httpServletRequest.getSession().setMaxInactiveInterval(60*timeOutMinutes);
+        logger.warn("Logged in.  Time out in " + timeOutMinutes + " minutes");
+        httpServletRequest.getSession().setMaxInactiveInterval(60*timeOutMinutes);
 		AuthenticationToken token = (AuthenticationToken) auth;
 
 		//-- Create response

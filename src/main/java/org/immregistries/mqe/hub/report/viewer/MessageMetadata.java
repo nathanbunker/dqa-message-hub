@@ -17,7 +17,8 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-import org.immregistries.mqe.hub.report.Sender;
+
+import org.immregistries.mqe.hub.report.SenderMetrics;
 
 @Entity
 @Table(name = "MESSAGE_METADATA")
@@ -45,7 +46,7 @@ public class MessageMetadata {
 
   @NotNull
   @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-  private Sender sender;
+  private SenderMetrics senderMetrics;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageDetection> detections = new ArrayList<>();
@@ -113,12 +114,12 @@ public List<MessageDetection> getDetections() {
     this.message = message;
   }
 
-  public Sender getSender() {
-    return sender;
+  public SenderMetrics getSenderMetrics() {
+    return senderMetrics;
   }
 
-  public void setSender(Sender sender) {
-    this.sender = sender;
+  public void setSenderMetrics(SenderMetrics senderMetrics) {
+    this.senderMetrics = senderMetrics;
   }
 
   public long getId() {

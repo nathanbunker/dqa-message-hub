@@ -2,6 +2,7 @@ package org.immregistries.mqe.hub.rest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
 import org.immregistries.mqe.hub.submission.IISGateway;
@@ -26,7 +27,7 @@ public class MqeHl7TestingController {
   private IISGateway iisGatewayService;
 
   @RequestMapping(value = "hl7", method = RequestMethod.POST)
-  public String hl7MessageInterface(@RequestBody String message) throws Exception {
+  public String hl7MessageInterface(@RequestBody String message, AuthenticationToken token) throws Exception {
 
     logger.info("hl7MessageInterface demo!");
 
@@ -37,7 +38,7 @@ public class MqeHl7TestingController {
       return iisGatewayService.queryIIS(messageSubmission);
     }
 
-    return messageConsumer.processMessageAndSaveMetrics(messageSubmission).getAck();
+    return messageConsumer.processMessageAndSaveMetrics(messageSubmission, token.getPrincipal().getUsername()).getAck();
   }
 
 

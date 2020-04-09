@@ -21,6 +21,7 @@ public class FileUploadData {
   private String facilityId;
   private String fileName;
   private String fileId;
+  private String username;
   private long startTimeMs = 1;
   private long endTimeMs = 0;
 
@@ -50,10 +51,11 @@ public class FileUploadData {
   public FileUploadData() {
   }
 
-  public FileUploadData(String facilityId, String fileName, String fileId) {
+  public FileUploadData(String facilityId, String fileName, String fileId, String username) {
     this.facilityId = facilityId;
     this.fileName = fileName;
     this.fileId = fileId;
+    this.username = username;
   }
 
   public Map<String, Integer> getMessageDates() {
@@ -68,6 +70,13 @@ public class FileUploadData {
     this.messageDates.put(date, ++i);
   }
 
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
 
   public String getStatus() {
     return status;
