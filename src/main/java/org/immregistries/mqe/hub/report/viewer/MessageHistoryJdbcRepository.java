@@ -366,6 +366,33 @@ public class MessageHistoryJdbcRepository {
     }
   }
 
+  @Cacheable("facilityMessageCountByUsername")
+  public int getFacilityMessageCountByUsername(final String providerIdentifier, Date rangeStart, Date rangeEnd, String username) {
+
+    SqlParameterSource namedParameters = new MapSqlParameterSource()
+            .addValue("rangeEnd", rangeEnd)
+            .addValue("userId", username)
+            .addValue("rangeStart", rangeStart)
+            .addValue("providerIdentifier", providerIdentifier);
+
+    List<MessageCounts> fmcList = new ArrayList<MessageCounts>();
+    ;
+
+    String query = getFacilityMessageCount + byUsername;
+    LOGGER.debug("JDBC Query: " + query);
+
+    try {
+      return jdbcTemplate.queryForObject(query, namedParameters, new RowMapper<Integer>() {
+        public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
+          return rs.getInt("MSG_COUNT");
+        }
+      });
+    } catch (EmptyResultDataAccessException er) {
+      LOGGER.warn("message history not found for interface id[" + providerIdentifier + "]");
+      return 0;
+    }
+  }
+
   /**
    * gets a list of days and counts of messages.
    */

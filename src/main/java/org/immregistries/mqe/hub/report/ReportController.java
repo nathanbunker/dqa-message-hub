@@ -96,7 +96,7 @@ public class ReportController {
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, token.getPrincipal().getUsername());
     VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
-    int numberOfMessages = repo.getFacilityMessageCount(providerKey, dateStart, dateStart);
+    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, token.getPrincipal().getUsername());
     CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
     ProviderReport providerReport = new ProviderReport();
     providerReport.setProvider(providerKey);
