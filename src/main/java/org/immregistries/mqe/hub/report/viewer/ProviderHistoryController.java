@@ -2,6 +2,8 @@ package org.immregistries.mqe.hub.report.viewer;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,11 @@ public class ProviderHistoryController {
 
   @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/counts/year/{year}")
   MqeMessageHistory jsonProviderMessageHistoryForYear(HttpServletRequest request,
-      @PathVariable("providerKey") String providerKey, @PathVariable("year") int year,
-      String filters) {
+                                                      @PathVariable("providerKey") String providerKey, @PathVariable("year") int year,
+                                                      String filters, AuthenticationToken token) {
     MqeMessageHistory history = new MqeMessageHistory();
     history.setYear(year);
-    List<MessageCounts> counts = repo.getFacilityMessageHistory(providerKey, year);
+    List<MessageCounts> counts = repo.getFacilityMessageHistoryByUsername(providerKey, year, token.getPrincipal().getUsername());
     history.setMessageHistory(counts);
 
     return history;

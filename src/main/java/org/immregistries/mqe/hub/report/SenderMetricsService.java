@@ -35,19 +35,19 @@ public class SenderMetricsService {
     //senderMetricsRepo.flush();
   }
 
-  public MqeMessageMetrics getMetricsFor(String sender, Date day) {
-    return getMetricsFor(sender, day, day);
+  public MqeMessageMetrics getMetricsFor(String sender, Date day, String username) {
+    return getMetricsFor(sender, day, day, username);
   }
 
-  public MqeMessageMetrics getMetricsFor(String sender, Date dayStart, Date dayEnd) {
+  public MqeMessageMetrics getMetricsFor(String sender, Date dayStart, Date dayEnd, String username) {
 
     if (StringUtils.isBlank(sender)) {
       sender = "MQE";
     }
 
     SenderMetrics metrics = senderMetricsRepo
-        .findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(sender, dayStart,
-            dayEnd);
+        .findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqualAndUsername(sender, dayStart,
+            dayEnd, username);
     logger.info("Metrics found for " + sender + " dayStart: " + dayStart + " dayEnd: " + dayEnd);
     logger.info("Metrics: " + metrics);
     MqeMessageMetrics out = new MqeMessageMetrics();
@@ -93,8 +93,8 @@ public class SenderMetricsService {
   SenderJpaRepository senderRepo;
 
   public SenderMetrics addToSenderMetrics(String sender, Date day,
-      MqeMessageMetrics incomingMetrics) {
-    SenderMetrics metrics = senderMetricsRepo.findBySenderNameAndMetricsDate(sender, day);
+      MqeMessageMetrics incomingMetrics, String username) {
+    SenderMetrics metrics = senderMetricsRepo.findBySenderNameAndMetricsDateAndUsername(sender, day, username);
 
     Sender s = senderRepo.findByName(sender);
 
@@ -110,6 +110,7 @@ public class SenderMetricsService {
       metrics = new SenderMetrics();
       metrics.setSender(s);
       metrics.setMetricsDate(day);
+      metrics.setUsername(username);
     }
 
     Map<VxuObject, Integer> objectCounts = incomingMetrics.getObjectCounts();

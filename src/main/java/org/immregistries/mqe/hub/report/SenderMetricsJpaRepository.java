@@ -7,6 +7,9 @@ public interface SenderMetricsJpaRepository extends JpaRepository<SenderMetrics,
 
   SenderMetrics findBySenderNameAndMetricsDate(String sender, Date sendDate);
 
-  SenderMetrics findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(String sender,
-      Date beginDate, Date endDate);
+  SenderMetrics findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqual(String sender, Date beginDate, Date endDate);
+
+  SenderMetrics findBySenderNameAndMetricsDateGreaterThanEqualAndMetricsDateLessThanEqualAndUsername(String sender, Date beginDate, Date endDate, String username);
+
+  SenderMetrics findBySenderNameAndMetricsDateAndUsername(String sender, Date beginDate, String username);
 }

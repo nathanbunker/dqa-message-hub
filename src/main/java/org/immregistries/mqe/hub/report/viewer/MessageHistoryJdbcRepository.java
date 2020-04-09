@@ -40,18 +40,23 @@ public class MessageHistoryJdbcRepository {
   private static final String getFacilityMessageHistoryBEGIN =
       " SELECT COUNT (*) AS MSG_COUNT, TRUNC (mv.input_time) AS day "
           + " from MESSAGE_METADATA mv "
-          + " join sender s on s.sender_id = mv.sender_sender_id "
+          + " join SENDER_METRICS sm on sm.sender_metrics_id = mv.sender_metrics_sender_metrics_id "
+          + " join sender s on s.sender_id = sm.sender_sender_id "
           + " where s.name = :providerIdentifier "
           + " and trunc(mv.input_time) >= :rangeStart "
           + " and trunc(mv.input_time) <= :rangeEnd ";
 
   private static final String getFacilityMessageCount =
           " SELECT COUNT (*) AS MSG_COUNT from MESSAGE_METADATA mv "
-                  + " join SENDER s on s.sender_id = mv.sender_sender_id "
+                  + " join SENDER_METRICS sm on sm.sender_metrics_id = mv.sender_metrics_sender_metrics_id "
+                  + " join sender s on s.sender_id = sm.sender_sender_id "
                   + " where s.name = :providerIdentifier "
                   + " and trunc(mv.input_time) >= :rangeStart "
                   + " and trunc(mv.input_time) <= :rangeEnd ";
 
+
+
+  private static final String byUsername = " and sm.username = :userId";
   private static final String getFacilityMessageHistoryMessageTextFilter =
       " and INSTR(UPPER(mv.message), UPPER(:messageSearchString)) > 1 ";
 
@@ -277,6 +282,11 @@ public class MessageHistoryJdbcRepository {
       getFacilityMessageHistoryBEGIN
           + getFacilityMessageHistoryFINISH;
 
+  private static final String getFacilityMessageHistoryByUsername =
+          getFacilityMessageHistoryBEGIN
+                  + byUsername
+                  + getFacilityMessageHistoryFINISH;
+
   @Cacheable("facilityHistory")
   public List<MessageCounts> getFacilityMessageHistory(final String providerIdentifier, int year) {
 
@@ -292,6 +302,33 @@ public class MessageHistoryJdbcRepository {
     ;
 
     String query = getFacilityMessageHistory;
+    LOGGER.debug("JDBC Query: " + query);
+
+    try {
+      fmcList.addAll(jdbcTemplate.query(query, namedParameters, getHistoryRowMapper()));
+    } catch (EmptyResultDataAccessException er) {
+      LOGGER.warn("message history not found for interface id[" + providerIdentifier + "]");
+    }
+
+    return fmcList;
+  }
+
+
+  public List<MessageCounts> getFacilityMessageHistoryByUsername(final String providerIdentifier, int year, String username) {
+
+    Date rangeStart = getRangeStartForYear(year);
+    Date rangeEnd = getRangeEndForYear(year);
+
+    SqlParameterSource namedParameters = new MapSqlParameterSource()
+            .addValue("rangeEnd", rangeEnd)
+            .addValue("userId", username)
+            .addValue("rangeStart", rangeStart)
+            .addValue("providerIdentifier", providerIdentifier);
+
+    List<MessageCounts> fmcList = new ArrayList<MessageCounts>();
+    ;
+
+    String query = getFacilityMessageHistoryByUsername;
     LOGGER.debug("JDBC Query: " + query);
 
     try {

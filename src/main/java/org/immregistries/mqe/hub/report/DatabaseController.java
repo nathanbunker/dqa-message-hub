@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
@@ -55,11 +56,12 @@ public class DatabaseController {
 
   @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/{dateStart}/{dateEnd}")
   public CodeCollectionMap getCodesFor(@PathVariable("providerKey") String providerKey,
-      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
-      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+                                       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+                                       @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
+                                       AuthenticationToken token) {
     logger.info("DatabaseController getCodesFor sender:" + providerKey + " dateStart: " + dateStart
         + " dateEnd: " + dateEnd);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
     return codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
   }
 
@@ -68,10 +70,11 @@ public class DatabaseController {
   public VaccinationCollectionMap getVaccinationsFor(
       @PathVariable("providerKey") String providerKey,
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
-      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
+      AuthenticationToken token) {
     logger.info("DatabaseController getVaccinationsFor sender:" + providerKey + " dateStart: "
         + dateStart + " dateEnd: " + dateEnd);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     // map them to age groups.
@@ -153,10 +156,11 @@ public class DatabaseController {
   public VaccinationExpectedCollectionMap getVaccinationsExpectedFor(
       @PathVariable("providerKey") String providerKey,
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
-      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
+      AuthenticationToken token) {
     logger.info("DatabaseController getVaccinationsExpectedFor sender:" + providerKey
         + " dateStart: " + dateStart + " dateEnd: " + dateEnd);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     // map them to age groups.
@@ -196,10 +200,11 @@ public class DatabaseController {
   public VaccinationExpectedCollectionMap getVaccinationsNoExpectedFor(
       @PathVariable("providerKey") String providerKey,
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
-      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd) {
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
+      AuthenticationToken token) {
     logger.info("DatabaseController getVaccinationsNotExpectedFor sender:" + providerKey
         + " dateStart: " + dateStart + " dateEnd: " + dateEnd);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
     VaccineCollection senderVaccines = allDaysMetrics.getVaccinations();
     senderVaccines = senderVaccines.reduce();
     // map them to age groups.

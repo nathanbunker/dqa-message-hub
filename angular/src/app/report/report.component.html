@@ -289,12 +289,12 @@
         </tr>
       </table>
     </div>
-    <div style="width: 100%; padding: 20px;">
+    <!-- <div style="width: 100%; padding: 20px;">
       <table style="border-spacing:0 10px; border-collapse:separate;">
         <tr>
           <td><h3 style="color: gray;" >Site Identifiers</h3></td>
         </tr>
-        <tr *ngFor="let identifier of report.siteIdentifiers">
+        <tr *ngFor="let identifier of report.siteIdentifiers.siteIdentifiers">
           <td style="text-align: end;"><strong>{{identifier.location}}</strong></td>
           <td style="padding: 10px;">
             <ng-container *ngFor="let value of identifier.values">
@@ -303,7 +303,7 @@
           </td>
         </tr>
       </table>
-    </div>
+    </div> -->
     <h3 style="color: gray;" >Common Message</h3>
     <app-hl7-view  *ngIf="report.commonMessage" [hl7Text]="report.commonMessage" ></app-hl7-view>
   </div>

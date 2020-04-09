@@ -1,5 +1,7 @@
 package org.immregistries.mqe.hub.report;
 
+import org.immregistries.mqe.hub.authentication.model.UserCredentials;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,10 +30,12 @@ public class SenderMetrics {
   @Column(name = "SENDER_METRICS_ID")
   private long id;
 
-
   @NotNull
   @ManyToOne(fetch= FetchType.EAGER, cascade = CascadeType.ALL)
   private Sender sender;
+
+  @NotNull
+  private String username;
 
   @javax.persistence.Temporal(TemporalType.DATE)
   private Date metricsDate;
@@ -105,6 +109,14 @@ public class SenderMetrics {
 
   public void setDetectionMetrics(List<SenderDetectionMetrics> detectionMetrics) {
     this.detectionMetrics = detectionMetrics;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public List<VaccineCount> getVaccineCounts() {

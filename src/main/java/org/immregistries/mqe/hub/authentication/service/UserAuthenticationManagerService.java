@@ -28,21 +28,24 @@ public class UserAuthenticationManagerService implements AuthenticationManager {
         }
         AuthenticationToken token = (AuthenticationToken) authentication;
 
-        UserCredentials credentials = userJpaRepository.findByUsernameAndFacilityId(token.getPrincipal().getUsername(), token.getPrincipal().getFacilityId());
+        UserCredentials credentials = userJpaRepository.findByUsername(token.getPrincipal().getUsername());
         if(credentials != null) {
             if(passwordEncoder.matches(token.getCredentials(), credentials.getPassword())) {
                 token.setAuthenticated(true);
+                token.setUser(credentials);
                 token.eraseCredentials();
-                return token;
+                return this.getAuthToken(credentials);
             } else {
                 throw new BadCredentialsException("Invalid Password");
             }
         } else {
             String encryptedPassword = passwordEncoder.encode(token.getCredentials());
-            userJpaRepository.save(new UserCredentials(token.getPrincipal().getUsername(), token.getPrincipal().getFacilityId(), encryptedPassword));
-            token.setAuthenticated(true);
-            token.eraseCredentials();
-            return token;
+            UserCredentials createdUser = userJpaRepository.save(new UserCredentials(token.getPrincipal().getUsername(), token.getPrincipal().getFacilityId(), encryptedPassword));
+            return this.getAuthToken(createdUser);
         }
+    }
+
+    private AuthenticationToken getAuthToken(UserCredentials credentials) {
+        return new AuthenticationToken(credentials.getUsername(), credentials.getFacilityId());
     }
 }

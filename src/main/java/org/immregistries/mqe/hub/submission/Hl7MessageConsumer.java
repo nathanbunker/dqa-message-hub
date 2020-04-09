@@ -12,8 +12,8 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
-import org.immregistries.mqe.hub.report.Sender;
 import org.immregistries.mqe.hub.report.SenderJpaRepository;
+import org.immregistries.mqe.hub.report.SenderMetrics;
 import org.immregistries.mqe.hub.report.SenderMetricsService;
 import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
@@ -164,7 +164,7 @@ public class Hl7MessageConsumer {
   }
 
 
-  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission) {
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission, String username) {
     //  StopWatch stopWatch = new StopWatch();
     //  stopWatch.start();
     Hl7MessageHubResponse response = this.processMessage(messageSubmission);
@@ -200,13 +200,13 @@ public class Hl7MessageConsumer {
     Date sentDate = new Date();
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
-    this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
+    SenderMetrics sm = this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate, username);
     //  stopWatch.stop();
     //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
     MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(),
-        response.getAck(), response.getSender(), sentDate, messageDate, response);
+        response.getAck(), sm, sentDate, messageDate, response);
     //  stopWatch.stop();
     //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
 
@@ -250,19 +250,19 @@ public class Hl7MessageConsumer {
   @Autowired
   SenderJpaRepository senderRepo;
 
-  private MessageMetadata saveMessageForSender(String message, String ack, String sender,
+  private MessageMetadata saveMessageForSender(String message, String ack, SenderMetrics senderMetrics,
       Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
     MessageMetadata mm = new MessageMetadata();
 
 
-    Sender s = senderRepo.findByName(sender);
-
-    if (s == null) {
-      s = new Sender();
-      s.setName(sender);
-      s.setCreatedDate(new Date());
-      senderRepo.save(s);
-    }
+//    Sender s = senderRepo.findByName(sender);
+//
+//    if (s == null) {
+//      s = new Sender();
+//      s.setName(sender);
+//      s.setCreatedDate(new Date());
+//      senderRepo.save(s);
+//    }
 
     //for demo day, let's make a random date in the last month.
     mm.setInputTime(sentDate);
@@ -270,7 +270,7 @@ public class Hl7MessageConsumer {
     message = message.replaceAll("\\n\\r", "\\r");
     mm.setMessage(message);
     mm.setResponse(ack);
-    mm.setSender(s);
+    mm.setSenderMetrics(senderMetrics);
 
     for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
       for (ValidationReport vr : rr.getValidationDetections()) {
@@ -330,11 +330,11 @@ public class Hl7MessageConsumer {
     return mm;
   }
 
-  private MqeMessageMetrics saveMetricsFromValidationResults(String sender,
-      MqeMessageServiceResponse validationResults, Date metricsDate) {
+  private SenderMetrics saveMetricsFromValidationResults(String sender,
+      MqeMessageServiceResponse validationResults, Date metricsDate, String username) {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
-    metricsSvc.addToSenderMetrics(sender, metricsDate, metrics);
-    return metrics;
+    SenderMetrics sm = metricsSvc.addToSenderMetrics(sender, metricsDate, metrics, username);
+    return sm;
   }
 
   private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults,

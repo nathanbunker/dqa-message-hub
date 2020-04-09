@@ -11,6 +11,7 @@ import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hl7util.parser.model.HL7MessagePart;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReader;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReaderNIST;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.settings.DetectionsSettings;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
@@ -56,13 +57,14 @@ public class MessageRestController {
       @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
       @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
       @PathVariable("page") int pageNumber, @PathVariable("messages") int itemsCount,
+      AuthenticationToken token,
       String filters) {
 
     LOGGER.info("jsonMessagesGetter - calling for messages.  ");
 
     ViewerFilter vf = new ViewerFilter(filters);
 
-    MessageListContainer container = messageRetreiver.getMessages(providerKey, dateStart, dateEnd, vf, pageNumber, itemsCount);
+    MessageListContainer container = messageRetreiver.getMessages(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, vf, pageNumber, itemsCount);
 
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
@@ -85,7 +87,7 @@ public class MessageRestController {
     MessageDetailItem mdi = new MessageDetailItem();
     mdi.setVxuParts(vxuLocs);
     mdi.setMessageMetaData(mli);
-    mdi.setProviderKey(mq.getSender().getName());
+    mdi.setProviderKey(mq.getSenderMetrics().getSender().getName());
     for (MessageCode mc : mq.getCodes()) {
       CodeDetail cd = new CodeDetail();
       cd.setCodeCount(mc.getCodeCount());
@@ -105,7 +107,7 @@ public class MessageRestController {
         dd.setDescription(d.getDisplayText());
         dd.setName(d.toString());
         dd.setSeverity(d.getSeverity().getCode());
-        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getSender().getName(), mdt.getDetectionId());
+        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getSenderMetrics().getSender().getName(), mdt.getDetectionId());
         if (severityLevelOverride != null) {
         	dd.setSeverity(severityLevelOverride.getCode());
         }

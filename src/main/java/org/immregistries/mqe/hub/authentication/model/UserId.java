@@ -5,10 +5,8 @@ import java.util.Objects;
 
 @MappedSuperclass
 public class UserId {
+
     @Id
-    @SequenceGenerator(name = "USER_ID_GENERATOR", sequenceName = "USER_ID_SEQ")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "USER_ID_GENERATOR")
-    protected Long id;
     @Column(name = "username", updatable = false, nullable = false)
     protected String username;
     @Column(name = "facilityId", updatable = false, nullable = false)
@@ -17,8 +15,9 @@ public class UserId {
     public UserId() {
     }
 
-    public UserId(String user, String facilityId) {
-        this.username = user;
+
+    public UserId(String username, String facilityId) {
+        this.username = username;
         this.facilityId = facilityId;
     }
 
@@ -45,14 +44,6 @@ public class UserId {
         UserId userId = (UserId) o;
         return username.equals(userId.username) &&
                 facilityId.equals(userId.facilityId);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     @Override
