@@ -3,9 +3,9 @@ package org.immregistries.mqe.hub.report;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SiteIdentifiers {
+public class FacilityIdentifiers {
   private String location;
-  private List<SiteIdentifierCount> siteIdentifiers = new ArrayList<>();
+  private List<FacilityIdentifierCount> identifiers = new ArrayList<>();
 
   public String getLocation() {
     return location;
@@ -15,16 +15,16 @@ public class SiteIdentifiers {
     this.location = location;
   }
 
-  public List<SiteIdentifierCount> getSiteIdentifiers() {
-    return siteIdentifiers;
+  public List<FacilityIdentifierCount> getIdentifiers() {
+    return identifiers;
   }
 
-  public void setSiteIdentifiers(
-      List<SiteIdentifierCount> siteIdentifiers) {
-    this.siteIdentifiers = siteIdentifiers;
+  public void setIdentifiers(
+      List<FacilityIdentifierCount> identifiers) {
+    this.identifiers = identifiers;
   }
 
-  public class SiteIdentifierCount {
+  public class FacilityIdentifierCount {
     private String value;
     private int count;
 

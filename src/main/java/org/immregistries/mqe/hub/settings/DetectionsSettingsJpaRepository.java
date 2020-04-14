@@ -4,8 +4,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DetectionsSettingsJpaRepository extends JpaRepository<DetectionsSettings, Long> {
-
-  public List<DetectionsSettings> findByDetectionGroupName(String groupName);
-  
-  public DetectionsSettings findByDetectionGroupNameAndMqeCode(String groupId, String MqeCode);
+  public List<DetectionsSettings> findByDetectionSettingsGroupName(String groupName);
+  public DetectionsSettings findByDetectionSettingsGroupNameAndMqeCode(String groupId, String MqeCode);
 }

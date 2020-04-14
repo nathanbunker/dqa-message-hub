@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -17,8 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
-
-import org.immregistries.mqe.hub.report.SenderMetrics;
+import org.immregistries.mqe.hub.report.FacilityMessageCounts;
 
 @Entity
 @Table(name = "MESSAGE_METADATA")
@@ -46,7 +46,8 @@ public class MessageMetadata {
 
   @NotNull
   @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
-  private SenderMetrics senderMetrics;
+  @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
+  private FacilityMessageCounts facilityMessageCounts;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageDetection> detections = new ArrayList<>();
@@ -114,12 +115,12 @@ public List<MessageDetection> getDetections() {
     this.message = message;
   }
 
-  public SenderMetrics getSenderMetrics() {
-    return senderMetrics;
+  public FacilityMessageCounts getFacilityMessageCounts() {
+    return facilityMessageCounts;
   }
 
-  public void setSenderMetrics(SenderMetrics senderMetrics) {
-    this.senderMetrics = senderMetrics;
+  public void setFacilityMessageCounts(FacilityMessageCounts fmc) {
+    this.facilityMessageCounts = fmc;
   }
 
   public long getId() {

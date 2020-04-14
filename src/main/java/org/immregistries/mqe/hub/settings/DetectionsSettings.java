@@ -5,12 +5,12 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import org.immregistries.mqe.hub.report.SeverityGroup;
-//, uniqueConstraints = @UniqueConstraint(name = "UNIQUE_DETECTIONS_SETTINGS", columnNames = {"mqeCode", "detectionGroup"})
+import org.immregistries.mqe.hub.report.DetectionSettingsGroup;
+//, uniqueConstraints = @UniqueConstraint(name = "UNIQUE_DETECTIONS_SETTINGS", columnNames = {"mqeCode", "settingsGroup"})
 @Entity
 @Table(name = "DETECTIONS_SETTINGS")
 public class DetectionsSettings {
@@ -21,24 +21,25 @@ public class DetectionsSettings {
 	private long id;
 
 	@OneToOne
-	private SeverityGroup detectionGroup;
+	@JoinColumn(name="DETECTION_SETTINGS_GROUP_ID")
+	private DetectionSettingsGroup detectionSettingsGroup;
 	private String mqeCode;
 	private String severity;
 	
 	public DetectionsSettings() {}
 	
-	public DetectionsSettings(SeverityGroup sg, String mqeCode, String severity) {
-		this.detectionGroup = sg;
+	public DetectionsSettings(DetectionSettingsGroup sg, String mqeCode, String severity) {
+		this.detectionSettingsGroup = sg;
 		this.mqeCode = mqeCode;
 		this.severity = severity;
 	}
 
-	public SeverityGroup getDetectionGroup() {
-		return detectionGroup;
+	public DetectionSettingsGroup getDetectionSettingsGroup() {
+		return detectionSettingsGroup;
 	}
 
-	public void setDetectionGroup(SeverityGroup detectionGroup) {
-		this.detectionGroup = detectionGroup;
+	public void setDetectionSettingsGroup(DetectionSettingsGroup detectionSettingsGroup) {
+		this.detectionSettingsGroup = detectionSettingsGroup;
 	}
 
 	public long getId() {
@@ -69,7 +70,7 @@ public class DetectionsSettings {
 	public String toString() {
 		return "DetectionsSettings{" +
 				"id=" + id +
-				", detectionGroup=" + detectionGroup +
+				", settingsGroup=" + detectionSettingsGroup +
 				", mqeCode='" + mqeCode + '\'' +
 				", severity='" + severity + '\'' +
 				'}';

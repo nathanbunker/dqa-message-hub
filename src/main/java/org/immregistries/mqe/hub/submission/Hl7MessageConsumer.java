@@ -12,9 +12,10 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
-import org.immregistries.mqe.hub.report.SenderJpaRepository;
-import org.immregistries.mqe.hub.report.SenderMetrics;
-import org.immregistries.mqe.hub.report.SenderMetricsService;
+import org.immregistries.mqe.hub.report.Facility;
+import org.immregistries.mqe.hub.report.FacilityJpaRepository;
+import org.immregistries.mqe.hub.report.FacilityMessageCounts;
+import org.immregistries.mqe.hub.report.FacilityMessageCountsService;
 import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadata;
@@ -54,7 +55,7 @@ public class Hl7MessageConsumer {
   private MqeMessageService validator = MqeMessageService.INSTANCE;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
-  private SenderMetricsService metricsSvc;
+  private FacilityMessageCountsService metricsSvc;
   @Autowired
   private MessageMetadataJpaRepository metaRepo;
   @Autowired
@@ -72,9 +73,9 @@ public class Hl7MessageConsumer {
 
     //    StopWatch stopWatch = new StopWatch();
     //    stopWatch.start();
-    String sender = validator.getSendingFacility(message);
-    if (StringUtils.isBlank(sender)) {
-      sender = "Unspecified";
+    String facility = validator.getSendingFacility(message);
+    if (StringUtils.isBlank(facility)) {
+      facility = "Unspecified";
     }
     //    stopWatch = new StopWatch();
     //    stopWatch.start();
@@ -84,10 +85,10 @@ public class Hl7MessageConsumer {
 
     //    stopWatch = new StopWatch();
     //    stopWatch.start();
-    HashMap<String, SeverityLevel> so = severityOverrides.get(sender);
+    HashMap<String, SeverityLevel> so = severityOverrides.get(facility);
     if (so == null) {
-      so = retrieveDetectionOverrides(sender);
-      severityOverrides.put(sender, so);
+      so = retrieveDetectionOverrides(facility);
+      severityOverrides.put(facility, so);
     }
     //    new HashMap<String, String>();
     //    stopWatch.stop();
@@ -103,7 +104,7 @@ public class Hl7MessageConsumer {
 
     //    stopWatch = new StopWatch();
     //    stopWatch.start();
-    // apply sender level detection overrides
+    // apply facility level detection overrides
     applySenderDetectionOverrides(so, validationResults);
     //    stopWatch.stop();
     //    logger.warn("applySenderDetectionOverrides: " + stopWatch.getTotalTimeMillis());
@@ -117,7 +118,7 @@ public class Hl7MessageConsumer {
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
     response.setMqeResponse(validationResults);
-    response.setSender(sender);
+    response.setSender(facility);
 
     return response;
   }
@@ -135,13 +136,13 @@ public class Hl7MessageConsumer {
     }
   }
 
-  // Possibly use sender facility to gather sender's detection config
+  // Possibly use facility facility to gather facility's detection config
   @Cacheable("detectionOverrides")
-  public HashMap<String, SeverityLevel> retrieveDetectionOverrides(String sender) {
+  public HashMap<String, SeverityLevel> retrieveDetectionOverrides(String facility) {
     HashMap<String, SeverityLevel> detectionsOverride = new HashMap<>();
 
-    if (sender != null) {
-      List<DetectionsSettings> settings = detectionsSettingsRepo.findByDetectionGroupName("sender");
+    if (facility != null) {
+      List<DetectionsSettings> settings = detectionsSettingsRepo.findByDetectionSettingsGroupName("facility");
       for (DetectionsSettings ds : settings) {
         String code = ds.getMqeCode();
         String severity = ds.getSeverity();
@@ -156,7 +157,7 @@ public class Hl7MessageConsumer {
   private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
     SeverityLevel severityLevel = null;
 
-    DetectionsSettings ds = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp, mqeCode);
+    DetectionsSettings ds = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(detectionProp, mqeCode);
     if (ds != null) {
       severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
     }
@@ -167,67 +168,51 @@ public class Hl7MessageConsumer {
   public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission, String username) {
     //  StopWatch stopWatch = new StopWatch();
     //  stopWatch.start();
-    Hl7MessageHubResponse response = this.processMessage(messageSubmission);
+    Hl7MessageHubResponse messageHubResponse = this.processMessage(messageSubmission);
     //  stopWatch.stop();
     //  logger.warn("processMessage: " + stopWatch.getTotalTimeMillis());
 
+    String facility = messageSubmission.getFacilityCode();
+    if (StringUtils.isBlank(facility)) {
+      facility = messageHubResponse.getSender();
+    }
 
     if (iisGatewayService.isIisgatewayEnable()) {
-      if (messageSubmission != null && messageSubmission.getUser() != null
-          && !messageSubmission.getUser().equals("")) {
-        if (!iisGatewayService.isIisgatewayFilterErrorsEnable()
-            || hasNoErrors(response.getMqeResponse().getValidationResults())) {
-          //  stopWatch = new StopWatch();
-          //  stopWatch.start();
-          String responseMessageFromIIS = submitMessageToIIS(messageSubmission);
-          if (responseMessageFromIIS != null) {
-            if (iisGatewayService.isIisgatewayReturnAckIisEnable()) {
-              if (!iisGatewayService.isIisgatewayReturnAckMqeEnable()) {
-                response.setAck(responseMessageFromIIS);
-              } else {
-                // TODO read the ACK, pull out requirements and add them to the items that were detected so they will show in the ACK
-              }
-            }
-          }
-          //  stopWatch.stop();
-          //  logger.warn("submitMessageToIIS: " + stopWatch.getTotalTimeMillis());
-        }
+      String iisGatewayAck =
+        iisGatewayService.submit(messageSubmission, this.hasErrors(messageHubResponse.getMqeResponse().getValidationResults()));
+      if (!StringUtils.isBlank(iisGatewayAck)) {
+        messageHubResponse.setAck(iisGatewayAck);
       }
     }
 
-    MqeMessageServiceResponse dqr = response.getMqeResponse();
-    Date messageDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
+    MqeMessageServiceResponse mqeResponse = messageHubResponse.getMqeResponse();
+    Date messageDate = mqeResponse.getMessageObjects().getMessageHeader().getMessageDate();
     Date sentDate = new Date();
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
-    SenderMetrics sm = this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate, username);
+    FacilityMessageCounts fmc = this.saveMetricsFromValidationResults(facility, mqeResponse, sentDate, username);
     //  stopWatch.stop();
     //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
     //  stopWatch = new StopWatch();
     //  stopWatch.start();
-    MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(),
-        response.getAck(), sm, sentDate, messageDate, response);
+    MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(), messageHubResponse.getAck(), messageDate, messageHubResponse, fmc);
     //  stopWatch.stop();
     //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
 
-    return response;
+    return messageHubResponse;
   }
 
-  private static boolean hasNoErrors(List<ValidationRuleResult> validationRuleResultList) {
+  private boolean hasErrors(List<ValidationRuleResult> validationRuleResultList) {
     for (ValidationRuleResult validationRuleResult : validationRuleResultList) {
       for (Reportable reportable : validationRuleResult.getValidationDetections()) {
         if (reportable.getSeverity() == SeverityLevel.ERROR) {
-          return false;
+          return true;
         }
       }
     }
-    return true;
+    return false;
   }
 
-
-  private String submitMessageToIIS(Hl7MessageSubmission messageSubmission) {
-    return iisGatewayService.sendVXU(messageSubmission);
-  }
 
   //  int daysSpread = 60;
   //  Date getRandomDate() {
@@ -248,29 +233,19 @@ public class Hl7MessageConsumer {
   //  }
 
   @Autowired
-  SenderJpaRepository senderRepo;
+  FacilityJpaRepository facilityRepo;
 
-  private MessageMetadata saveMessageForSender(String message, String ack, SenderMetrics senderMetrics,
-      Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
+//  private MessageMetadata saveMessageForSender(String message, String ack, String facility, Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
+  private MessageMetadata saveMessageForSender(String message, String ack, Date messageDate, Hl7MessageHubResponse response, FacilityMessageCounts fmc) {
     MessageMetadata mm = new MessageMetadata();
 
 
-//    Sender s = senderRepo.findByName(sender);
-//
-//    if (s == null) {
-//      s = new Sender();
-//      s.setName(sender);
-//      s.setCreatedDate(new Date());
-//      senderRepo.save(s);
-//    }
-
-    //for demo day, let's make a random date in the last month.
-    mm.setInputTime(sentDate);
+    mm.setInputTime(fmc.getUploadDate());
     mm.setMessageTime(messageDate);
     message = message.replaceAll("\\n\\r", "\\r");
     mm.setMessage(message);
     mm.setResponse(ack);
-    mm.setSenderMetrics(senderMetrics);
+    mm.setFacilityMessageCounts(fmc);
 
     for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
       for (ValidationReport vr : rr.getValidationDetections()) {
@@ -330,15 +305,12 @@ public class Hl7MessageConsumer {
     return mm;
   }
 
-  private SenderMetrics saveMetricsFromValidationResults(String sender,
-      MqeMessageServiceResponse validationResults, Date metricsDate, String username) {
+  private FacilityMessageCounts saveMetricsFromValidationResults(String facility, MqeMessageServiceResponse validationResults, Date metricsDate, String username) {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
-    SenderMetrics sm = metricsSvc.addToSenderMetrics(sender, metricsDate, metrics, username);
-    return sm;
+    return metricsSvc.addToFacilityMessageCounts(facility, metricsDate, username, metrics);
   }
 
-  private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults,
-      List<Reportable> nistReportablesList) {
+  private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults, List<Reportable> nistReportablesList) {
 
     List<ValidationRuleResult> resultList = validationResults.getValidationResults();
     List<Reportable> reportables = new ArrayList<>(nistReportablesList);

@@ -1,6 +1,6 @@
 package org.immregistries.mqe.hub.report;
 
-public class ProviderSummaryReport {
+public class FacilitySummaryReport {
     private MessagesSummary messages = new MessagesSummary();
     private PatientSummary patients = new PatientSummary();
     private VaccinationSummary vaccinations = new VaccinationSummary();

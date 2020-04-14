@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CodeCountJpaRepository extends JpaRepository<CodeCount, Long> {
 
-  List<CodeCount> findBySenderMetrics(SenderMetrics sm);
+  List<CodeCount> findByFacilityMessageCounts(FacilityMessageCounts sm);
 }

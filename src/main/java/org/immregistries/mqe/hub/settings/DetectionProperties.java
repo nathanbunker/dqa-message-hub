@@ -9,8 +9,8 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashSet;
 import javax.annotation.PostConstruct;
-import org.immregistries.mqe.hub.report.SeverityGroup;
-import org.immregistries.mqe.hub.report.SeverityGroupJpaRepository;
+import org.immregistries.mqe.hub.report.DetectionSettingsGroup;
+import org.immregistries.mqe.hub.report.SettingsGroupJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class DetectionProperties {
   private final Logger LOGGER = LoggerFactory.getLogger(DetectionProperties.class);
 
   @Autowired
-  SeverityGroupJpaRepository sgRepo;
+  SettingsGroupJpaRepository sgRepo;
 
   private final String propertyFileName = "detections.properties";
   public final String GROUP_PROPERTY = "GROUP_ID";
@@ -54,9 +54,9 @@ public class DetectionProperties {
 				  if (GROUP_PROPERTY.contentEquals(propName)) {
 					  currentGroup = propVal;
 				  } else {
-            SeverityGroup sg = sgRepo.findByName(currentGroup);
+            DetectionSettingsGroup sg = sgRepo.findByName(currentGroup);
             if (sg==null) {
-              sg = new SeverityGroup();
+              sg = new DetectionSettingsGroup();
               sg.setName(currentGroup);
               sg.setCreatedDate(new Date());
               sgRepo.save(sg);

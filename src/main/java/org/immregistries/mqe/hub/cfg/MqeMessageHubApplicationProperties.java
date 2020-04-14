@@ -146,7 +146,7 @@ public class MqeMessageHubApplicationProperties {
   private SeverityLevel getDefaultSeverityByCode(DetectionProperties detectionProp, String mqeCode) {
 	  SeverityLevel severityLevel = null;
 	  
-	  DetectionsSettings ds = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
+	  DetectionsSettings ds = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
 	  if (ds != null) {
 		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
 	  }

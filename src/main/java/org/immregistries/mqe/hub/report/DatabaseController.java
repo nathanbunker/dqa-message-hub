@@ -7,11 +7,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.immregistries.codebase.client.generated.Code;
 import org.immregistries.codebase.client.reference.CodesetType;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
@@ -21,11 +18,8 @@ import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportGroup;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportStatus;
 import org.immregistries.mqe.validator.engine.codes.CodeRepository;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
-import org.immregistries.mqe.validator.report.codes.CodeCollection;
-import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.validator.report.codes.VaccineBucket;
 import org.immregistries.mqe.validator.report.codes.VaccineCollection;
-import org.immregistries.mqe.vxu.VxuField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,16 +34,16 @@ public class DatabaseController {
   private static final Log logger = LogFactory.getLog(DatabaseController.class);
 
   @Autowired
-  private SenderMetricsService metricsSvc;
+  private FacilityMessageCountsService metricsSvc;
   @Autowired
-  private SenderMetricsJpaRepository repo;
+  private FacilityMessageCountsJpaRepository repo;
   @Autowired
   private CodeCollectionService codeCollectionService;
 
   private final CodeRepository codeRepo = CodeRepository.INSTANCE;
 
-  @RequestMapping(value = "/senderMetrics")
-  public List<SenderMetrics> getAllSM() throws Exception {
+  @RequestMapping(value = "/facilityMessageCounts")
+  public List<FacilityMessageCounts> getAllSM() throws Exception {
     logger.info("DatabaseController exampleReport demo!");
     return repo.findAll();
   }

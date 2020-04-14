@@ -13,13 +13,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "SEVERITY_GROUP", indexes = { @Index(name = "IDX_SEVERITY_GROUP_X1", columnList = "name") })
-public class SeverityGroup {
+@Table(name = "FACILITY", indexes = { @Index(name = "IDX_FACILITY_X1", columnList = "name") })
+public class Facility {
 
   @Id
-  @SequenceGenerator(name = "SEVERITY_GROUP_GENERATOR", sequenceName = "SEVERITY_GROUP_SEQ")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEVERITY_GROUP_GENERATOR")
-  @Column(name = "SEVERITY_GROUP_ID")
+  @SequenceGenerator(name = "FACILITY_GENERATOR", sequenceName = "FACILITY_SEQ")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FACILITY_GENERATOR")
+  @Column(name = "FACILITY_ID")
   private long id;
 
   private String name;
@@ -53,7 +53,7 @@ public class SeverityGroup {
 
   @Override
   public String toString() {
-    return "SEVERITY_GROUP{" +
+    return "Sender{" +
         "id=" + id +
         ", name='" + name + '\'' +
         ", createdDate=" + createdDate +

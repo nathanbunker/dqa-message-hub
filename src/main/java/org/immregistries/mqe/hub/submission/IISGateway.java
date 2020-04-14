@@ -2,6 +2,7 @@ package org.immregistries.mqe.hub.submission;
 
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
@@ -155,5 +156,25 @@ public class IISGateway {
   }
 
 
+  public String submit(Hl7MessageSubmission messageSubmission, boolean hasErrors) {
+    if (messageSubmission != null && !StringUtils.isBlank(messageSubmission.getUser())) {
+      if (!this.isIisgatewayFilterErrorsEnable() || !hasErrors) {
+        //  stopWatch = new StopWatch();
+        //  stopWatch.start();
+        String responseMessageFromIIS = this.sendVXU(messageSubmission);
+        /* thinking about putting this elsewhere, and just returning the iis gateway ack. */
+        if (responseMessageFromIIS != null) {
+          if (this.isIisgatewayReturnAckIisEnable()) {
+            if (!this.isIisgatewayReturnAckMqeEnable()) {
+              return responseMessageFromIIS;
+            } else {
+              // TODO read the ACK, pull out requirements and add them to the items that were detected so they will show in the ACK
+            }
+          }
+        }
+      }
+    }
 
+    return "";
+  }
 }

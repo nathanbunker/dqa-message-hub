@@ -53,7 +53,7 @@ public class ReportController {
   private Hl7MessageConsumer msgr;
 
   @Autowired
-  private SenderMetricsService metricsSvc;
+  private FacilityMessageCountsService metricsSvc;
   
   @Autowired
   private DetectionsSettingsJpaRepository detectionsSettingsRepo;
@@ -93,10 +93,11 @@ public class ReportController {
 
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
   public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
-    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, token.getPrincipal().getUsername());
-    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, token.getPrincipal().getUsername());
-    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, token.getPrincipal().getUsername());
+    final String username = token.getPrincipal().getUsername();
+    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
+    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, username);
+    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, username);
     CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
     ProviderReport providerReport = new ProviderReport();
     providerReport.setProvider(providerKey);
@@ -108,7 +109,7 @@ public class ReportController {
     providerReport.setNumberOfErrors(providerReport.getErrors().size());
 
     /* new data */
-    ProviderSummaryReport psr = providerReport.getCountSummary();
+    FacilitySummaryReport psr = providerReport.getCountSummary();
     psr.getMessages().setTotal(numberOfMessages);
 
     Integer patientCount = allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT);
@@ -129,8 +130,6 @@ public class ReportController {
     }
   psr.getPatients().setAdults(adultCount);
     psr.getPatients().setChildren(childCount);
-
-
 
     return  providerReport;
   }
@@ -170,7 +169,7 @@ public class ReportController {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, username);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
-      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(providerKey, score.getMqeCode());
+      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(providerKey, score.getMqeCode());
       if (detectionSetting != null) {
         SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
         score.setSeverity(severity);

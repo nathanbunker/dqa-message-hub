@@ -14,12 +14,12 @@ public interface MessagesViewJpaRepository extends JpaRepository<MessageMetadata
 	 * Query part to get the entries based on a date and a facility.
 	 */
 
-	static String BASE = " select mm from MessageMetadata as mm where mm.senderMetrics.username = :userId and mm.senderMetrics.sender.name = :providerKey and trunc(inputTime) >= trunc(:forDate) and trunc(inputTime) <= trunc(:forDateEnd) ";
-	static String TEXT_FILTER =  " and LOCATE(UPPER(:searchText), UPPER(mm.message)) > 0 ";
-	static String STATISTIC_FILTER = " and exists (select 1 from MessageDetection d where d.messageMetadata.id = mm.id and d.detectionId = :detectionId)";
-	static String CODE_FILTER = " and exists (select 1 from MessageCode c where c.messageMetadata.id = mm.id and c.codeValue = :codeValue and c.codeType = :codeType)";
-	static String CVX_FILTER = " and exists (select 1 from MessageVaccine v where v.messageMetadata.id = mm.id and v.vaccineCvx IN (:cvxList) and v.age >= :ageLow and v.age < :ageHigh)";
-	static String ONE = " limit 1 ";
+	String BASE = " select mm from MessageMetadata as mm where mm.facilityMessageCounts.username = :userId and mm.facilityMessageCounts.facility.name = :providerKey and trunc(inputTime) >= trunc(:forDate) and trunc(inputTime) <= trunc(:forDateEnd) ";
+	String TEXT_FILTER =  " and LOCATE(UPPER(:searchText), UPPER(mm.message)) > 0 ";
+	String STATISTIC_FILTER = " and exists (select 1 from MessageDetection d where d.messageMetadata.id = mm.id and d.detectionId = :detectionId)";
+	String CODE_FILTER = " and exists (select 1 from MessageCode c where c.messageMetadata.id = mm.id and c.codeValue = :codeValue and c.codeType = :codeType)";
+	String CVX_FILTER = " and exists (select 1 from MessageVaccine v where v.messageMetadata.id = mm.id and v.vaccineCvx IN (:cvxList) and v.age >= :ageLow and v.age < :ageHigh)";
+	String ONE = " limit 1 ";
 
 	@Query(value=BASE)
 	Page<MessageMetadata> findByProviderAndDate(@Param("userId") String userId, @Param("providerKey") String providerKey, @Param("forDate") Date dateStart, @Param("forDateEnd") Date dateEnd, Pageable pager);

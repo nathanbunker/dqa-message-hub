@@ -123,7 +123,7 @@ public class MessageRetrieverService {
         Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
         SeverityLevel sl = dt.getSeverity();
 
-    	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(mv.getSenderMetrics().getSender().getName(), d.getDetectionId());
+    	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(mv.getFacilityMessageCounts().getFacility().getName(), d.getDetectionId());
 		if (setting != null) {
 			sl = SeverityLevel.findByLabel(setting.getSeverity());
 		}

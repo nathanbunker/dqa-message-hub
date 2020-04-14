@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import javax.persistence.EntityManager;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.test.MessageGenerator;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.FileResponse;
@@ -91,12 +92,14 @@ public class MessageInputController {
 
   @Transactional
   @RequestMapping(value = "form-standard", method = RequestMethod.POST)
-  public String urlEncodedHttpFormPost(String MESSAGEDATA, AuthenticationToken token) throws Exception {
-    return this.urlEncodedHttpFormPostInner(MESSAGEDATA, token.getPrincipal().getUsername(), token.getCredentials(), token.getPrincipal().getFacilityId());
+  public String urlEncodedHttpFormPost(String MESSAGEDATA, String facility, AuthenticationToken token) throws Exception {
+    if (StringUtils.isBlank(facility)) {
+      facility = token.getPrincipal().getFacilityId();
+    }
+    return this.urlEncodedHttpFormPostInner(MESSAGEDATA, token.getPrincipal().getUsername(), token.getCredentials(), facility);
   }
 
-  public String urlEncodedHttpFormPostInner(String MESSAGEDATA, String USERID, String PASSWORD,
-      String FACILITYID) throws Exception {
+  public String urlEncodedHttpFormPostInner(String MESSAGEDATA, String USERID, String PASSWORD, String FACILITYID) throws Exception {
 
     String response = "hl7 message interface endpoint! message: " + MESSAGEDATA + " user: " + USERID
         + " password: " + PASSWORD + " facilityId: " + FACILITYID;
@@ -113,23 +116,11 @@ public class MessageInputController {
     if (isQBP(MESSAGEDATA)) {
       return iisGatewayService.queryIIS(messageSubmission);
     }
-//    stopWatch.stop();
-//    logger.warn("iisGatewayService: " + stopWatch.getTotalTimeMillis());
-
-//    stopWatch = new StopWatch();
-//    stopWatch.start();
+    /* This isn't using the facility we've provided... how interesting. */
     String ack = messageConsumer.processMessageAndSaveMetrics(messageSubmission, USERID).getAck();
-//    stopWatch.stop();
-//    logger.warn("processMessageAndSaveMetrics: " + stopWatch.getTotalTimeMillis());
 
-//    stopWatch = new StopWatch();
-//    stopWatch.start();
     em.flush();
     em.clear();
-//    stopWatch.stop();
-//    logger.warn("EntityManager.clear.flush: " + stopWatch.getTotalTimeMillis());
-
-
     return ack;
   }
 

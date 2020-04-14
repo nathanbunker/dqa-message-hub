@@ -26,7 +26,7 @@ public class DetectionsSettingsService {
 	 */
 	public void loadDetectionsToDB(HashSet<DetectionsSettings> allPropertySettings) {
 	  for (DetectionsSettings ds : allPropertySettings) {
-		  DetectionsSettings dbDetectionSetting = dsRepo.findByDetectionGroupNameAndMqeCode(ds.getDetectionGroup().getName(), ds.getMqeCode());
+		  DetectionsSettings dbDetectionSetting = dsRepo.findByDetectionSettingsGroupNameAndMqeCode(ds.getDetectionSettingsGroup().getName(), ds.getMqeCode());
 		  if (dbDetectionSetting != null) {
 			  dbDetectionSetting.setSeverity(ds.getSeverity());
 			  dsRepo.save(dbDetectionSetting);

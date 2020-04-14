@@ -12,30 +12,31 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "VACCINE_COUNT")
-public class VaccineCount {
+@Table(name = "FACILITY_VACCINE_COUNTS")
+public class FacilityVaccineCounts {
 
   @Id
-  @SequenceGenerator(name = "VACCINE_COUNT_GENERATOR", sequenceName = "VACCINE_COUNT_SEQ", allocationSize = 100)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "VACCINE_COUNT_GENERATOR")
-  @Column(name = "VACCINE_COUNT_ID")
+  @SequenceGenerator(name = "FACILITY_VACCINE_COUNTS_GENERATOR", sequenceName = "FACILITY_VACCINE_COUNTS_SEQ", allocationSize = 100)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FACILITY_VACCINE_COUNTS_GENERATOR")
+  @Column(name = "FACILITY_VACCINE_COUNTS_ID")
   private long id;
 
   @JsonIgnore
   @ManyToOne
-  @JoinColumn(name = "sender_metrics_id")
-  private SenderMetrics senderMetrics;
+  @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
+  private FacilityMessageCounts facilityMessageCounts;
+
   private int age = 0;
   private String vaccineCvx;
   private int count = 0;
   private boolean administered;
 
-  public SenderMetrics getSenderMetrics() {
-    return senderMetrics;
+  public FacilityMessageCounts getFacilityMessageCounts() {
+    return facilityMessageCounts;
   }
 
-  public void setSenderMetrics(SenderMetrics senderMetrics) {
-    this.senderMetrics = senderMetrics;
+  public void setFacilityMessageCounts(FacilityMessageCounts facilityMessageCounts) {
+    this.facilityMessageCounts = facilityMessageCounts;
   }
 
   public long getId() {
@@ -80,7 +81,7 @@ public class VaccineCount {
 
 @Override
 public String toString() {
-	return "VaccineCount [id=" + id + ", age=" + age + ", vaccineCvx=" + vaccineCvx
+	return "FacilityVaccineCounts [id=" + id + ", age=" + age + ", vaccineCvx=" + vaccineCvx
 			+ ", count=" + count + ", administered=" + administered + "]";
 }
 }

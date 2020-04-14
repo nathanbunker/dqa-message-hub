@@ -87,7 +87,7 @@ public class MessageRestController {
     MessageDetailItem mdi = new MessageDetailItem();
     mdi.setVxuParts(vxuLocs);
     mdi.setMessageMetaData(mli);
-    mdi.setProviderKey(mq.getSenderMetrics().getSender().getName());
+    mdi.setProviderKey(mq.getFacilityMessageCounts().getFacility().getName());
     for (MessageCode mc : mq.getCodes()) {
       CodeDetail cd = new CodeDetail();
       cd.setCodeCount(mc.getCodeCount());
@@ -107,7 +107,7 @@ public class MessageRestController {
         dd.setDescription(d.getDisplayText());
         dd.setName(d.toString());
         dd.setSeverity(d.getSeverity().getCode());
-        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getSenderMetrics().getSender().getName(), mdt.getDetectionId());
+        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getFacilityMessageCounts().getFacility().getName(), mdt.getDetectionId());
         if (severityLevelOverride != null) {
         	dd.setSeverity(severityLevelOverride.getCode());
         }
@@ -126,7 +126,7 @@ public class MessageRestController {
   
   private SeverityLevel getSeverityOverride(String provider, String mqeCode) {
 	  SeverityLevel sl = null;
-	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionGroupNameAndMqeCode(provider, mqeCode);
+	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(provider, mqeCode);
 		if (setting != null) {
 			sl = SeverityLevel.findByLabel(setting.getSeverity());
 		}

@@ -252,15 +252,19 @@ public class FileInputController {
               return fileUpload;
             }
           }
-          String sender = quickParser.getMsh4Sender(message);
-        
-        if (StringUtils.isBlank(sender)) {
-          sender = "Unspecified";
+          String sendingFacility = quickParser.getMsh4Sender(message);
+
+        if (StringUtils.isBlank(sendingFacility)) {
+          if (StringUtils.isBlank(token.getPrincipal().getFacilityId())) {
+            sendingFacility = "Unspecified";
+          } else {
+            sendingFacility = token.getPrincipal().getFacilityId();
+          }
         }
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        String ackResult = messageController.urlEncodedHttpFormPost(message, token);
+        String ackResult = messageController.urlEncodedHttpFormPost(message, sendingFacility, token);
         stopWatch.stop();
         logger.warn("urlEncodedHttpFormPost: " + stopWatch.getTotalTimeMillis());
         fileUpload.getHl7Messages().set(idx, null);

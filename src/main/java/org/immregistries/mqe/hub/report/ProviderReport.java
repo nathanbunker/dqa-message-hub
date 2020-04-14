@@ -6,7 +6,6 @@ import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 
 import java.util.Date;
 import java.util.List;
-import org.immregistries.mqe.validator.report.codes.VaccineCollection;
 
 public class ProviderReport {
 
@@ -17,25 +16,25 @@ public class ProviderReport {
     private int numberOfErrors;
     private List<ScoreReportable> errors = new ArrayList<>();
     private List<CollectionBucket> codeIssues = new ArrayList<>();
-    private ProviderSummaryReport countSummary = new ProviderSummaryReport();
-    private SiteIdentifiers siteIdentifiers = new SiteIdentifiers();
+    private FacilitySummaryReport countSummary = new FacilitySummaryReport();
+    private FacilityIdentifiers facilityIdentifiers = new FacilityIdentifiers();
     private String commonMessage;
     private List<CollectionBucket> vaccinationCodes = new ArrayList<>();
 
-    public ProviderSummaryReport getCountSummary() {
+    public FacilitySummaryReport getCountSummary() {
         return countSummary;
     }
 
-    public void setCountSummary(ProviderSummaryReport countSummary) {
+    public void setCountSummary(FacilitySummaryReport countSummary) {
         this.countSummary = countSummary;
     }
 
-    public SiteIdentifiers getSiteIdentifiers() {
-        return siteIdentifiers;
+    public FacilityIdentifiers getFacilityIdentifiers() {
+        return facilityIdentifiers;
     }
 
-    public void setSiteIdentifiers(SiteIdentifiers siteIdentifiers) {
-        this.siteIdentifiers = siteIdentifiers;
+    public void setFacilityIdentifiers(FacilityIdentifiers facilityIdentifiers) {
+        this.facilityIdentifiers = facilityIdentifiers;
     }
 
     public String getCommonMessage() {

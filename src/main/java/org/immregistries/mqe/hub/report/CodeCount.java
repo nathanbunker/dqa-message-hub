@@ -13,8 +13,8 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "CODE_COUNT", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CODE_COUNT", columnNames = {
-    "ATTRIBUTE", "SENDER_METRICS_ID", "CODE_TYPE", "CODE_VALUE"}))
+@Table(name = "FACILITY_CODE_COUNTS", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CODE_COUNT", columnNames = {
+    "ATTRIBUTE", "FACILITY_MESSAGE_COUNTS_ID", "CODE_TYPE", "CODE_VALUE"}))
 public class CodeCount {
 
   @Id
@@ -25,8 +25,8 @@ public class CodeCount {
 
   @JsonIgnore
   @ManyToOne
-  @JoinColumn(name = "sender_metrics_id")
-  private SenderMetrics senderMetrics;
+  @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
+  private FacilityMessageCounts facilityMessageCounts;
 
   @Column(name = "CODE_TYPE")
   private String codeType;
@@ -79,12 +79,12 @@ public class CodeCount {
     this.codeCount = count;
   }
 
-  public SenderMetrics getSenderMetrics() {
-    return senderMetrics;
+  public FacilityMessageCounts getFacilityMessageCounts() {
+    return facilityMessageCounts;
   }
 
-  public void setSenderMetrics(SenderMetrics senderMetrics) {
-    this.senderMetrics = senderMetrics;
+  public void setFacilityMessageCounts(FacilityMessageCounts facilityMessageCounts) {
+    this.facilityMessageCounts = facilityMessageCounts;
   }
 
   public String getOrigin() {
@@ -97,7 +97,7 @@ public class CodeCount {
 
   @Override
   public String toString() {
-    return "CodeCount{" + "id=" + id + ", senderMetrics=" + senderMetrics.getId() + ", codeType='"
+    return "CodeCount{" + "id=" + id + ", facilityMessageCounts=" + facilityMessageCounts.getId() + ", codeType='"
         + codeType + '\'' + ", attribute='" + attribute + '\''
         + ", codeValue='" + codeValue + '\'' + ", codeCount=" + codeCount + '}';
   }

@@ -37,7 +37,7 @@ public class ProviderJdbcRepository {
    * Get message errors for this message.
    */
   private static final String getProviders =
-      " select distinct name from SENDER";
+      " select distinct name from facility";
 
   @Cacheable("facilitiesList")
   public List<String> getActiveFacilities() {
@@ -58,32 +58,11 @@ public class ProviderJdbcRepository {
   /**
    * Get message errors for this message.
    */
-  private static final String getAuthorizedTransferInterfaces =
-      " select distinct name from sender";
 
   private static final String getAuthorizedTransferInterfacesForUser =
-          " select distinct s.name " +
-                  "from SENDER_METRICS sm " +
-                  "join SENDER s on s.sender_id = sm.sender_sender_id where sm.username = :ssUserId";
-
-  @Cacheable("facilitiesList")
-  public List<String> getActiveAuthorizedFacilities(String ssUserId) {
-    SqlParameterSource namedParameters = new MapSqlParameterSource()
-        .addValue("ssUserId", ssUserId);
-
-    List<String> facilityList = new ArrayList<String>();
-    LOGGER.debug("JDBC Query: " + getAuthorizedTransferInterfaces);
-    try {
-      List<String> rows = jdbcTemplate
-          .query(getAuthorizedTransferInterfaces, namedParameters, getFacilityRowMapper());
-      facilityList.addAll(rows);
-      LOGGER.info("facilities found: " + facilityList.size());
-    } catch (EmptyResultDataAccessException er) {
-      LOGGER.warn("facilities not found for query: " + getProviders);
-    }
-
-    return facilityList;
-  }
+          " select distinct f.name " +
+                  "from FACILITY_MESSAGE_COUNTS fmc " +
+                  "join FACILITY f on f.facility_id = fmc.facility_id where fmc.username = :ssUserId";
 
   public List<String> getActiveAuthorizedFacilitiesForUser(String ssUserId) {
     SqlParameterSource namedParameters = new MapSqlParameterSource()
