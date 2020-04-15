@@ -13,7 +13,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "DETECTION_DETECTION_SETTINGS_GROUP", indexes = { @Index(name = "IDX_DETECTION_SETTINGS_GROUP_X1", columnList = "name") })
+@Table(name = "DETECTION_SETTINGS_GROUP", indexes = { @Index(name = "IDX_DETECTION_SETTINGS_GROUP_X1", columnList = "name") })
 public class DetectionSettingsGroup {
 
   @Id
