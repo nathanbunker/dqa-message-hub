@@ -13,9 +13,9 @@ public class DetectionsSettingsService {
 	private static final Logger logger = LoggerFactory.getLogger(DetectionsSettingsService.class);
 
 	@Autowired
-	DetectionsSettingsJpaRepository dsRepo;
+	DetectionSeverityJpaRepository dsRepo;
 	
-	public void saveDetectionSetting(DetectionsSettings ds) {
+	public void saveDetectionSetting(DetectionSeverityOverride ds) {
 		dsRepo.save(ds);
 	}
 	
@@ -24,9 +24,9 @@ public class DetectionsSettingsService {
 	 * Only loads new entries or updates existing entries
 	 * Does not remove entries in the db that aren't defined in the file
 	 */
-	public void loadDetectionsToDB(HashSet<DetectionsSettings> allPropertySettings) {
-	  for (DetectionsSettings ds : allPropertySettings) {
-		  DetectionsSettings dbDetectionSetting = dsRepo.findByDetectionSettingsGroupNameAndMqeCode(ds.getDetectionSettingsGroup().getName(), ds.getMqeCode());
+	public void loadDetectionsToDB(HashSet<DetectionSeverityOverride> allPropertySettings) {
+	  for (DetectionSeverityOverride ds : allPropertySettings) {
+		  DetectionSeverityOverride dbDetectionSetting = dsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(ds.getDetectionSeverityOverrideGroup().getName(), ds.getMqeCode());
 		  if (dbDetectionSetting != null) {
 			  dbDetectionSetting.setSeverity(ds.getSeverity());
 			  dsRepo.save(dbDetectionSetting);

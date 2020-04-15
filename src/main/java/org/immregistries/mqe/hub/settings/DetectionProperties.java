@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashSet;
 import javax.annotation.PostConstruct;
-import org.immregistries.mqe.hub.report.DetectionSettingsGroup;
 import org.immregistries.mqe.hub.report.SettingsGroupJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,7 @@ public class DetectionProperties {
   public final String GROUP_PROPERTY = "GROUP_ID";
   public final String DEFAULT_GROUP = "DEFAULT";
   MqeProperties prop = new MqeProperties();
-  private HashSet<DetectionsSettings> allPropertySettings = new HashSet<DetectionsSettings>();
+  private HashSet<DetectionSeverityOverride> allPropertySettings = new HashSet<DetectionSeverityOverride>();
 
   @PostConstruct
   private void init() {
@@ -54,14 +53,14 @@ public class DetectionProperties {
 				  if (GROUP_PROPERTY.contentEquals(propName)) {
 					  currentGroup = propVal;
 				  } else {
-            DetectionSettingsGroup sg = sgRepo.findByName(currentGroup);
+            DetectionSeverityOverrideGroup sg = sgRepo.findByName(currentGroup);
             if (sg==null) {
-              sg = new DetectionSettingsGroup();
+              sg = new DetectionSeverityOverrideGroup();
               sg.setName(currentGroup);
               sg.setCreatedDate(new Date());
               sgRepo.save(sg);
             }
-					  DetectionsSettings ds = new DetectionsSettings(sg, propName, propVal);
+					  DetectionSeverityOverride ds = new DetectionSeverityOverride(sg, propName, propVal);
 					  allPropertySettings.add(ds);
 				  }
 			  }
@@ -84,11 +83,11 @@ private void loadProps() {
     }
   }
 
-  public HashSet<DetectionsSettings> getAllPropertySettings() {
+  public HashSet<DetectionSeverityOverride> getAllPropertySettings() {
 	return allPropertySettings;
 }
 
-public void setAllPropertySettings(HashSet<DetectionsSettings> allPropertySettings) {
+public void setAllPropertySettings(HashSet<DetectionSeverityOverride> allPropertySettings) {
 	this.allPropertySettings = allPropertySettings;
 }
 

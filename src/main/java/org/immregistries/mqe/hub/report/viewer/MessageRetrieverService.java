@@ -10,8 +10,8 @@ import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ public class MessageRetrieverService {
   MessagesViewJpaRepository mvRepo;
   
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
   private final MessageParser parser = new MessageParserHL7();
 
@@ -123,7 +123,7 @@ public class MessageRetrieverService {
         Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
         SeverityLevel sl = dt.getSeverity();
 
-    	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(mv.getFacilityMessageCounts().getFacility().getName(), d.getDetectionId());
+    	DetectionSeverityOverride setting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(mv.getFacilityMessageCounts().getFacility().getName(), d.getDetectionId());
 		if (setting != null) {
 			sl = SeverityLevel.findByLabel(setting.getSeverity());
 		}

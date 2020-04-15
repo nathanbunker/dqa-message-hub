@@ -12,7 +12,6 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
-import org.immregistries.mqe.hub.report.Facility;
 import org.immregistries.mqe.hub.report.FacilityJpaRepository;
 import org.immregistries.mqe.hub.report.FacilityMessageCounts;
 import org.immregistries.mqe.hub.report.FacilityMessageCountsService;
@@ -23,8 +22,8 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
@@ -61,7 +60,7 @@ public class Hl7MessageConsumer {
   @Autowired
   NistValidatorHandler nistValidatorHandler;
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
   @Autowired
   private IISGateway iisGatewayService;
 
@@ -142,8 +141,8 @@ public class Hl7MessageConsumer {
     HashMap<String, SeverityLevel> detectionsOverride = new HashMap<>();
 
     if (facility != null) {
-      List<DetectionsSettings> settings = detectionsSettingsRepo.findByDetectionSettingsGroupName("facility");
-      for (DetectionsSettings ds : settings) {
+      List<DetectionSeverityOverride> settings = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupName("facility");
+      for (DetectionSeverityOverride ds : settings) {
         String code = ds.getMqeCode();
         String severity = ds.getSeverity();
         SeverityLevel sl = SeverityLevel.valueOf(severity);
@@ -157,7 +156,7 @@ public class Hl7MessageConsumer {
   private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
     SeverityLevel severityLevel = null;
 
-    DetectionsSettings ds = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(detectionProp, mqeCode);
+    DetectionSeverityOverride ds = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(detectionProp, mqeCode);
     if (ds != null) {
       severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
     }

@@ -3,8 +3,8 @@ package org.immregistries.mqe.hub.cfg;
 import javax.annotation.PostConstruct;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.settings.DetectionProperties;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.hub.settings.DetectionsSettingsService;
 import org.immregistries.mqe.hub.settings.MqeSettings;
 import org.immregistries.mqe.hub.settings.MqeSettingsJpaRepository;
@@ -36,7 +36,7 @@ public class MqeMessageHubApplicationProperties {
   private DetectionsSettingsService detectionsSettingsSvc;
   
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionSeverityOverridesRepo;
 
   @Autowired
 	DetectionProperties detectionProp;
@@ -146,7 +146,8 @@ public class MqeMessageHubApplicationProperties {
   private SeverityLevel getDefaultSeverityByCode(DetectionProperties detectionProp, String mqeCode) {
 	  SeverityLevel severityLevel = null;
 	  
-	  DetectionsSettings ds = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
+	  DetectionSeverityOverride ds = detectionSeverityOverridesRepo
+				.findByDetectionSeverityOverrideGroupNameAndMqeCode(detectionProp.DEFAULT_GROUP, mqeCode);
 	  if (ds != null) {
 		  severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
 	  }

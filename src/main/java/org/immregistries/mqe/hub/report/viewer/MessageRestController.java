@@ -12,8 +12,8 @@ import org.immregistries.mqe.hl7util.parser.model.HL7MessagePart;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReader;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReaderNIST;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class MessageRestController {
   MessageRetrieverService messageRetreiver;
   
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
   @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}/messages/{messages}/page/{page}")
   public MessageListContainer jsonMessagesGetter(HttpServletRequest request,
@@ -126,7 +126,7 @@ public class MessageRestController {
   
   private SeverityLevel getSeverityOverride(String provider, String mqeCode) {
 	  SeverityLevel sl = null;
-	DetectionsSettings setting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(provider, mqeCode);
+	DetectionSeverityOverride setting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(provider, mqeCode);
 		if (setting != null) {
 			sl = SeverityLevel.findByLabel(setting.getSeverity());
 		}

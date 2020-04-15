@@ -1,4 +1,4 @@
-package org.immregistries.mqe.hub.report;
+package org.immregistries.mqe.hub.settings;
 
 import java.util.Date;
 import javax.persistence.Column;
@@ -13,13 +13,13 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity
-@Table(name = "DETECTION_SETTINGS_GROUP", indexes = { @Index(name = "IDX_DETECTION_SETTINGS_GROUP_X1", columnList = "name") })
-public class DetectionSettingsGroup {
+@Table(name = "DETECTION_SEVERITY_OVERRIDE_GROUP", indexes = { @Index(name = "IDX_DETECTION_SEVERITY_OVERRIDE_GROUP_X1", columnList = "name") })
+public class DetectionSeverityOverrideGroup {
 
   @Id
-  @SequenceGenerator(name = "DETECTION_SETTINGS_GROUP_GENERATOR", sequenceName = "DETECTION_SETTINGS_GROUP_SEQ")
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DETECTION_SETTINGS_GROUP_GENERATOR")
-  @Column(name = "DETECTION_SETTINGS_GROUP_ID")
+  @SequenceGenerator(name = "DETECTION_SEVERITY_OVERRIDE_GROUP_GENERATOR", sequenceName = "DETECTION_SEVERITY_OVERRIDE_GROUP_SEQ")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "DETECTION_SEVERITY_OVERRIDE_GROUP_GENERATOR")
+  @Column(name = "DETECTION_SEVERITY_OVERRIDE_GROUP_ID")
   private long id;
 
   private String name;
@@ -53,7 +53,7 @@ public class DetectionSettingsGroup {
 
   @Override
   public String toString() {
-    return "DETECTION_SETTINGS_GROUP{" +
+    return "DETECTION_SEVERITY_OVERRIDE_GROUP{" +
         "id=" + id +
         ", name='" + name + '\'' +
         ", createdDate=" + createdDate +

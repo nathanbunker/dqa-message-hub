@@ -12,8 +12,8 @@ import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.report.viewer.*;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
@@ -56,7 +56,7 @@ public class ReportController {
   private FacilityMessageCountsService metricsSvc;
   
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
   private ReportScorer scorer = ReportScorer.INSTANCE;
 
@@ -169,7 +169,7 @@ public class ReportController {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, username);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     for (ScoreReportable score : report.getDetectionCounts()) {
-      DetectionsSettings detectionSetting = detectionsSettingsRepo.findByDetectionSettingsGroupNameAndMqeCode(providerKey, score.getMqeCode());
+      DetectionSeverityOverride detectionSetting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(providerKey, score.getMqeCode());
       if (detectionSetting != null) {
         SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
         score.setSeverity(severity);
