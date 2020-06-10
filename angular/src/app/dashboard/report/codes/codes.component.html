@@ -14,7 +14,8 @@
     <thead>
       <tr>
         <th style="width: 12%;">Code</th>
-        <th style="width: 50%;">Label</th>
+        <th style="width: 35%;">Label</th>
+        <th style="width: 15%;">Detail</th>
         <th style="width: 13%;">Status</th>
         <th style="width: 13%;">Count</th>
         <th style="width: 12%;">filter</th>
@@ -24,6 +25,7 @@
       <tr *ngFor="let codeReceived of codeTable.value">
         <td>{{codeReceived.value}}</td>
         <td>{{codeReceived.label}}</td>
+        <td>{{codeReceived.attribute}}</td>
         <td>{{codeReceived.status}}</td>
         <td>{{codeReceived.count}}</td>
         <td>
