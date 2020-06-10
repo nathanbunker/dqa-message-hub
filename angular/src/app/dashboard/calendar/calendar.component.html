@@ -1,5 +1,3 @@
-<p>
-  Calendar Goes Here!
-  {{calendarInfo | json}}
-</p>
-<google-chart [data]="calendarChart" (chartSelect)='handleChartClick($event)'></google-chart>
+<div class="calendar-chart">
+  <google-chart [data]="calendarChart" (chartSelect)='handleChartClick($event)'></google-chart>
+</div>

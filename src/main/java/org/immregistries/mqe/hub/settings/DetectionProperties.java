@@ -6,24 +6,33 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.HashSet;
+import javax.annotation.PostConstruct;
+import org.immregistries.mqe.hub.report.SettingsGroupJpaRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-public enum DetectionProperties {
-  INSTANCE;
+@Component
+public class DetectionProperties {
   private final Logger LOGGER = LoggerFactory.getLogger(DetectionProperties.class);
-  
+
+  @Autowired
+  SettingsGroupJpaRepository sgRepo;
+
   private final String propertyFileName = "detections.properties";
   public final String GROUP_PROPERTY = "GROUP_ID";
   public final String DEFAULT_GROUP = "DEFAULT";
   MqeProperties prop = new MqeProperties();
-  private HashSet<DetectionsSettings> allPropertySettings = new HashSet<DetectionsSettings>();
-  
-  DetectionProperties() {
+  private HashSet<DetectionSeverityOverride> allPropertySettings = new HashSet<DetectionSeverityOverride>();
+
+  @PostConstruct
+  private void init() {
     loadProps();
   }
-  
+
   private void loadPropertiesFromFile() throws IOException {
 	  InputStream inputStream = getInputStreamForProperties();
 	  if (inputStream == null) {
@@ -31,7 +40,7 @@ public enum DetectionProperties {
 	  }
 	  
 	  BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-	  
+
 	  try {
 		  String currentLine = reader.readLine();
 		  String currentGroup = "";
@@ -44,7 +53,14 @@ public enum DetectionProperties {
 				  if (GROUP_PROPERTY.contentEquals(propName)) {
 					  currentGroup = propVal;
 				  } else {
-					  DetectionsSettings ds = new DetectionsSettings(currentGroup, propName, propVal);
+            DetectionSeverityOverrideGroup sg = sgRepo.findByName(currentGroup);
+            if (sg==null) {
+              sg = new DetectionSeverityOverrideGroup();
+              sg.setName(currentGroup);
+              sg.setCreatedDate(new Date());
+              sgRepo.save(sg);
+            }
+					  DetectionSeverityOverride ds = new DetectionSeverityOverride(sg, propName, propVal);
 					  allPropertySettings.add(ds);
 				  }
 			  }
@@ -67,11 +83,11 @@ private void loadProps() {
     }
   }
 
-  public HashSet<DetectionsSettings> getAllPropertySettings() {
+  public HashSet<DetectionSeverityOverride> getAllPropertySettings() {
 	return allPropertySettings;
 }
 
-public void setAllPropertySettings(HashSet<DetectionsSettings> allPropertySettings) {
+public void setAllPropertySettings(HashSet<DetectionSeverityOverride> allPropertySettings) {
 	this.allPropertySettings = allPropertySettings;
 }
 

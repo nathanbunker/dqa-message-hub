@@ -1,0 +1,73 @@
+.report-header {
+  padding: 10px 20px;
+  color: white;
+}
+
+.integration-report {
+  background-color: #9cacb9;
+}
+
+.summary-counts {
+  background-color: rgb(3, 189, 133);
+}
+
+.table-number {
+  text-align: center;
+  font-size: 25px;
+  min-width: 45px;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 5px;
+}
+
+.table-green-cell {
+  background-color: rgb(203, 243, 221);
+}
+
+.table-number-label {
+  text-align: end;
+  padding-right: 10px;
+}
+
+.table-number-empty-cell {
+  font-size: 25px;
+  min-width: 40px;
+}
+
+.quality-issue {
+  background-color: orange;
+}
+
+.code-issue {
+  background-color: rgb(247, 107, 107);
+}
+
+.big-icon {
+  font-size: 3em;
+}
+
+.bigger-icon {
+  font-size: 3.5em;
+}
+
+.small-icon {
+  font-size: 2.5em;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.subtext {
+  color: gray;
+}
+
+.number-indicator {
+  font-weight: bold;
+  font-size: 3em;
+}
+
+.title-no-margin {
+  margin: 0;
+  text-align: center;
+}

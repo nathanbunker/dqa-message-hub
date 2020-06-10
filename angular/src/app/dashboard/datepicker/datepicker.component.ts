@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import {NgbDate, NgbCalendar} from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { NgbDate } from '@ng-bootstrap/ng-bootstrap';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-datepicker',
@@ -8,42 +9,32 @@ import {NgbDate, NgbCalendar} from '@ng-bootstrap/ng-bootstrap';
 })
 export class DatepickerComponent implements OnInit {
 
-  model;
+  date: NgbDate;
 
-  hoveredDate: NgbDate;
-
-  fromDate: NgbDate;
-  toDate: NgbDate;
-
-  constructor(calendar: NgbCalendar) {
-    this.fromDate = calendar.getToday();
-    this.toDate = calendar.getNext(calendar.getToday(), 'd', 10);
+  @Input()
+  set dateString(value: string) {
+    const _parsed = moment(value, 'YYYYMMDD');
+    console.log(value);
+    console.log(_parsed.year(), _parsed.month() + 1, _parsed.date());
+    this.date = new NgbDate(_parsed.year(), _parsed.month() + 1, _parsed.date());
   }
 
-  onDateSelection(date: NgbDate) {
-    if (!this.fromDate && !this.toDate) {
-      this.fromDate = date;
-    } else if (this.fromDate && !this.toDate && date.after(this.fromDate)) {
-      this.toDate = date;
-    } else {
-      this.toDate = null;
-      this.fromDate = date;
-    }
-  }
-
-  isHovered(date: NgbDate) {
-    return this.fromDate && !this.toDate && this.hoveredDate && date.after(this.fromDate) && date.before(this.hoveredDate);
-  }
-
-  isInside(date: NgbDate) {
-    return date.after(this.fromDate) && date.before(this.toDate);
-  }
-
-  isRange(date: NgbDate) {
-    return date.equals(this.fromDate) || date.equals(this.toDate) || this.isInside(date) || this.isHovered(date);
-  }
+  @Output()
+  dateStringChange: EventEmitter<string>;
 
   ngOnInit() {
   }
 
+  constructor() {
+    this.dateStringChange = new EventEmitter<string>();
+  }
+
+  handleDateSelection(selected: NgbDate) {
+    const str = moment({
+      year: selected.year,
+      month: selected.month - 1,
+      day: selected.day,
+    }).format('YYYYMMDD');
+    this.dateStringChange.emit(str);
+  }
 }

@@ -3,6 +3,8 @@ package org.immregistries.mqe.hub.report.viewer;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,9 +28,9 @@ public class FacilityRestController {
   ProviderJdbcRepository providers;
 
   @RequestMapping(method = RequestMethod.GET, value = "")
-  List<String> jsonFacilities(HttpServletRequest request) {
+  List<String> jsonFacilities(HttpServletRequest request, AuthenticationToken token) {
     List<String> tiList = new ArrayList<String>();
-    tiList.addAll(providers.getActiveAuthorizedFacilities("DEFAULT"));
+    tiList.addAll(providers.getActiveAuthorizedFacilitiesForUser(token.getPrincipal().getUsername()));
     return tiList;
   }
 }

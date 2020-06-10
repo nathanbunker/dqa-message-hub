@@ -1,0 +1,154 @@
+<div class="container" style="padding-top: 20px;" *ngIf="urlParams$ | async as params">
+  <a routerLink="/dashboard" >
+    <fa-icon icon="chevron-left"></fa-icon> Select Provider
+  </a>
+  <div class="row" style="padding-top:40px;">
+    <div class="col-md-12">
+      <h2 class="messageList-header">{{ params.provider }} </h2>
+    </div>
+  </div>
+  <div class="row justify-content-end" style="padding-top:40px;">
+    <div class="col-md-3">
+        <app-datepicker [dateString]="params.dateStart" (dateStringChange)="dateChange($event, 0)"></app-datepicker>
+    </div>
+
+    <div class="col-md-1 text-center" style="font-size:1.5em;font-weight:bold;">
+      To
+    </div>
+
+    <div class="col-md-3 ">
+      <div class="row justify-content-end">
+        <app-datepicker [dateString]="params.dateEnd" (dateStringChange)="dateChange($event, 1)"></app-datepicker>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row">
+    <div class="col-md-1" style="margin-top: 75px; margin-left: -120px;">
+      <div style="height:73px">
+          <button style="font-size: 3em; border: none; color: #D3D3D3;"
+                  *ngIf="(calendarYear$ | async) < currentYear"
+                  (click)="nextYear()"
+                  type="button" class="btn btn-default btn-sm">
+                  <fa-icon icon="chevron-right"></fa-icon>
+          </button>
+      </div>
+      <div style="height:73px">
+          <button style="font-size: 3em; border: none; color: #D3D3D3;"
+                  (click)="previousYear()"
+                  type="button"
+                  class="btn btn-default btn-sm" >
+                  <fa-icon icon="chevron-left"></fa-icon>
+          </button>
+      </div>
+    </div>
+    <div class="col-md-11">
+      <div *ngIf="calendar$ | async as calendar">
+        <app-calendar [calendarInfo]="calendar" [startDate]="params.dateStart" [endDate]="params.dateEnd" (select)="dateSelected($event)"></app-calendar>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <button class="btn btn-sm btn-primary" (click)="openFilterDialog(textFilter)">
+      <fa-icon icon="filter"></fa-icon>
+      Filter
+    </button>
+  </div>
+
+  <div class="row">
+    <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+      <tr *ngIf="params.filter.messageSearchText">
+        <td style="width: 20%;">
+          <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('messageSearchText')">
+            <fa-icon icon="times"></fa-icon>
+          </button>
+          <span style="color: gray;">Message Search : </span>
+        </td>
+        <td style="vertical-align: middle;  font-weight: bold;">
+          {{params.filter.messageSearchText}}
+        </td>
+      </tr>
+      <tr *ngIf="params.filter.detectionId">
+        <td style="width: 20%;">
+            <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('detectionId')">
+              <fa-icon icon="times"></fa-icon>
+            </button>
+          <span style="color: gray;">MQE Detection : </span>
+        </td>
+        <td style="vertical-align: middle; font-weight: bold;">
+          <span *ngIf="report$ | async" >{{filterDisplay.detections[params.filter.detectionId]}}</span> ({{params.filter.detectionId}})
+        </td>
+      </tr>
+      <tr *ngIf="params.filter.vaccineGroupAge && params.filter.vaccineGroup">
+        <td style="width: 20%;">
+            <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('vaccineGroup', 'vaccineGroupAge')">
+              <fa-icon icon="times"></fa-icon>
+            </button>
+          <span style="color: gray;">Vaccine : </span>
+        </td>
+        <td style="vertical-align: middle; font-weight: bold;">
+            {{params.filter.vaccineGroup}} - {{params.filter.vaccineGroupAge}}
+        </td>
+      </tr>
+        <tr *ngIf="params.filter.codeType && params.filter.codeValue">
+          <td style="width: 20%;">
+              <button type="button" class="btn btn-default btn-sm" style="border: 1px solid lightgray; margin-right: 5px;" (click)="clearFilter('codeType', 'codeValue')">
+                <fa-icon icon="times"></fa-icon>
+              </button>
+            <span style="color: gray;">Code : </span>
+          </td>
+          <td style="vertical-align: middle; font-weight: bold;">
+              "{{params.filter.codeValue}}" - {{params.filter.codeType}}
+          </td>
+        </tr>
+    </table>
+  </div>
+
+  <ngb-tabset #tabs="ngbTabset" class="row dashboard-tabs" style="padding-top:10px; width: 100%;" [activeId]="params.tab" (tabChange)="switchTab($event)">
+    <ngb-tab [id]="tabsType.MESSAGES" title="Messages" style="width: 100%; padding: 10px;">
+      <ng-template ngbTabContent>
+          <app-messages [messageList]="messageList$ | async" [page]="params.page" (pageChange)="pageChange($event)"></app-messages>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab [id]="tabsType.DETECTIONS" title="Errors/Warnings">
+      <ng-template ngbTabContent>
+          <app-detections [report]="report$ | async" [filters]="params.filter" (filterBy)="filterBy($event, 'detectionId')"></app-detections>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab [id]="tabsType.CODES" title="Codes">
+      <ng-template ngbTabContent>
+        <app-codes [codes]="codesReceivedList$ | async" [filters]="params.filter" (filterBy)="filterByAll($event)"></app-codes>
+    </ng-template>
+    </ngb-tab>
+    <ngb-tab [id]="tabsType.VACCINES" title="Vaccines">
+      <ng-template ngbTabContent>
+        <app-vaccines [data]="vaccinationTabData$ | async" [filters]="params.filter" (filterBy)="filterByAll($event)"></app-vaccines>
+      </ng-template>
+    </ngb-tab>
+    <ngb-tab [id]="tabsType.REPORT" title="Report">
+      <ng-template ngbTabContent>
+        <app-report [data]="providerReport$ | async"></app-report>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+
+</div>
+
+<ng-template #textFilter let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Message Filter</h4>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="textSearch">Full Text Search</label>
+        <input id="textSearch" class="form-control" #input name="textSearch">
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modal.close(input.value)">Ok</button>
+    <button type="button" class="btn btn-warning" (click)="modal.close()">Cancel</button>
+  </div>
+</ng-template>

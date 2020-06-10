@@ -1,4 +1,5 @@
 /target/
+/src/main/resources/static/ngx/
 .settings
 .classpath
 .project
@@ -18,3 +19,7 @@ node
 *.db
 
 \.vscode/
+
+angular/package-lock\.json
+
+.DS_Store

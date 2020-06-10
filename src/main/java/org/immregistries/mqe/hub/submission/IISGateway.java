@@ -2,6 +2,7 @@ package org.immregistries.mqe.hub.submission;
 
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.ReportableSource;
 import org.immregistries.mqe.hl7util.SeverityLevel;
@@ -28,13 +29,45 @@ public class IISGateway {
   @Value("${iisgateway.enable}")
   private boolean iisgatewayEnable = false;
   
+  @Value("${iisgateway.query.enable}")
+  private boolean iisgatewayQueryEnable = true;
+  
+  @Value("${iisgateway.filterErrors.enable}")
+  private boolean iisgatewayFilterErrorsEnable = true;
+  
+  @Value("${iisgateway.returnAck.mqe.enable}")
+  private boolean iisgatewayReturnAckMqeEnable = true;
+  
+  @Value("${iisgateway.returnAck.iis.enable}")
+  private boolean iisgatewayReturnAckIisEnable = true;
+  
   @Value("${iisgateway.url}")
-  private String iisgatewayUrl = "http://localhost/iis-kernel/pop";
+  private String iisgatewayUrl = "http://florence.immregistries.org/iis-sandbox/pop";
   //  public static final String IIS_GATEWAY_URL = "http://florence.immregistries.org/iis-kernel/pop";
+
+  public boolean isIisgatewayEnable() {
+    return iisgatewayEnable;
+  }
+
+  public boolean isIisgatewayQueryEnable() {
+    return iisgatewayQueryEnable;
+  }
+
+  public boolean isIisgatewayFilterErrorsEnable() {
+    return iisgatewayFilterErrorsEnable;
+  }
+
+  public boolean isIisgatewayReturnAckMqeEnable() {
+    return iisgatewayReturnAckMqeEnable;
+  }
+
+  public boolean isIisgatewayReturnAckIisEnable() {
+    return iisgatewayReturnAckIisEnable;
+  }
 
   public String queryIIS(Hl7MessageSubmission messageSubmission) {
 
-    if (iisgatewayEnable) {
+    if (iisgatewayEnable && iisgatewayQueryEnable && !messageSubmission.getUser().equals("")) {
       RestTemplate restTemplate = new RestTemplate();
 
       HttpHeaders headers = new HttpHeaders();
@@ -100,7 +133,7 @@ public class IISGateway {
     }
   }
 
-  public void sendVXU(Hl7MessageSubmission messageSubmission) {
+  public String sendVXU(Hl7MessageSubmission messageSubmission) {
     if (iisgatewayEnable) {
       RestTemplate restTemplate = new RestTemplate();
 
@@ -117,10 +150,31 @@ public class IISGateway {
           new HttpEntity<MultiValueMap<String, String>>(map, headers);
       ResponseEntity<String> result =
           restTemplate.exchange(iisgatewayUrl, HttpMethod.POST, request, String.class);
-      return;
+      return result.getBody();
     }
+    return null;
   }
 
 
+  public String submit(Hl7MessageSubmission messageSubmission, boolean hasErrors) {
+    if (messageSubmission != null && !StringUtils.isBlank(messageSubmission.getUser())) {
+      if (!this.isIisgatewayFilterErrorsEnable() || !hasErrors) {
+        //  stopWatch = new StopWatch();
+        //  stopWatch.start();
+        String responseMessageFromIIS = this.sendVXU(messageSubmission);
+        /* thinking about putting this elsewhere, and just returning the iis gateway ack. */
+        if (responseMessageFromIIS != null) {
+          if (this.isIisgatewayReturnAckIisEnable()) {
+            if (!this.isIisgatewayReturnAckMqeEnable()) {
+              return responseMessageFromIIS;
+            } else {
+              // TODO read the ACK, pull out requirements and add them to the items that were detected so they will show in the ACK
+            }
+          }
+        }
+      }
+    }
 
+    return "";
+  }
 }

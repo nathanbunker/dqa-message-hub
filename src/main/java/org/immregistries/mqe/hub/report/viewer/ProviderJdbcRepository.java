@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,7 +37,7 @@ public class ProviderJdbcRepository {
    * Get message errors for this message.
    */
   private static final String getProviders =
-      " select distinct provider as name from message_metadata";
+      " select distinct name from facility";
 
   @Cacheable("facilitiesList")
   public List<String> getActiveFacilities() {
@@ -57,19 +58,21 @@ public class ProviderJdbcRepository {
   /**
    * Get message errors for this message.
    */
-  private static final String getAuthorizedTransferInterfaces =
-      " select distinct provider as name from message_metadata";
 
-  @Cacheable("facilitiesList")
-  public List<String> getActiveAuthorizedFacilities(String ssUserId) {
+  private static final String getAuthorizedTransferInterfacesForUser =
+          " select distinct f.name " +
+                  "from FACILITY_MESSAGE_COUNTS fmc " +
+                  "join FACILITY f on f.facility_id = fmc.facility_id where fmc.username = :ssUserId";
+
+  public List<String> getActiveAuthorizedFacilitiesForUser(String ssUserId) {
     SqlParameterSource namedParameters = new MapSqlParameterSource()
-        .addValue("ssUserId", ssUserId);
+            .addValue("ssUserId", ssUserId);
 
     List<String> facilityList = new ArrayList<String>();
-    LOGGER.debug("JDBC Query: " + getAuthorizedTransferInterfaces);
+    LOGGER.debug("JDBC Query: " + getAuthorizedTransferInterfacesForUser);
     try {
       List<String> rows = jdbcTemplate
-          .query(getAuthorizedTransferInterfaces, namedParameters, getFacilityRowMapper());
+              .query(getAuthorizedTransferInterfacesForUser, namedParameters, getFacilityRowMapper());
       facilityList.addAll(rows);
       LOGGER.info("facilities found: " + facilityList.size());
     } catch (EmptyResultDataAccessException er) {

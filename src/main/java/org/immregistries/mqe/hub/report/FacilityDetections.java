@@ -12,19 +12,19 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "SENDER_DETECTION_METRICS")
-public class SenderDetectionMetrics {
+@Table(name = "FACILITY_DETECTION_COUNTS")
+public class FacilityDetections {
 
   @Id
-  @SequenceGenerator(name = "SENDER_DETECTION_METRICS_GENERATOR", sequenceName = "SENDER_DETECTION_METRICS_SEQ", allocationSize = 100)
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SENDER_DETECTION_METRICS_GENERATOR")
-  @Column(name = "SENDER_DETECTION_METRICS_ID")
+  @SequenceGenerator(name = "FACILITY_DETECTIONS_GENERATOR", sequenceName = "FACILITY_DETECTIONS_SEQ", allocationSize = 100)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FACILITY_DETECTIONS_GENERATOR")
+  @Column(name = "FACILITY_DETECTIONS_ID")
   private long id;
 
   @JsonIgnore
   @ManyToOne
-  @JoinColumn(name = "sender_metrics_id")
-  private SenderMetrics senderMetrics;
+  @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
+  private FacilityMessageCounts facilityMessageCounts;
   private String mqeDetectionCode;
   private int attributeCount = 0;
 
@@ -52,11 +52,11 @@ public class SenderDetectionMetrics {
     this.attributeCount = attributeCount;
   }
 
-  public SenderMetrics getSenderMetrics() {
-    return senderMetrics;
+  public FacilityMessageCounts getFacilityMessageCounts() {
+    return facilityMessageCounts;
   }
 
-  public void setSenderMetrics(SenderMetrics senderMetrics) {
-    this.senderMetrics = senderMetrics;
+  public void setFacilityMessageCounts(FacilityMessageCounts facilityMessageCounts) {
+    this.facilityMessageCounts = facilityMessageCounts;
   }
 }

@@ -4,11 +4,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
+import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.parser.MessageParser;
 import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hl7util.parser.model.HL7MessagePart;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReader;
 import org.immregistries.mqe.hl7util.parser.profile.generator.MessageProfileReaderNIST;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,19 +47,25 @@ public class MessageRestController {
 
   @Autowired
   MessageRetrieverService messageRetreiver;
+  
+  @Autowired
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
-  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}/messages/{messages}/page/{page}")
+  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}/messages/{messages}/page/{page}")
   public MessageListContainer jsonMessagesGetter(HttpServletRequest request,
       @PathVariable("providerKey") String providerKey,
-      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date,
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart,
+      @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd,
       @PathVariable("page") int pageNumber, @PathVariable("messages") int itemsCount,
+      AuthenticationToken token,
       String filters) {
 
     LOGGER.info("jsonMessagesGetter - calling for messages.  ");
 
     ViewerFilter vf = new ViewerFilter(filters);
 
-    MessageListContainer container = messageRetreiver.getMessages(providerKey, date, vf, pageNumber, itemsCount);
+    MessageListContainer container = messageRetreiver.getMessages(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, vf, pageNumber, itemsCount);
+
     LOGGER.info(
         "jsonMessagesGetter - Messages: " + container.getTotalMessages() + " pages: " + container
             .getTotalPages() + " current page: " + container.getPageNumber());
@@ -76,7 +87,7 @@ public class MessageRestController {
     MessageDetailItem mdi = new MessageDetailItem();
     mdi.setVxuParts(vxuLocs);
     mdi.setMessageMetaData(mli);
-    mdi.setProviderKey(mq.getProvider());
+    mdi.setProviderKey(mq.getFacilityMessageCounts().getFacility().getName());
     for (MessageCode mc : mq.getCodes()) {
       CodeDetail cd = new CodeDetail();
       cd.setCodeCount(mc.getCodeCount());
@@ -92,10 +103,14 @@ public class MessageRestController {
       String l = mdt.getLocationTxt();
       DetectionDetail dd = new DetectionDetail();
       dd.setDetectionId(mdt.getDetectionId());
-      if (d!=null) {
+      if (d != null) {
         dd.setDescription(d.getDisplayText());
         dd.setName(d.toString());
         dd.setSeverity(d.getSeverity().getCode());
+        SeverityLevel severityLevelOverride = getSeverityOverride(mq.getFacilityMessageCounts().getFacility().getName(), mdt.getDetectionId());
+        if (severityLevelOverride != null) {
+        	dd.setSeverity(severityLevelOverride.getCode());
+        }
         dd.setLocation(l);
       }
         mdi.getDetections().add(dd);
@@ -107,6 +122,15 @@ public class MessageRestController {
     mdi.setMessageResponse(mq.getResponse().replaceAll("[\\r]+", "\n"));
 
     return mdi;
+  }
+  
+  private SeverityLevel getSeverityOverride(String provider, String mqeCode) {
+	  SeverityLevel sl = null;
+	DetectionSeverityOverride setting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(provider, mqeCode);
+		if (setting != null) {
+			sl = SeverityLevel.findByLabel(setting.getSeverity());
+		}
+		return sl;
   }
 
   List<HL7LocationValue> prepareHL7LocationList(List<HL7MessagePart> list) {

@@ -33,6 +33,7 @@ public class NistValidatorHandler {
 
   public void resetNistValidator() {
     nistValidator = null;
+    this.exception = null;
   }
 
   public Throwable getException() {
@@ -56,6 +57,7 @@ public class NistValidatorHandler {
         if (nistValidatorConnectionStatus != MqeServiceConnectionStatus.CONNECTED) {
           props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.CONNECTED);
         }
+        setException(null);
       } catch (Exception e) {
         this.exception = e;
         switch (nistValidatorConnectionStatus) {
@@ -67,8 +69,9 @@ public class NistValidatorHandler {
             props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.SECOND_FAILURE);
             break;
           case SECOND_FAILURE:
+        	props.disableNistValidator();
+        	break;
           case DISABLED:
-            props.setNistValidatorConnectionStatus(MqeServiceConnectionStatus.DISABLED);
             break;
         }
       }

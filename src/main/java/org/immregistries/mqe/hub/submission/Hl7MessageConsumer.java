@@ -3,17 +3,18 @@ package org.immregistries.mqe.hub.submission;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.core.util.DateUtility;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hl7util.builder.AckBuilder;
 import org.immregistries.mqe.hl7util.builder.AckData;
 import org.immregistries.mqe.hl7util.model.Hl7Location;
-import org.immregistries.mqe.hub.report.SenderMetricsService;
+import org.immregistries.mqe.hub.report.FacilityJpaRepository;
+import org.immregistries.mqe.hub.report.FacilityMessageCounts;
+import org.immregistries.mqe.hub.report.FacilityMessageCountsService;
 import org.immregistries.mqe.hub.report.viewer.MessageCode;
 import org.immregistries.mqe.hub.report.viewer.MessageDetection;
 import org.immregistries.mqe.hub.report.viewer.MessageMetadata;
@@ -21,11 +22,11 @@ import org.immregistries.mqe.hub.report.viewer.MessageMetadataJpaRepository;
 import org.immregistries.mqe.hub.report.viewer.MessageVaccine;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageHubResponse;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
-import org.immregistries.mqe.hub.settings.DetectionsSettings;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsJpaRepository;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
+import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.MqeMessageService;
 import org.immregistries.mqe.validator.MqeMessageServiceResponse;
-import org.immregistries.mqe.validator.detection.Detection;
 import org.immregistries.mqe.validator.detection.ValidationReport;
 import org.immregistries.mqe.validator.engine.ValidationRuleResult;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
@@ -34,7 +35,10 @@ import org.immregistries.mqe.validator.report.codes.CodeCollection;
 import org.immregistries.mqe.validator.report.codes.CollectionBucket;
 import org.immregistries.mqe.vxu.MqeMessageHeader;
 import org.immregistries.mqe.vxu.MqeVaccination;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 //import org.immregistries.mqe.nist.validator.connector.Assertion;
@@ -43,124 +47,209 @@ import org.springframework.stereotype.Service;
 @Service
 public class Hl7MessageConsumer {
 
+  private static final Logger logger = LoggerFactory.getLogger(Hl7MessageConsumer.class);
+
   @Autowired
   private NistValidatorService nistValidatorService;
   private MqeMessageService validator = MqeMessageService.INSTANCE;
   private ReportScorer scorer = ReportScorer.INSTANCE;
   @Autowired
-  private SenderMetricsService metricsSvc;
+  private FacilityMessageCountsService metricsSvc;
   @Autowired
   private MessageMetadataJpaRepository metaRepo;
   @Autowired
   NistValidatorHandler nistValidatorHandler;
   @Autowired
-  private DetectionsSettingsJpaRepository detectionsSettingsRepo;
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
   @Autowired
   private IISGateway iisGatewayService;
+
+  private static final HashMap<String, HashMap<String, SeverityLevel>> severityOverrides =
+      new HashMap<>();
 
   public Hl7MessageHubResponse processMessage(Hl7MessageSubmission messageSubmission) {
     String message = messageSubmission.getMessage();
 
-    String sender = messageSubmission.getFacilityCode();
-    if (sender == null) {
-      sender = "MQE";
+    //    StopWatch stopWatch = new StopWatch();
+    //    stopWatch.start();
+    String facility = validator.getSendingFacility(message);
+    if (StringUtils.isBlank(facility)) {
+      facility = "Unspecified";
     }
-
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
     List<Reportable> nistReportableList = nistValidatorHandler.validate(message);
-    
-    HashMap<String, String> detectionsOverride = retrieveDetectionOverrides(sender);
+    //    stopWatch.stop();
+    //    logger.warn("nistValidatorHandler.validate: " + stopWatch.getTotalTimeMillis());
 
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
+    HashMap<String, SeverityLevel> so = severityOverrides.get(facility);
+    if (so == null) {
+      so = retrieveDetectionOverrides(facility);
+      severityOverrides.put(facility, so);
+    }
+    //    new HashMap<String, String>();
+    //    stopWatch.stop();
+    //    logger.warn("retrieveDetectionOverrides: " + stopWatch.getTotalTimeMillis());
+
+
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
     //force serial processing...
-    MqeMessageServiceResponse validationResults = validator.processMessage(message, detectionsOverride);
+    MqeMessageServiceResponse validationResults = validator.processMessage(message);
+    //    stopWatch.stop();
+    //    logger.warn("validator.processMessage: " + stopWatch.getTotalTimeMillis());
 
-    // apply sender level detection overrides
-    applySenderDetectionOverrides(sender, validationResults);
-    
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
+    // apply facility level detection overrides
+    applySenderDetectionOverrides(so, validationResults);
+    //    stopWatch.stop();
+    //    logger.warn("applySenderDetectionOverrides: " + stopWatch.getTotalTimeMillis());
+
+    //    stopWatch = new StopWatch();
+    //    stopWatch.start();
     String ack = makeAckFromValidationResults(validationResults, nistReportableList);
+    //    stopWatch.stop();
+    //    logger.warn("makeAckFromValidationResults: " + stopWatch.getTotalTimeMillis());
 
     Hl7MessageHubResponse response = new Hl7MessageHubResponse();
     response.setAck(ack);
     response.setMqeResponse(validationResults);
-    response.setSender(sender);
+    response.setSender(facility);
 
     return response;
   }
 
-  private void applySenderDetectionOverrides(String sender, MqeMessageServiceResponse validationResults) {
-	List<ValidationRuleResult> results = validationResults.getValidationResults();
-	for (ValidationRuleResult res : results) {
-		for (ValidationReport report : res.getIssues()) {
-			DetectionsSettings setting = detectionsSettingsRepo.findByGroupIdAndMqeCode(sender, report.getDetection().getMqeMqeCode());
-			if (setting != null) {
-				report.setSeverityLevel(SeverityLevel.findByLabel(setting.getSeverity()));
-			}
-		}
-	}
-}
-
-// Possibly use sender facility to gather sender's detection config
-  private HashMap<String, String> retrieveDetectionOverrides(String sender) {
-	HashMap<String, String> detectionsOverride = new HashMap<String, String>();
-	//detectionsOverride.put("MQE0119", "ERROR"); // debug with: patient dob is underage, default is ACCEPT
-	
-	if (detectionsOverride.isEmpty()) {
-		//Detection.resetDetectionSeverityToDefault();
-	}
-	
-	return detectionsOverride;
-}
-
-public Hl7MessageHubResponse processMessageAndSaveMetrics(
-      Hl7MessageSubmission messageSubmission) {
-    Hl7MessageHubResponse response = this.processMessage(messageSubmission);
-	submitMessageToIIS(messageSubmission);
-    MqeMessageServiceResponse dqr = response.getMqeResponse();
-    Date sentDate = dqr.getMessageObjects().getMessageHeader().getMessageDate();
-    this.saveMetricsFromValidationResults(response.getSender(), dqr, sentDate);
-    MessageMetadata mm = this
-        .saveMessageForSender(messageSubmission.getMessage(), response.getAck(),
-            response.getSender(), sentDate, response);
-
-    return response;
-  }
-  
-  private void submitMessageToIIS(Hl7MessageSubmission messageSubmission) {
-	iisGatewayService.sendVXU(messageSubmission);	
+  private void applySenderDetectionOverrides(HashMap<String, SeverityLevel> overrides,
+      MqeMessageServiceResponse validationResults) {
+    List<ValidationRuleResult> results = validationResults.getValidationResults();
+    for (ValidationRuleResult res : results) {
+      for (ValidationReport report : res.getValidationDetections()) {
+        SeverityLevel slOverride = overrides.get(report.getDetection().getMqeMqeCode());
+        if (slOverride != null) {
+          report.setSeverityLevel(slOverride);
+        }
+      }
+    }
   }
 
-//  int daysSpread = 60;
-//  Date getRandomDate() {
-//    DateTime dt = new DateTime();
-//    int randomDays = (int) Math.floor(Math.random() * daysSpread);
-//    DateTime thisDate = dt.minusDays(randomDays);
-//    if (thisDate.getDayOfWeek() >= 6) {
-//      int randomWeekDay = (int) Math.floor(Math.random() * 5) + 1;
-//      int day = thisDate.getDayOfWeek();
-//      if (day == 7) {
-//        randomWeekDay = randomWeekDay - 1;
-//      }
-//      thisDate = thisDate.minusDays(randomWeekDay);
-//    }
-//
-//    Date sentDate = thisDate.toDate();
-//    return sentDate;
-//  }
+  // Possibly use facility facility to gather facility's detection config
+  @Cacheable("detectionOverrides")
+  public HashMap<String, SeverityLevel> retrieveDetectionOverrides(String facility) {
+    HashMap<String, SeverityLevel> detectionsOverride = new HashMap<>();
 
-  private MessageMetadata saveMessageForSender(String message, String ack, String sender,
-      Date sentDate, Hl7MessageHubResponse response) {
+    if (facility != null) {
+      List<DetectionSeverityOverride> settings = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupName("facility");
+      for (DetectionSeverityOverride ds : settings) {
+        String code = ds.getMqeCode();
+        String severity = ds.getSeverity();
+        SeverityLevel sl = SeverityLevel.valueOf(severity);
+        detectionsOverride.put(code, sl);
+      }
+    }
+    return detectionsOverride;
+  }
+
+
+  private SeverityLevel getDefaultSeverityByCode(String detectionProp, String mqeCode) {
+    SeverityLevel severityLevel = null;
+
+    DetectionSeverityOverride ds = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(detectionProp, mqeCode);
+    if (ds != null) {
+      severityLevel = SeverityLevel.findByLabel(ds.getSeverity());
+    }
+    return severityLevel;
+  }
+
+
+  public Hl7MessageHubResponse processMessageAndSaveMetrics(Hl7MessageSubmission messageSubmission, String username) {
+    //  StopWatch stopWatch = new StopWatch();
+    //  stopWatch.start();
+    Hl7MessageHubResponse messageHubResponse = this.processMessage(messageSubmission);
+    //  stopWatch.stop();
+    //  logger.warn("processMessage: " + stopWatch.getTotalTimeMillis());
+
+    String facility = messageSubmission.getFacilityCode();
+    if (StringUtils.isBlank(facility)) {
+      facility = messageHubResponse.getSender();
+    }
+
+    if (iisGatewayService.isIisgatewayEnable()) {
+      String iisGatewayAck =
+        iisGatewayService.submit(messageSubmission, this.hasErrors(messageHubResponse.getMqeResponse().getValidationResults()));
+      if (!StringUtils.isBlank(iisGatewayAck)) {
+        messageHubResponse.setAck(iisGatewayAck);
+      }
+    }
+
+    MqeMessageServiceResponse mqeResponse = messageHubResponse.getMqeResponse();
+    Date messageDate = mqeResponse.getMessageObjects().getMessageHeader().getMessageDate();
+    Date sentDate = new Date();
+    //  stopWatch = new StopWatch();
+    //  stopWatch.start();
+    FacilityMessageCounts fmc = this.saveMetricsFromValidationResults(facility, mqeResponse, sentDate, username);
+    //  stopWatch.stop();
+    //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
+    //  stopWatch = new StopWatch();
+    //  stopWatch.start();
+    MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(), messageHubResponse.getAck(), messageDate, messageHubResponse, fmc);
+    //  stopWatch.stop();
+    //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
+
+    return messageHubResponse;
+  }
+
+  private boolean hasErrors(List<ValidationRuleResult> validationRuleResultList) {
+    for (ValidationRuleResult validationRuleResult : validationRuleResultList) {
+      for (Reportable reportable : validationRuleResult.getValidationDetections()) {
+        if (reportable.getSeverity() == SeverityLevel.ERROR) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+
+  //  int daysSpread = 60;
+  //  Date getRandomDate() {
+  //    DateTime dt = new DateTime();
+  //    int randomDays = (int) Math.floor(Math.random() * daysSpread);
+  //    DateTime thisDate = dt.minusDays(randomDays);
+  //    if (thisDate.getDayOfWeek() >= 6) {
+  //      int randomWeekDay = (int) Math.floor(Math.random() * 5) + 1;
+  //      int day = thisDate.getDayOfWeek();
+  //      if (day == 7) {
+  //        randomWeekDay = randomWeekDay - 1;
+  //      }
+  //      thisDate = thisDate.minusDays(randomWeekDay);
+  //    }
+  //
+  //    Date sentDate = thisDate.toDate();
+  //    return sentDate;
+  //  }
+
+  @Autowired
+  FacilityJpaRepository facilityRepo;
+
+//  private MessageMetadata saveMessageForSender(String message, String ack, String facility, Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
+  private MessageMetadata saveMessageForSender(String message, String ack, Date messageDate, Hl7MessageHubResponse response, FacilityMessageCounts fmc) {
     MessageMetadata mm = new MessageMetadata();
-    //for demo day, let's make a random date in the last month.
-    mm.setInputTime(sentDate);
+
+
+    mm.setInputTime(fmc.getUploadDate());
+    mm.setMessageTime(messageDate);
     message = message.replaceAll("\\n\\r", "\\r");
     mm.setMessage(message);
     mm.setResponse(ack);
-    mm.setProvider(sender);
+    mm.setFacilityMessageCounts(fmc);
 
     for (ValidationRuleResult rr : response.getMqeResponse().getValidationResults()) {
       for (ValidationReport vr : rr.getValidationDetections()) {
-        Detection d = vr.getDetection();
-        if (SeverityLevel.ERROR == d.getSeverity() ||
-            SeverityLevel.WARN == d.getSeverity()) {
+        MqeDetection d = vr.getDetection();
+        if (SeverityLevel.ERROR == d.getSeverity() || SeverityLevel.WARN == d.getSeverity()) {
           StringBuilder locBldr = new StringBuilder();
           for (Hl7Location loc : vr.getHl7LocationList()) {
             locBldr.append(loc.toString());
@@ -186,43 +275,41 @@ public Hl7MessageHubResponse processMessageAndSaveMetrics(
       mc.setMessageMetadata(mm);
       mm.getCodes().add(mc);
     }
-    
+
     Map<String, MessageVaccine> map = new HashMap<>();
     for (MqeVaccination mv : response.getMqeResponse().getMessageObjects().getVaccinations()) {
-    	if (!mv.isAdministered()){
-    		continue;
-    	}
-    	Date date = mv.getAdminDate();
-    	Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
-    	int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
-    	String cvx = mv.getCvxDerived();
-    	String key = cvx+":"+age;
-    	MessageVaccine v = map.get(key);
-    	if (v == null) {
-    		v = new MessageVaccine();
-    		v.setCount(0);
-    		v.setMessageMetadata(mm);
-    		v.setVaccineCvx(cvx);
-    		v.setAge(age);
-    		mm.getVaccines().add(v);
-    		map.put(key, v);
-    	}
-    	v.setCount(v.getCount() + 1);
+      if (!mv.isAdministered()) {
+        continue;
+      }
+      Date date = mv.getAdminDate();
+      Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
+      int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
+      mm.setPatientAge(age);
+      String cvx = mv.getCvxDerived();
+      String key = cvx + ":" + age;
+      MessageVaccine v = map.get(key);
+      if (v == null) {
+        v = new MessageVaccine();
+        v.setCount(0);
+        v.setMessageMetadata(mm);
+        v.setVaccineCvx(cvx);
+        v.setAge(age);
+        mm.getVaccines().add(v);
+        map.put(key, v);
+      }
+      v.setCount(v.getCount() + 1);
     }
     metaRepo.save(mm);
 
     return mm;
   }
 
-  private MqeMessageMetrics saveMetricsFromValidationResults(String sender,
-      MqeMessageServiceResponse validationResults, Date metricsDate) {
+  private FacilityMessageCounts saveMetricsFromValidationResults(String facility, MqeMessageServiceResponse validationResults, Date metricsDate, String username) {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
-    metricsSvc.addToSenderMetrics(sender, metricsDate, metrics);
-    return metrics;
+    return metricsSvc.addToFacilityMessageCounts(facility, metricsDate, username, metrics);
   }
 
-  private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults,
-      List<Reportable> nistReportablesList) {
+  private String makeAckFromValidationResults(MqeMessageServiceResponse validationResults, List<Reportable> nistReportablesList) {
 
     List<ValidationRuleResult> resultList = validationResults.getValidationResults();
     List<Reportable> reportables = new ArrayList<>(nistReportablesList);
@@ -249,4 +336,5 @@ public Hl7MessageHubResponse processMessageAndSaveMetrics(
 
     return ackBuilder.buildAckFrom(data);
   }
+
 }

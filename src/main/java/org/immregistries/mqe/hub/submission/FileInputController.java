@@ -15,11 +15,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.hl7util.parser.HL7QuickParser;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
+import org.immregistries.mqe.hub.authentication.model.UserCredentials;
 import org.immregistries.mqe.hub.rest.FileUploadData;
 import org.immregistries.mqe.hub.rest.MessageInputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,12 +47,12 @@ public class FileInputController {
 
   @RequestMapping(value = "upload-messages", method = RequestMethod.POST)
   public FileUploadData urlEncodedHttpFormFilePost(@RequestParam("file") MultipartFile file,
-      String facilityId) throws Exception {
+      String facilityId, AuthenticationToken token) throws Exception {
 
     InputStream inputStream = file.getInputStream();
 
     String fileId = "file" + String.valueOf(new Date().getTime());
-    FileUploadData fileUpload = new FileUploadData(facilityId, file.getOriginalFilename(), fileId);
+    FileUploadData fileUpload = new FileUploadData(facilityId, file.getOriginalFilename(), fileId, token.getPrincipal().getUsername());
     ByteArrayOutputStream result = new ByteArrayOutputStream();
     int length;
     byte[] buffer = new byte[1024];
@@ -80,6 +83,12 @@ public class FileInputController {
 
       if (!line.matches(FHS_BHS_REGEX)) {
         if (line.matches(MSH_REGEX)) {
+          /* replace any white space at the beginning of the line.
+           * This will eliminate issues with unusual message separators.
+           * We were seeing "VT" and "FS" - vertical tab and file separator
+           */
+          line = line.replaceAll("^\\s+MSH", "MSH");
+
           if (oneMessage.length() <= 0) {
             oneMessage.append(line);
           } else {
@@ -104,16 +113,20 @@ public class FileInputController {
   }
 
   @RequestMapping(value = "report-file", method = RequestMethod.GET)
-  public FileUploadData reportFile(@RequestParam("fileId") String fileId) {
-    return this.fileQueue.get(fileId);
+  public FileUploadData reportFile(@RequestParam("fileId") String fileId, AuthenticationToken token) {
+    FileUploadData data = this.fileQueue.get(fileId);
+    if(data != null && data.getUsername().equals(token.getPrincipal().getUsername())) {
+      return data;
+    }
+    return null;
   }
 
 
   @RequestMapping(value = "report-acks", method = RequestMethod.GET)
-  public List<String> reportAcks(@RequestParam("fileId") String fileId) {
+  public List<String> reportAcks(@RequestParam("fileId") String fileId, AuthenticationToken token) {
     FileUploadData ud = this.fileQueue.get(fileId);
 
-    if (ud != null) {
+    if (ud != null && ud.getUsername().equals(token.getPrincipal().getUsername())) {
       return ud.getAckMessages();
     }
 
@@ -121,15 +134,16 @@ public class FileInputController {
   }
 
   @RequestMapping(value = "remove-file", method = RequestMethod.GET)
-  public void removeFile(@RequestParam("fileId") String fileId) {
+  public void removeFile(@RequestParam("fileId") String fileId, AuthenticationToken token) {
 
     FileUploadData data = this.fileQueue.get(fileId);
 
-    if (data != null) {
+    if (data != null && data.getUsername().equals(token.getPrincipal().getUsername())) {
       data.setStatus("deleted");
+      this.fileQueue.remove(fileId);
     }
 
-    this.fileQueue.remove(fileId);
+
   }
 
   private class FileProcessingQueue {
@@ -146,16 +160,20 @@ public class FileInputController {
   }
 
   @RequestMapping(value = "get-queues", method = RequestMethod.GET)
-  public FileProcessingQueue getQueues() {
+  public FileProcessingQueue getQueues(AuthenticationToken token) {
     FileProcessingQueue queue = new FileProcessingQueue();
-    queue.getUploads().addAll(this.fileQueue.values());
+    for(FileUploadData data : this.fileQueue.values()) {
+      if(data.getUsername().equals(token.getPrincipal().getUsername())) {
+        queue.getUploads().add(data);
+      }
+    }
     return queue;
   }
 
   @RequestMapping(value = "stop-file", method = RequestMethod.GET)
-  public void stopFile(@RequestParam("fileId") String fileId) {
+  public void stopFile(@RequestParam("fileId") String fileId, AuthenticationToken token) {
     FileUploadData fud = this.fileQueue.get(fileId);
-    if (fud != null) {
+    if (fud != null && fud.getUsername().equals(token.getPrincipal().getUsername())) {
       fud.setStatus("Stop");
       if (fud.getNumberUnProcessed() <= 0) {
         fud.setStatus("finished");
@@ -164,16 +182,21 @@ public class FileInputController {
   }
 
   @RequestMapping(value = "unpause-file", method = RequestMethod.GET)
-  public void unpauseFile(@RequestParam("fileId") String fileId) {
+  public void unpauseFile(@RequestParam("fileId") String fileId, AuthenticationToken token) {
     FileUploadData fud = this.fileQueue.get(fileId);
-    if (fud != null && fud.getPercentage() < 100) {
+    if (fud != null && fud.getUsername().equals(token.getPrincipal().getUsername()) && fud.getPercentage() < 100) {
       fud.setStatus("started");
     }
   }
 
   @RequestMapping(value = "process-file", method = RequestMethod.POST)
-  public FileUploadData processFile(@RequestParam("fileId") String fileId) throws Exception {
+  public FileUploadData processFile(@RequestParam("fileId") String fileId, AuthenticationToken token) throws Exception {
     FileUploadData fileUpload = this.fileQueue.get(fileId);
+
+    if(fileUpload == null || !fileUpload.getUsername().equals(token.getPrincipal().getUsername())) {
+      return fileUpload;
+    }
+
 
     if ("started".equals(fileUpload.getStatus())) {
       return fileUpload;
@@ -229,15 +252,21 @@ public class FileInputController {
               return fileUpload;
             }
           }
-          String sender = quickParser.getMsh4Sender(message);
-        
-        if (StringUtils.isBlank(sender)) {
-          sender = "Unspecified";
+          String sendingFacility = quickParser.getMsh4Sender(message);
+
+        if (StringUtils.isBlank(sendingFacility)) {
+          if (StringUtils.isBlank(token.getPrincipal().getFacilityId())) {
+            sendingFacility = "Unspecified";
+          } else {
+            sendingFacility = token.getPrincipal().getFacilityId();
+          }
         }
 
-
-        String ackResult = messageController.urlEncodedHttpFormPost(message, null, null, sender);
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        String ackResult = messageController.urlEncodedHttpFormPost(message, sendingFacility, token);
+        stopWatch.stop();
+        logger.warn("urlEncodedHttpFormPost: " + stopWatch.getTotalTimeMillis());
         fileUpload.getHl7Messages().set(idx, null);
 
         //If the ack ends with a line break, remove it.

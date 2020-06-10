@@ -1,3 +1,197 @@
-<p>
-  message-validation works!
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="heading row">
+        <h4>Input VXU</h4>
+      </div>
+      <div class="row">
+        <div class="form-group col-md-12">
+						<textarea id="Message" class="form-control" ng-trim="false"
+                      rows="10" [(ngModel)]="messageText.message"></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" type="submit" (click)="submit()">Submit</button>&nbsp;
+      <button class="btn btn-primary" type="submit" (click)="getExample()">Example</button>
+    </div>
+  </div>
+  <br/><br/><br/>
+
+  <ng-template #loading>
+    <div class="text-primary text-center loading" *ngIf="submitted">
+      <fa-icon  [icon]="['fas', 'cog']" [spin]="true"></fa-icon> <br/> <span>Validating Message...</span>
+    </div>
+  </ng-template>
+
+  <div *ngIf="validationResult | async as vr; else loading" class="row">
+    
+    <div class="" *ngIf="vr.ack != null">
+      <div class="col-md-12">
+        <h4>VXU</h4>
+        <app-hl7-view [hl7Text]='vr.vxu'></app-hl7-view>
+        <br />
+        <h4>ACK</h4>
+        <app-hl7-view [hl7Text]='vr.ack'></app-hl7-view>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" *ngIf="vr.ack != null">
+          <div class="heading row">
+            <h4>MQE Evaluation</h4>
+          </div>
+          <div class="heading row">
+            <h5>Errors ({{errorArray.length}})</h5>
+          </div>
+          <div id="errorFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-5">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-5">Location</th>
+              </tr>
+              </thead>
+              <ng-container *ngIf="errorArray.length == 0">
+                <tbody>
+                  <tr *ngIf="errorArray.length == 0 && false" >
+                    <td>
+                      No Error Codes.  
+                    </td>
+                  </tr>
+                </tbody>
+              </ng-container>
+              <ng-container *ngIf="errorArray.length > 0">
+                <tbody>
+                    <tr *ngFor="let issue of errorArray">
+                      <td>{{issue.applicationErrorCode.alternateText}}</td>
+                      <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                      <td>{{issue.severity}}</td>
+                      <td><span *ngFor="let location of issue.hl7LocationList">
+                        {{location.segmentId}}-{{location.fieldPosition}}
+                      </span>
+                      </td>
+                    </tr>
+                </tbody>
+              </ng-container>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Warnings ({{warnArray.length}})</h5>
+          </div>
+          <div id="warnFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-5">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-5">Location</th>
+              </tr>
+              </thead>
+              <ng-container *ngIf="warnArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Warning Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </ng-container>
+              <ng-container *ngIf="warnArray.length > 0">
+                  <tbody>
+                      <tr *ngFor="let issue of warnArray">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </ng-container>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Informational ({{infoArray.length}})</h5>
+          </div>
+          <div id="infoFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-5">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-5">Location</th>
+              </tr>
+              </thead>
+              <ng-container *ngIf="infoArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Informational Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </ng-container>
+              <ng-container *ngIf="infoArray.length > 0">
+                  <tbody>
+                      <tr *ngFor="let issue of infoArray">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </ng-container>
+            </table>
+          </div>
+          <div class="heading row">
+            <h5>Accept ({{acceptArray.length}})</h5>
+          </div>
+          <div id="acceptFindings">
+            <table class="table">
+              <thead>
+              <tr>
+                <th class="col-md-5">Issue</th>
+                <th class="col-md-1">Code</th>
+                <th class="col-md-1">Severity</th>
+                <th class="col-md-5">Location</th>
+              </tr>
+              </thead>
+              <ng-container *ngIf="acceptArray.length == 0">
+                  <tbody>
+                    <tr>
+                      <td>
+                        No Accepted Codes
+                      </td>
+                    </tr>
+                  </tbody>
+              </ng-container>
+              <ng-container *ngIf="acceptArray.length > 0">
+                  <tbody>
+                      <tr *ngFor="let issue of acceptArray">
+                        <td>{{issue.applicationErrorCode.alternateText}}</td>
+                        <td>{{issue.applicationErrorCode.alternateIdentifier}}</td>
+                        <td>{{issue.severity}}</td>
+                        <td><span *ngFor="let location of issue.hl7LocationList">
+                          {{location.segmentId}}-{{location.fieldPosition}}
+                        </span>
+                        </td>
+                      </tr>
+                  </tbody>
+              </ng-container>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- <div *ngIf="!validationResult; else errorMessage"></div>
+<ng-template #errorMessage>
+      <pre>Error</pre>
+</ng-template> -->

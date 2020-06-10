@@ -1,16 +1,12 @@
-<div class="container">
+<div style="border: 2px dotted grey; padding: 10px; margin: 10px;">
   <div class="row">
-    <strong class="col-sm-3" style="padding-left: 5px; word-break: break-all;">{{fileUploadInfo?.fileName}}</strong>
-    <div class="col-sm-5">
-      <ngb-progressbar  showValue="true" [value]="fileUploadInfo.percentage" [type]="fileUploadInfo?.status === 'exception' ? 'danger' : fileUploadInfo?.status === 'finished' ? 'success' : 'info'"></ngb-progressbar>
-      <div *ngIf="fileUploadInfo?.status === 'started'">
-        ({{ (((fileUploadInfo?.numberUnProcessed * fileUploadInfo?.averageElapsed) / 1000) | number: '1.2') }}s estimated remaining)
-      </div>
+    <div class="col-md-4" style="padding-top:5px;padding-bottom:5px;">
+      <span class="upload-file-name"><strong>{{fileUploadInfo?.fileName}}</strong></span>
     </div>
     <div class="col-sm-2">
-      <div  *ngIf="fileUploadInfo?.status === 'reading'">
+      <div *ngIf="fileUploadInfo?.status === 'reading'">
         reading file ...
-        <br/><span *ngIf="fileUploadInfo?.numberOfMessages > 0">{{fileUploadInfo?.numberOfMessages}} loaded</span>
+        <br /><span *ngIf="fileUploadInfo?.numberOfMessages > 0">{{fileUploadInfo?.numberOfMessages}} loaded</span>
       </div>
       <div style="padding-top:5px;padding-bottom:5px;" *ngIf="fileUploadInfo?.status === 'started'">
         {{fileUploadInfo?.numberProcessed}} of {{fileUploadInfo?.numberOfMessages}}<br />
@@ -19,7 +15,7 @@
       <div style="padding-top:5px;padding-bottom:5px;" *ngIf="fileUploadInfo?.status === 'finished'">
         {{fileUploadInfo?.numberProcessed}} messages<br />
         ({{fileUploadInfo?.averageElapsed}} ms avg)<br />
-        Elapsed - {{fileUploadInfo?.elapsedTimeMs}}<br />
+        Elapsed - {{fileUploadInfo?.elapsedTimeMs | duration}}<br />
       </div>
       <div style="padding-top:5px;padding-bottom:5px;" *ngIf="fileUploadInfo?.status === 'deleting'">
         {{fileUploadInfo?.numberProcessed}} messages<br />
@@ -31,12 +27,29 @@
         (Exception Occurred)<br />
       </div>
     </div>
+    <div class="col-sm-4">
+      <ngb-progressbar showValue="true" [value]="fileUploadInfo.numberProcessed  === 0 ? 0 : fileUploadInfo.percentage"
+        [type]="fileUploadInfo?.status === 'exception' ? 'danger' : fileUploadInfo?.status === 'finished' ? 'success' : 'info'">
+      </ngb-progressbar>
+      <div *ngIf="fileUploadInfo?.status === 'started'">
+        ({{ (((fileUploadInfo?.numberUnProcessed * fileUploadInfo?.averageElapsed)) | duration) }}
+        estimated remaining)
+      </div>
+    </div>
+
     <div class="col-sm-2">
-      <button class="btn btn-secondary" style="margin-right: 2px;" (click)="downloadAcks(fileUploadInfo?.fileId, fileUploadInfo?.fileName)" [disabled]="fileUploadInfo?.status !== 'finished'">
+      <button class="btn btn-secondary btn-sm" style="margin-right: 2px;"
+        (click)="downloadAcks(fileUploadInfo?.fileId, fileUploadInfo?.fileName)"
+        [disabled]="fileUploadInfo?.status !== 'finished'">
         <fa-icon icon="download"></fa-icon> Acks
       </button>
-      <button class="btn btn-danger">
+      <button class="btn btn-danger btn-sm" *ngIf="!deleteRequest" (click)="requestDelete()">
         <fa-icon icon="trash-alt"></fa-icon>
+      </button>
+      <button class="btn btn-sm" *ngIf="deleteRequest" (click)="cancelDelete()"
+      [ngStyle]="{'background-color': 'rgba(255, 193, 7,' + ((countDown  > 0) ? countDown/100 : 0) +')'}" >
+        <fa-icon icon="trash-alt"></fa-icon>
+        Cancel
       </button>
     </div>
   </div>

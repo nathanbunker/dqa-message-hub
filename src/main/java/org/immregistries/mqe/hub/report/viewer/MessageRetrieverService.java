@@ -10,6 +10,8 @@ import org.immregistries.mqe.hl7util.parser.MessageParserHL7;
 import org.immregistries.mqe.hub.report.vaccineReport.AgeCategory;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportBuilder;
 import org.immregistries.mqe.hub.report.vaccineReport.VaccineReportConfig;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.validator.detection.Detection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,37 +30,40 @@ public class MessageRetrieverService {
 
   @Autowired
   MessagesViewJpaRepository mvRepo;
+  
+  @Autowired
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
   private final MessageParser parser = new MessageParserHL7();
 
-  public MessageListContainer getMessages(String providerKey, Date dateCreated,
+  public MessageListContainer getMessages(String providerKey, String username, Date dateStart, Date dateEnd,
       ViewerFilter filters, int pageNumber, int itemsCount) {
     LOGGER.info("getMessages");
     //Decide which method to call based on what gets sent in:
     List<MessageMetadata> messages = new ArrayList<>();
     Page<MessageMetadata> mvpage = null;
 
-    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "id");
+    Pageable pager = new PageRequest(pageNumber, itemsCount, Sort.Direction.ASC, "messageTime");
 
     if (filters.isMessageTextFilter() && !filters.isDetectionIdFilter()) {
       mvpage = mvRepo
-          .findByProviderAndDateAndMessageText(providerKey, dateCreated, filters.getMessageText(),
+          .findByProviderAndDateAndMessageText(username, providerKey, dateStart, dateEnd, filters.getMessageText(),
               pager);
     } else if (!filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
-      mvpage = mvRepo.findByDetectionId(providerKey, dateCreated, filters.getDetectionId(), pager);
+      mvpage = mvRepo.findByDetectionId(username, providerKey, dateStart, dateEnd, filters.getDetectionId(), pager);
     } else if (filters.isMessageTextFilter() && filters.isDetectionIdFilter()) {
-      mvpage = mvRepo.findByDetectionIdAndMessageText(providerKey, dateCreated, filters.getDetectionId(), filters.getMessageText(), pager);
+      mvpage = mvRepo.findByDetectionIdAndMessageText(username, providerKey, dateStart, dateEnd, filters.getDetectionId(), filters.getMessageText(), pager);
     } else if (filters.isCodeTypeFilter() && filters.isCodeValueFilter()) {
-      mvpage = mvRepo.findByCodeValue(providerKey, dateCreated, filters.getCodeValue(), filters.getCodeType(), pager);
+      mvpage = mvRepo.findByCodeValue(username, providerKey, dateStart, dateEnd, filters.getCodeValue(), filters.getCodeType(), pager);
     } else if (filters.isVaccineGroupFilter()) {
     	VaccineReportConfig vaccineReportConfig =
     	        VaccineReportBuilder.INSTANCE.getDefaultVaccineReportConfig();
     	List<String> cvxs = vaccineReportConfig.getCvxListForVaccineReportGroup(filters.getVaccineGroup());
     	AgeCategory ages = vaccineReportConfig.getAgeCategoryForLabel(filters.getVaccineGroupAge());
-    	mvpage = mvRepo.findByVaccine(providerKey, dateCreated, cvxs, ages.getAgeHigh(), ages.getAgeLow(), pager);
+    	mvpage = mvRepo.findByVaccine(username, providerKey, dateStart, dateEnd, cvxs, ages.getAgeHigh(), ages.getAgeLow(), pager);
     } else {
       LOGGER.info("getMessages NO FILTER");
-      mvpage = mvRepo.findByProviderAndDate(providerKey, dateCreated, pager);
+      mvpage = mvRepo.findByProviderAndDate(username, providerKey, dateStart, dateEnd, pager);
     }
 
     long totalElements = 0;
@@ -95,6 +100,7 @@ public class MessageRetrieverService {
 
     item.setId(mv.getId());
     item.setReceived(mv.getInputTime());
+    item.setMessageTime(mv.getMessageTime());
 //		item.setMcirError("Y".equals(mv.getTransferErrorFl()));
 
     HL7MessageMap map = parser.getMessagePartMap(mv.getMessage());
@@ -114,8 +120,14 @@ public class MessageRetrieverService {
     item.setPatientName(patientLast + ", " + patientFirst);
 
     for (MessageDetection d : mv.getDetections()) {
-      Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
-      SeverityLevel sl = dt.getSeverity();
+        Detection dt = Detection.getByMqeErrorCodeString(d.getDetectionId());
+        SeverityLevel sl = dt.getSeverity();
+
+    	DetectionSeverityOverride setting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(mv.getFacilityMessageCounts().getFacility().getName(), d.getDetectionId());
+		if (setting != null) {
+			sl = SeverityLevel.findByLabel(setting.getSeverity());
+		}
+
       if (sl == SeverityLevel.ERROR) {
         item.setErrorsCount(item.getErrorsCount() + 1);
       } else if (sl == SeverityLevel.WARN) {

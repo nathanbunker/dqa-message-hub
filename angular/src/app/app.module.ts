@@ -1,8 +1,8 @@
-import {BrowserModule} from '@angular/platform-browser';
-import {NgModule} from '@angular/core';
-
-import {HttpClientModule} from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { TableModule } from 'primeng/table';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
 import { HeaderComponent } from './header/header.component';
@@ -16,13 +16,12 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CalendarComponent } from './dashboard/calendar/calendar.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
-import { ReportComponent } from './dashboard/report/report.component';
 import { MessagesComponent } from './dashboard/report/messages/messages.component';
 import { DetectionsComponent } from './dashboard/report/detections/detections.component';
 import { CodesComponent } from './dashboard/report/codes/codes.component';
@@ -35,8 +34,21 @@ import { CodeDocComponent } from './documentation/code-doc/code-doc.component';
 import { DetectionDocComponent } from './documentation/detection-doc/detection-doc.component';
 import { Ng2GoogleChartsModule } from 'ng2-google-charts';
 import { ProviderTypeaheadComponent } from './dashboard/provider-typeahead/provider-typeahead.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DatepickerComponent } from './dashboard/datepicker/datepicker.component';
+import { DocumentationService } from './services/documentation.service';
+import { ReportingService } from './services/reporting.service';
+import { ProviderComponent } from './dashboard/provider/provider.component';
+import { ProviderDashboardGuard } from './guards/provider-dashboard.guard';
+import { ToastrModule } from 'ngx-toastr';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { Hl7Reference } from './hl7-reference';
+import { Hl7ViewComponent } from './hl7-view/hl7-view.component';
+import { ReportComponent } from './report/report.component';
+import { DurationPipe } from './pipes/duration.pipe';
+import { LoginComponent } from './login/login.component';
+import { AuthenticatedGuard, NotAuthenticatedGuard } from './services/auth-guard.service';
+import { AuthInterceptor } from './services/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -48,7 +60,6 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     DashboardComponent,
     CalendarComponent,
     MessageDetailComponent,
-    ReportComponent,
     MessagesComponent,
     DetectionsComponent,
     CodesComponent,
@@ -60,7 +71,12 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     CodeDocComponent,
     DetectionDocComponent,
     ProviderTypeaheadComponent,
-    DatepickerComponent
+    DatepickerComponent,
+    ProviderComponent,
+    Hl7ViewComponent,
+    ReportComponent,
+    DurationPipe,
+    LoginComponent,
   ],
   imports: [
     BrowserModule,
@@ -69,14 +85,47 @@ import { DatepickerComponent } from './dashboard/datepicker/datepicker.component
     HttpClientModule,
     Ng2GoogleChartsModule,
     NgbModule,
-    FormsModule
+    TableModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    ReactiveFormsModule,
+    ToastrModule.forRoot({ positionClass: 'toast-top-right' }),
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    DocumentationService,
+    ReportingService,
+    ProviderDashboardGuard,
+    Hl7Reference,
+    AuthenticatedGuard,
+    NotAuthenticatedGuard,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
+  exports: [ReportComponent]
 })
 export class AppModule {
   constructor() {
-  // Add an icon to the library for convenient access in other components
-  library.add(faSlidersH, faCoffee, faStethoscope, faCaretDown, faTrashAlt, faDownload);
+    // Add an icon to the library for convenient access in other components
+    library.add(
+      faSlidersH,
+      faCoffee,
+      faStethoscope,
+      faCaretDown,
+      faTrashAlt,
+      faDownload,
+      faChevronRight,
+      faChevronLeft,
+      faThumbsDown,
+      faThumbsUp,
+      faChevronDown,
+      faSearch,
+      faFilter,
+      faSpinner,
+      faEnvelope,
+      faSyringe,
+      faExclamationTriangle,
+      faCog,
+      faTimes,
+    );
   }
 }

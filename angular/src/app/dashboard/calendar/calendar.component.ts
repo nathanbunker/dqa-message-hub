@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CalendarInfo } from 'src/app/dashboard/dashboard.component';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Input } from '@angular/core';
 import { GoogleChartInterface } from 'ng2-google-charts/google-charts-interfaces';
 import * as moment from 'moment';
@@ -12,40 +11,51 @@ import * as moment from 'moment';
 })
 export class CalendarComponent implements OnInit {
 
-  constructor() { }
+  start: moment.Moment;
+  end: moment.Moment;
+  activity: CalendarInfo;
+  chartData = [];
+  selectedColors = { colors: ['#a2c0f3', '#9AF3BF'] };
+  heatmapColors = { colors: ['#9AF3BF', '#259253'] };
 
   @Input()
-  calendarInfo: CalendarInfo;
-  searchOptions = {};
-  resultsMetaData = {
-    page: 0,
-    elementsPerPage: 10,
-    maxSize: 10,
-    totalElements: 0, // Don't modify this except with the actual list length. Modifying this causes a page reload...
-    messages: [],
-  };
+  set startDate(date: string) {
+    this.start = moment(date, 'YYYYMMDD');
+    this.calendarChart.options.colorAxis = this.selectedColors;
+  }
 
-  calendarChart: GoogleChartInterface = {
-    chartType: 'Calendar',
-    dataTable: [
-      ['Date', 'Attendance'],
-      [ new Date(2012, 3, 13), 37032 ],
-      [ new Date(2012, 3, 14), 38024 ],
-      [ new Date(2012, 3, 15), 38024 ],
-      [ new Date(2012, 3, 16), 38108 ],
-      [ new Date(2012, 3, 17), 38229 ]
-    ],
-    // opt_firstRowIsData: true,
-    options:
-    // {'title': 'Date'},
+  @Input()
+  set endDate(date: string) {
+    this.end = moment(date, 'YYYYMMDD');
+    this.calendarChart.options.colorAxis = this.selectedColors;
+  }
+
+  @Input()
+  set calendarInfo(info: CalendarInfo) {
+    this.activity = info;
+    this.populateCalendar();
+  }
+
+  @Output()
+  select: EventEmitter<Date>;
+  header = [
+    'Date',
+    'Count',
     {
+      id: 'tooltip',
+      type: 'string',
+      role: 'tooltip',
+      'p': { 'html': true }
+    }
+  ];
+  calendarChart = {
+    chartType: 'Calendar',
+    dataTable: [],
+    options: {
       title: '',
-
-    // 	        height: 220,
+      height: 250,
       calendar: {
         cellSize: 20,
-    // 	        	yearLabel : {display:'none', color:'grey', /*fontSize: 100*/},
-    // 	        forceIFrame: true, //This doesn't seem to work.
         focusedCellColor: {
           stroke: '#d3362d',
           strokeOpacity: 1,
@@ -57,52 +67,148 @@ export class CalendarComponent implements OnInit {
           strokeWidth: 1
         }
       },
-
-      colorAxis: {colors: ['#9AF3BF', '#259253']},
-      tooltip: {isHtml: true},
+      legend: 'none',
+      colorAxis: this.heatmapColors,
+      tooltip: { isHtml: true },
     }
   };
 
-myChartObject = {type: 'Calendar', data: {
-  'cols': [
-    {id: 'Date', label: 'Day', type: 'date'},
-    {id: 'count', label: 'Slices', type: 'number'},
-    {
-      id: 'tooltip',
-      type: 'string',
-      role: 'tooltip',
-      'p': {'html': true}
-    }
-  ],
-  'rows': []
-}
-};
-
-  handleChartClick = function (selectedItem) {
-    console.log('handleChartClick');
-    console.log(selectedItem);
-    if (selectedItem) {
-//        		&& selectedItem.row >= 0) {
-      var selectedDate = this.convertChartDateToLocalDate(selectedItem.selectedRowValues[0]);
-      this.searchOptions.date = selectedDate;
-      this.calendarDisplayYear = moment(
-          this.searchOptions.date).year();
-      this.resultsMetaData.page = 1;
-      // this.reloadPageData();
-    }
-  };
-
-  ngOnInit() {
-    // this.calendarChart.dataTable = this.calendarInfo;
+  constructor() {
+    this.select = new EventEmitter<Date>();
   }
 
-// So...  for some reason google charts sends the date back as if it were in UTC time...
-convertChartDateToLocalDate(chartDate) {
-  var m = moment.utc(chartDate);
-  var offsetMinutes = m.toDate().getTimezoneOffset();
-  m.add(offsetMinutes, 'minutes');
-  return m.toDate();
+  getTooltip(date: moment.Moment, activity: boolean, count: number, selected: boolean) {
+    return '<div style="width: 200px; padding: 5px; text-align: center;">' +
+      '<span style="font-weight: bold; font-size: 20px; text-align: center;">' + date.format('MM · DD · YYYY') + '</span><br>' +
+      '<span style="font-weight: 500; font-size: 18px; text-align: center; margin-top: 5px;">' +
+      (activity ? ('RECEIVED ' + count) : ('NO ACTIVITY')) + '</span><br>' +
+      (selected ? '<span style="font-size: 15px; text-align: center; margin-top: 5px;" > (SELECTED) </span>' : '') +
+      '</div>';
+  }
+
+  populateCalendar() {
+    // Clear Chart Data
+    this.calendarChart.dataTable = [
+      this.header,
+    ];
+    // Initialize year variables
+    const yearStart = moment(this.activity.year + '0101', 'YYYYMMDD');
+    const yearEnd = moment(this.activity.year + '1231', 'YYYYMMDD');
+
+    // start cursor at the beginning of the year
+    let cursor = moment(this.activity.year + '0101', 'YYYYMMDD');
+    let firstDate = true;
+
+    // If we have data for the year
+    if (this.activity.messageHistory && this.activity.messageHistory.length > 0) {
+
+      // for each piece of data
+      for (const data of this.activity.messageHistory) {
+        const date = moment(data.day, 'YYYY-MM-DD');
+        const value = data.count;
+
+        // if the date is after star of the year
+        if (yearStart.isBefore(date) && firstDate) {
+          firstDate = false;
+          // populate start of the year node
+          this.pushToCalendar(yearStart);
+        }
+
+        // if the date is after previous populated date
+        const days = cursor.diff(date, 'days');
+        if (days < 1) {
+          // fill the empty space between date and previous
+          this.fillInEmptyDates(moment(cursor).add(1, 'days'), moment(date).subtract(1, 'days'));
+        }
+
+        // fill the current date
+        this.pushToCalendar(date, value);
+
+        // advance cursor to next date
+        cursor = date;
+      }
+
+      // if last populate date is not the end of year date then populate empty space between last date and year end
+      if (cursor.isBefore(yearEnd)) {
+        this.fillInEmptyDates(moment(cursor).add(1, 'days'), yearEnd);
+      }
+    } else {
+      // fill empty calendar
+      this.fillInEmptyDates(yearStart, yearEnd);
+      this.calendarChart.dataTable.push([
+        yearStart.toDate(),
+        NaN,
+        this.getTooltip(yearStart, false, NaN, false),
+      ]);
+    }
+
+    this.calendarChart = {
+      ...this.calendarChart,
+    };
+
+    console.log(this.calendarChart);
+  }
+
+  fillInEmptyDates(start: moment.Moment, end: moment.Moment) {
+    const dates = this.getAllDates(start, end);
+    for (const date of dates) {
+      this.pushToCalendar(date);
+    }
+  }
+
+  pushToCalendar(date: moment.Moment, count?: number) {
+    const selected = this.start && this.end && date.isBetween(this.start, this.end, 'day', '[]');
+    const tooltip = this.getTooltip(date, count && count > 0, count, selected);
+    const rangeValue = (selected ? -100 + (count >= 1 ? 140 : 0) : (count >= 1 ? 100 : null));
+
+    this.calendarChart.dataTable.push(
+      [
+        date.toDate(),
+        rangeValue,
+        tooltip,
+      ]
+    );
+  }
+
+  getAllDates(_start: moment.Moment, _end: moment.Moment): moment.Moment[] {
+    const dates: moment.Moment[] = [
+      _start.clone(),
+    ];
+
+    while (_start.isBefore(_end)) {
+      _start.add(1, 'days');
+      dates.push(_start.clone());
+    }
+
+    return dates;
+  }
+
+  // So...  for some reason google charts sends the date back as if it were in UTC time...
+  convertChartDateToLocalDate(chartDate) {
+    const m = moment.utc(chartDate);
+    const offsetMinutes = m.toDate().getTimezoneOffset();
+    m.add(offsetMinutes, 'minutes');
+    return m.toDate();
+  }
+
+  handleChartClick(selectedItem) {
+    if (selectedItem && selectedItem.selectedRowValues[0]) {
+      const selectedDate = this.convertChartDateToLocalDate(selectedItem.selectedRowValues[0]);
+      this.select.emit(selectedDate);
+    }
+  }
+
+  ngOnInit() {
+  }
 }
 
+export interface CalendarInfo {
+  year: number;
+  provider: string;
+  messageHistory: MessageDate[];
 }
 
+export interface MessageDate {
+  day: string;
+  count: number;
+}

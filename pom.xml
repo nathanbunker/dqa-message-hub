@@ -8,7 +8,7 @@
     <version>1.3.3.RELEASE</version>
   </parent>
   <groupId>org.immregistries</groupId>
-  <version>2019.03-BETA</version>
+  <version>2020.04-BETA</version>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mqe-message-hub</artifactId>
   <packaging>war</packaging>
@@ -18,13 +18,23 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <mqe.version>2018.12-BETA</mqe.version>
+    <mqe.version>2020.04-BETA</mqe.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-web</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
     </dependency>
 
     <dependency>
@@ -79,7 +89,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.197</version>
+      <version>1.4.200</version>
     </dependency>
 
     <dependency>
@@ -236,7 +246,7 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>run-script prod</arguments>
+              <arguments>run-script build</arguments>
             </configuration>
             <phase>generate-resources</phase>
           </execution>

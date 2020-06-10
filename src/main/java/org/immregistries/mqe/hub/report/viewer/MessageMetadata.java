@@ -10,12 +10,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import org.immregistries.mqe.hub.report.FacilityMessageCounts;
 
 @Entity
 @Table(name = "MESSAGE_METADATA")
@@ -33,11 +36,18 @@ public class MessageMetadata {
   @Lob
   private String response;
 
+  private int patientAge;
+
   @javax.persistence.Temporal(TemporalType.TIMESTAMP)
   private Date inputTime;
 
+  @javax.persistence.Temporal(TemporalType.TIMESTAMP)
+  private Date messageTime;
+
   @NotNull
-  private String provider;
+  @ManyToOne(fetch=FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
+  private FacilityMessageCounts facilityMessageCounts;
 
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageDetection> detections = new ArrayList<>();
@@ -47,6 +57,14 @@ public class MessageMetadata {
   
   @OneToMany(fetch=FetchType.LAZY, cascade = CascadeType.ALL, mappedBy="messageMetadata")
   public List<MessageVaccine> vaccines = new ArrayList<>();
+
+  public int getPatientAge() {
+    return patientAge;
+  }
+
+  public void setPatientAge(int patientAge) {
+    this.patientAge = patientAge;
+  }
 
   public List<MessageCode> getCodes() {
     return codes;
@@ -81,6 +99,14 @@ public List<MessageDetection> getDetections() {
     this.inputTime = inputTime;
   }
 
+  public Date getMessageTime() {
+    return messageTime;
+  }
+
+  public void setMessageTime(Date messageTime) {
+    this.messageTime = messageTime;
+  }
+
   public String getMessage() {
     return message;
   }
@@ -89,12 +115,12 @@ public List<MessageDetection> getDetections() {
     this.message = message;
   }
 
-  public String getProvider() {
-    return provider;
+  public FacilityMessageCounts getFacilityMessageCounts() {
+    return facilityMessageCounts;
   }
 
-  public void setProvider(String provider) {
-    this.provider = provider;
+  public void setFacilityMessageCounts(FacilityMessageCounts fmc) {
+    this.facilityMessageCounts = fmc;
   }
 
   public long getId() {

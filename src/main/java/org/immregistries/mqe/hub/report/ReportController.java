@@ -1,15 +1,29 @@
 package org.immregistries.mqe.hub.report;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.immregistries.mqe.hl7util.SeverityLevel;
+import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
+import org.immregistries.mqe.hub.report.viewer.*;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
+import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
+import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
 import org.immregistries.mqe.hub.submission.Hl7MessageConsumer;
 import org.immregistries.mqe.validator.report.MqeMessageMetrics;
 import org.immregistries.mqe.validator.report.ReportScorer;
+import org.immregistries.mqe.validator.report.ScoreReportable;
 import org.immregistries.mqe.validator.report.VxuScoredReport;
+import org.immregistries.mqe.validator.report.codes.CollectionBucket;
+import org.immregistries.mqe.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,10 +38,25 @@ public class ReportController {
   private static final Log logger = LogFactory.getLog(ReportController.class);
 
   @Autowired
+  MessageHistoryJdbcRepository repo;
+
+  @Autowired
+  MessagesViewJpaRepository mvRepo;
+
+  @Autowired
+  private CodeCollectionService codeCollectionService;
+
+  @Autowired
+  MessageRetrieverService messageRetreiver;
+
+  @Autowired
   private Hl7MessageConsumer msgr;
 
   @Autowired
-  private SenderMetricsService metricsSvc;
+  private FacilityMessageCountsService metricsSvc;
+  
+  @Autowired
+  private DetectionSeverityJpaRepository detectionsSettingsRepo;
 
   private ReportScorer scorer = ReportScorer.INSTANCE;
 
@@ -39,7 +68,7 @@ public class ReportController {
   }
 
   @RequestMapping(value = "/message", method = RequestMethod.POST)
-  public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission)
+  public VxuScoredReport scoreMessage(@RequestBody Hl7MessageSubmission submission, AuthenticationToken token)
       throws Exception {
     logger.info("ReportController scoreMessage demo! sender:" + submission.getFacilityCode());
     String submitter = submission.getFacilityCode();
@@ -48,21 +77,107 @@ public class ReportController {
       submission.setFacilityCode("MQE");
     }
 
-    msgr.processMessageAndSaveMetrics(submission);
+    msgr.processMessageAndSaveMetrics(submission, token.getPrincipal().getUsername());
 
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date());
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(submitter, new Date(), token.getPrincipal().getUsername());
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
     return report;
   }
 
-  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{date}")
+  @RequestMapping(method = RequestMethod.GET, value = "/{providerKey}/date/{dateStart}/{dateEnd}")
   public VxuScoredReport getReportFor(@PathVariable("providerKey") String providerKey,
-      @PathVariable("date") @DateTimeFormat(pattern = "yyyyMMdd") Date date) {
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date date,  @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, date);
+    return this.getScoredReportAndOverrideDefaults(providerKey, date, dateEnd, token.getPrincipal().getUsername());
+  }
+
+  @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
+  public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
+    final String username = token.getPrincipal().getUsername();
+    logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
+    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, username);
+    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, username);
+    CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
+    ProviderReport providerReport = new ProviderReport();
+    providerReport.setProvider(providerKey);
+    providerReport.setStartDate(dateStart);
+    providerReport.setEndDate(dateStart);
+    providerReport.setNumberOfMessage(numberOfMessages);
+    providerReport.setErrors(this.getErrors(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, vxuScoredReport));
+    providerReport.setCodeIssues(this.getCodeIssues(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, codeCollectionMap.getCodes()));
+    providerReport.setNumberOfErrors(providerReport.getErrors().size());
+
+    /* new data */
+    FacilitySummaryReport psr = providerReport.getCountSummary();
+    psr.getMessages().setTotal(numberOfMessages);
+
+    Integer patientCount = allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT);
+    if (patientCount!=null) {
+      psr.getPatients().setTotal(patientCount);
+
+    }
+    Map<Integer, Integer> patientAgecounts = allDaysMetrics.getPatientAgeCounts();
+    int adultCount = 0;
+    int childCount = 0;
+    for (Integer age : patientAgecounts.values()) {
+      int cnt = patientAgecounts.get(age);
+      if (age != null && age < 18) {
+        childCount = childCount + cnt;
+      } else {
+        adultCount = adultCount + cnt;
+      }
+    }
+  psr.getPatients().setAdults(adultCount);
+    psr.getPatients().setChildren(childCount);
+
+    return  providerReport;
+  }
+
+  private List<ScoreReportable> getErrors(String providerKey, String username, Date date, Date dateEnd, VxuScoredReport report) {
+    List<ScoreReportable> errors = new ArrayList<>();
+    for(ScoreReportable detection: report.getDetectionCounts()) {
+      if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
+        Page<MessageMetadata> md = this.mvRepo.findByDetectionId(username, providerKey, date, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
+        System.out.println(md.getNumberOfElements());
+        if(md != null && md.getNumberOfElements() > 0) {
+          detection.setExampleMessage(md.getContent().get(0).getMessage());
+        }
+        errors.add(detection);
+      }
+    }
+    return errors;
+  }
+
+  List<CollectionBucket> getCodeIssues(String providerKey, String username, Date date, Date dateEnd, List<CollectionBucket> codes) {
+    List<CollectionBucket> codeIssues = new ArrayList<>();
+    for(CollectionBucket codeCount: codes) {
+      System.out.println(codeCount.getStatus());
+      if(!codeCount.getStatus().equals("Valid")) {
+        Page<MessageMetadata> md = this.mvRepo.findByCodeValue(username, providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
+        System.out.println(md.getNumberOfElements());
+        if(md != null && md.getNumberOfElements() > 0) {
+          codeCount.setExampleMessage(md.getContent().get(0).getMessage());
+        }
+        codeIssues.add(codeCount);
+      }
+    }
+    return codeIssues;
+  }
+
+  private VxuScoredReport getScoredReportAndOverrideDefaults(String providerKey, Date dateStart, Date dateEnd, String username) {
+    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, dateEnd, username);
     VxuScoredReport report = scorer.getDefaultReportForMetrics(allDaysMetrics);
+    for (ScoreReportable score : report.getDetectionCounts()) {
+      DetectionSeverityOverride detectionSetting = detectionsSettingsRepo.findByDetectionSeverityOverrideGroupNameAndMqeCode(providerKey, score.getMqeCode());
+      if (detectionSetting != null) {
+        SeverityLevel severity = SeverityLevel.findByLabel(detectionSetting.getSeverity());
+        score.setSeverity(severity);
+      }
+    }
     return report;
   }
+
 
   private String testMessage =
       "MSH|^~\\&|||||20170301131228-0500||VXU^V04^VXU_V04|3WzJ-A.01.01.2aF|P|2.5.1|" +

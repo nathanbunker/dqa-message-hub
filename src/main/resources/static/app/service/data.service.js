@@ -6,7 +6,7 @@ angular.module('messageHubDemoApp')
 
 .factory('MessageListFactory', function ($resource) {
   return $resource(
-      'messages/:providerKey/date/:date/messages/:messages/page/:page/?filters=:filters');
+      'api/messages/:providerKey/date/:date/messages/:messages/page/:page/?filters=:filters');
 })
 
 .factory('MessageDetailFactory', function ($resource) {

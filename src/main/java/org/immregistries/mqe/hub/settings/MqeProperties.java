@@ -9,7 +9,7 @@ public class MqeProperties extends Properties {
     
 	private static final long serialVersionUID = 4112578685029874840L;
 	private final HashSet<Object> keys = new LinkedHashSet<Object>();
-	private final HashSet<DetectionsSettings> detectionKeys = new LinkedHashSet<DetectionsSettings>();
+	private final HashSet<DetectionSeverityOverride> detectionKeys = new LinkedHashSet<DetectionSeverityOverride>();
 
     public MqeProperties() {
     }
