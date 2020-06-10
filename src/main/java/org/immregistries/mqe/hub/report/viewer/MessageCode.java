@@ -29,6 +29,15 @@ public class MessageCode {
   private String codeValue;
   private String codeStatus;
   private int codeCount;
+  private String attribute;
+
+  public String getAttribute() {
+    return attribute;
+  }
+
+  public void setAttribute(String attribute) {
+    this.attribute = attribute;
+  }
 
   public MessageMetadata getMessageMetadata() {
     return messageMetadata;

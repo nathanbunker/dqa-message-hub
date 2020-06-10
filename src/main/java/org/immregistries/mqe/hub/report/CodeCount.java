@@ -13,8 +13,9 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "FACILITY_CODE_COUNTS", uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CODE_COUNT", columnNames = {
-    "ATTRIBUTE", "FACILITY_MESSAGE_COUNTS_ID", "CODE_TYPE", "CODE_VALUE"}))
+@Table(name = "FACILITY_CODE_COUNTS")
+//, uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CODE_COUNT", columnNames = {
+//    "ATTRIBUTE", "FACILITY_MESSAGE_COUNTS_ID", "CODE_TYPE", "CODE_VALUE"}))
 public class CodeCount {
 
   @Id

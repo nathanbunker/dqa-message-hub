@@ -267,7 +267,9 @@ public class Hl7MessageConsumer {
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(response.getMqeResponse());
     CodeCollection c = metrics.getCodes();
     for (CollectionBucket cb : c.getCodeCountList()) {
+      //attribute!!?
       MessageCode mc = new MessageCode();
+      mc.setAttribute(cb.getAttribute());
       mc.setCodeCount(cb.getCount());
       mc.setCodeType(cb.getTypeCode());
       mc.setCodeValue(cb.getValue());
@@ -278,18 +280,16 @@ public class Hl7MessageConsumer {
 
     Map<String, MessageVaccine> map = new HashMap<>();
     for (MqeVaccination mv : response.getMqeResponse().getMessageObjects().getVaccinations()) {
-      if (!mv.isAdministered()) {
-        continue;
-      }
       Date date = mv.getAdminDate();
       Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
       int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
       mm.setPatientAge(age);
       String cvx = mv.getCvxDerived();
-      String key = cvx + ":" + age;
+      String key = cvx + ":" + age + ":" + (mv.isAdministered() ? "ADMIN" : "HIST");
       MessageVaccine v = map.get(key);
       if (v == null) {
         v = new MessageVaccine();
+        v.setAdministered(mv.isAdministered());
         v.setCount(0);
         v.setMessageMetadata(mm);
         v.setVaccineCvx(cvx);

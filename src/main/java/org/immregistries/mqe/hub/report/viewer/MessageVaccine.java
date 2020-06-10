@@ -28,6 +28,15 @@ public class MessageVaccine {
 	private String vaccineCvx;
 	private int count;
 	private int age;
+	private boolean administered;
+
+	public boolean isAdministered() {
+		return administered;
+	}
+
+	public void setAdministered(boolean administered) {
+		this.administered = administered;
+	}
 
 	public MessageMetadata getMessageMetadata() {
 		return messageMetadata;

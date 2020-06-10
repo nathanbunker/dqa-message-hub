@@ -24,16 +24,16 @@ public class CodeCollectionService {
         CodeCollection senderCodes = allDaysMetrics.getCodes();
         Map<String, List<CollectionBucket>> map = new TreeMap<>();
         for (CollectionBucket cb : senderCodes.getCodeCountList()) {
-            String s = cb.getTypeCode();
-            VxuField f = VxuField.getByName(s);
-            CodesetType t = f.getCodesetType();
+            VxuField field = VxuField.getByName(cb.getTypeCode());
+            CodesetType t = field.getCodesetType();
             if (t == null) {
                 throw new RuntimeException(
-                        "well...  this is embarrasing. there's a field with no type: " + f);
+                        "well...  this is embarrassing. there's a field with no type: " + field);
             }
-            cb.setSource(f.getHl7Locator());
+            cb.setSource(field.getHl7Locator());
             cb.setTypeName(t.getDescription());
             Code c = codeRepo.getCodeFromValue(cb.getValue(), t);
+
             if (c != null) {
                 if (c.getCodeStatus() != null && StringUtils.isNotBlank(c.getCodeStatus().getStatus())) {
                     String status = c.getCodeStatus().getStatus();
