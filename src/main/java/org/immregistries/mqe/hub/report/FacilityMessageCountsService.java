@@ -192,6 +192,7 @@ public class FacilityMessageCountsService {
       cc.setCodeType(f.toString());
       cc.setOrigin(f.getHl7Locator());
       cc.setCodeValue(bucket.getValue());
+      cc.setCodeStatus(bucket.getStatus());
       cc.setCodeCount(bucket.getCount());
       cc.setFacilityMessageCounts(metrics);
       metrics.getCodes().add(cc);

@@ -28,17 +28,20 @@ public class CodeCount {
   @ManyToOne
   @JoinColumn(name = "FACILITY_MESSAGE_COUNTS_ID")
   private FacilityMessageCounts facilityMessageCounts;
-
-  @Column(name = "CODE_TYPE")
   private String codeType;
-
   private String origin;
-
   private String attribute;
-
-  @Column(name = "CODE_VALUE")
+  private String codeStatus;
   private String codeValue;
   private int codeCount;
+
+  public String getCodeStatus() {
+    return codeStatus;
+  }
+
+  public void setCodeStatus(String codeStatus) {
+    this.codeStatus = codeStatus;
+  }
 
   public long getId() {
     return id;
