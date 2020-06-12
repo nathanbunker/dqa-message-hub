@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-//, uniqueConstraints = @UniqueConstraint(name = "UNIQUE_DETECTION_SETTINGS", columnNames = {"mqeCode", "settingsGroup"})
 @Entity
 @Table(name = "DETECTION_SEVERITY")
 public class DetectionSeverity {

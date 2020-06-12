@@ -2,13 +2,7 @@ package org.immregistries.mqe.hub.cfg;
 
 import javax.annotation.PostConstruct;
 import org.immregistries.mqe.hl7util.SeverityLevel;
-import org.immregistries.mqe.hub.settings.DetectionProperties;
-import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
-import org.immregistries.mqe.hub.settings.DetectionSeverityJpaRepository;
-import org.immregistries.mqe.hub.settings.DetectionsSettingsService;
-import org.immregistries.mqe.hub.settings.MqeSettings;
-import org.immregistries.mqe.hub.settings.MqeSettingsJpaRepository;
-import org.immregistries.mqe.hub.settings.MqeSettingsName;
+import org.immregistries.mqe.hub.settings.*;
 import org.immregistries.mqe.hub.submission.MqeServiceConnectionStatus;
 import org.immregistries.mqe.hub.submission.NistValidatorHandler;
 import org.immregistries.mqe.validator.ValidatorProperties;
@@ -19,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Component
 @ConfigurationProperties(prefix = "message-hub")
 public class MqeMessageHubApplicationProperties {
@@ -28,6 +25,9 @@ public class MqeMessageHubApplicationProperties {
 
   @Autowired
   NistValidatorHandler nistValidatorHandler;
+
+  @Autowired
+  private DefaultDetectionSeverityRepository detectionSeverityRepo;
 
   @Autowired
   private MqeSettingsJpaRepository settingsRepo;
@@ -129,6 +129,18 @@ public class MqeMessageHubApplicationProperties {
 	initializeDatabaseProperties();
     detectionsSettingsSvc.loadDetectionsToDB(detectionProp.getAllPropertySettings());
     updateDetectionsInMemory(detectionProp);
+    updateDefaultDetectionSeverity();
+  }
+
+  private void updateDefaultDetectionSeverity() {
+  	List<DetectionSeverity> detections = new ArrayList<>();
+  	for(Detection d : Detection.values()) {
+  		DetectionSeverity detectionSeverity = new DetectionSeverity();
+  		detectionSeverity.setMqeCode(d.getMqeMqeCode());
+  		detectionSeverity.setSeverity(d.getSeverity().name());
+  		detections.add(detectionSeverity);
+	}
+  	detectionSeverityRepo.save(detections);
   }
 
   private void updateDetectionsInMemory(DetectionProperties detectionProp) {

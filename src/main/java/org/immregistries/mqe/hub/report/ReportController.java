@@ -38,6 +38,9 @@ public class ReportController {
   private static final Log logger = LogFactory.getLog(ReportController.class);
 
   @Autowired
+  ProviderReportJdbcService providerReportJdbcService;
+
+  @Autowired
   MessageHistoryJdbcRepository repo;
 
   @Autowired
@@ -94,6 +97,7 @@ public class ReportController {
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
   public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     final String username = token.getPrincipal().getUsername();
+    providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
     VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, username);
@@ -139,7 +143,6 @@ public class ReportController {
     for(ScoreReportable detection: report.getDetectionCounts()) {
       if(detection.getSeverity().equals(SeverityLevel.ERROR)) {
         Page<MessageMetadata> md = this.mvRepo.findByDetectionId(username, providerKey, date, dateEnd, detection.getMqeCode(), new PageRequest(1,1));
-        System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           detection.setExampleMessage(md.getContent().get(0).getMessage());
         }
@@ -152,10 +155,8 @@ public class ReportController {
   List<CollectionBucket> getCodeIssues(String providerKey, String username, Date date, Date dateEnd, List<CollectionBucket> codes) {
     List<CollectionBucket> codeIssues = new ArrayList<>();
     for(CollectionBucket codeCount: codes) {
-      System.out.println(codeCount.getStatus());
       if(!codeCount.getStatus().equals("Valid")) {
         Page<MessageMetadata> md = this.mvRepo.findByCodeValue(username, providerKey, date, dateEnd, codeCount.getValue(), codeCount.getTypeCode(), new PageRequest(1,1));
-        System.out.println(md.getNumberOfElements());
         if(md != null && md.getNumberOfElements() > 0) {
           codeCount.setExampleMessage(md.getContent().get(0).getMessage());
         }
