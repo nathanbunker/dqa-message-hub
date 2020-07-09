@@ -281,8 +281,8 @@ public class Hl7MessageConsumer {
     Map<String, MessageVaccine> map = new HashMap<>();
     for (MqeVaccination mv : response.getMqeResponse().getMessageObjects().getVaccinations()) {
       Date date = mv.getAdminDate();
-      Date birthdate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
-      int age = DateUtility.INSTANCE.getYearsBetween(birthdate, date);
+      Date birthDate = response.getMqeResponse().getMessageObjects().getPatient().getBirthDate();
+      int age = DateUtility.INSTANCE.getYearsBetween(birthDate, date);
       mm.setPatientAge(age);
       String cvx = mv.getCvxDerived();
       String key = cvx + ":" + age + ":" + (mv.isAdministered() ? "ADMIN" : "HIST");
