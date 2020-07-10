@@ -61,7 +61,7 @@ public class ProviderReportJdbcService {
 
     List<ScoreReportable> getDetectionsReport(String providerKey, Date dateStart, Date dateEnd, String username) {
         String query =
-                "SELECT MQE_DETECTION_CODE, SUM(ATTRIBUTE_COUNT) as COUNT, coalesce(o1.SEVERITY , ds.SEVERITY) as SEVERITY, MESSAGE " +
+                "SELECT MQE_DETECTION_CODE, SUM(ATTRIBUTE_COUNT) as COUNT, coalesce(o1.SEVERITY , ds.SEVERITY) as SEVERITY, MESSAGE, HOW_TO_FIX, WHY_TO_FIX " +
                 "FROM FACILITY_MESSAGE_COUNTS fmc " +
                 "JOIN FACILITY f on f.facility_id = fmc.facility_id " +
                 "JOIN FACILITY_DETECTION_COUNTS fdc on fdc.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID " +
@@ -76,16 +76,16 @@ public class ProviderReportJdbcService {
                         "LEFT JOIN MESSAGE_DETECTION md on md.MESSAGE_METADATA_ID  = mm.MESSAGE_METADATA_ID " +
                         "GROUP BY DETECTION_ID " +
                 " ) em on em.DETECTION_ID = MQE_DETECTION_CODE " +
-
                 "AND em.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID " +
+                "LEFT JOIN DETECTION_GUIDANCE gd on gd.MQE_CODE = MQE_DETECTION_CODE " +
                 "WHERE f.name = :providerIdentifier " +
                 "AND fmc.username = :username " +
                 "AND trunc(fmc.upload_date) >= :rangeStart " +
                 "AND trunc(fmc.upload_date) <= :rangeEnd " +
                 "AND coalesce(o1.SEVERITY , ds.SEVERITY) = 'ERROR' " +
-                "GROUP BY MQE_DETECTION_CODE, em.MESSAGE " +
+                "GROUP BY MQE_DETECTION_CODE, em.MESSAGE, HOW_TO_FIX, WHY_TO_FIX " +
                 "ORDER BY count DESC " +
-                "LIMIT 10";
+                "LIMIT 10 ";
 
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("rangeEnd", dateEnd)
@@ -100,6 +100,8 @@ public class ProviderReportJdbcService {
                         resultSet.getString("SEVERITY"),
                         resultSet.getString("MQE_DETECTION_CODE"),
                         resultSet.getString("MESSAGE"),
+                        resultSet.getString("HOW_TO_FIX"),
+                        resultSet.getString("WHY_TO_FIX"),
                         resultSet.getInt("COUNT")
                 );
                 return scoreReportable;
@@ -237,6 +239,51 @@ public class ProviderReportJdbcService {
             }
         });
 
+    }
+
+    private static final String getAdultChildCounts =
+            "     select "
+                    + " round(sum(case when minor_adult = 'ADULT' then counted else 0 end)) as ADULT_COUNT, "
+                    + " round(sum(case when minor_adult = 'CHILD' then counted else 0 end)) as CHILD_COUNT "
+                    + " from ( "
+                    + "     select count(*) as counted, case when PATIENT_AGE > 18 then 'ADULT' else 'CHILD' end as minor_adult "
+                    + " from MESSAGE_METADATA mm "
+                    + " join FACILITY_MESSAGE_COUNTS fmc on fmc.FACILITY_MESSAGE_COUNTS_ID = mm.FACILITY_MESSAGE_COUNTS_ID "
+                    + " join FACILITY f on f.facility_id = fmc.facility_id "
+                    + " where f.name = :providerIdentifier "
+                    + " and fmc.username = :username "
+                    + " and trunc(mm.input_time) >= :rangeStart "
+                    + " and trunc(mm.input_time) <= :rangeEnd "
+                    + " group by case when PATIENT_AGE > 18 then 'ADULT' else 'CHILD' end "
+                    + "    ) ";
+
+    public FacilitySummaryReport.PatientSummary getPatientAgesByProvider(final String providerIdentifier, final String username, final  Date rangeStart, final  Date rangeEnd ) {
+
+        SqlParameterSource namedParameters = new MapSqlParameterSource()
+                .addValue("rangeEnd", rangeEnd)
+                .addValue("rangeStart", rangeStart)
+                .addValue("username", username)
+                .addValue("providerIdentifier", providerIdentifier);
+
+        String query = getAdultChildCounts;
+        LOGGER.debug("JDBC Query: " + query);
+        try {
+            return jdbcTemplate.queryForObject(query, namedParameters, new RowMapper<FacilitySummaryReport.PatientSummary>() {
+                public FacilitySummaryReport.PatientSummary mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    int child = rs.getInt("adult_count");
+                    int adult = rs.getInt("CHILD_count");
+                    FacilitySummaryReport fsr = new FacilitySummaryReport();
+                    FacilitySummaryReport.PatientSummary ps = fsr.getPatients();
+                    ps.setAdults(adult);
+                    ps.setChildren(child);
+                    ps.setTotal(adult+child);
+                    return ps;
+                }
+            });
+        } catch (EmptyResultDataAccessException er) {
+            LOGGER.warn("Adult/Child count not found for [" + providerIdentifier + "]");
+            return new FacilitySummaryReport().getPatients();
+        }
     }
 
 }

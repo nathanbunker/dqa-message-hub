@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,7 +20,6 @@ import org.immregistries.mqe.validator.report.ReportScorer;
 import org.immregistries.mqe.validator.report.ScoreReportable;
 import org.immregistries.mqe.validator.report.VxuScoredReport;
 import org.immregistries.mqe.validator.report.codes.CollectionBucket;
-import org.immregistries.mqe.vxu.VxuObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,9 +44,6 @@ public class ReportController {
 
   @Autowired
   MessagesViewJpaRepository mvRepo;
-
-  @Autowired
-  ReportJdbcRepository reportRepo;
 
   @Autowired
   private CodeCollectionService codeCollectionService;
@@ -108,7 +103,7 @@ public class ReportController {
     FacilitySummaryReport fsr = providerReport.getCountSummary();
     fsr.getMessages().setTotal(providerReport.getNumberOfMessage());
 
-    PatientSummary ps = reportRepo.getPatientAgesByProvider(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd);
+    PatientSummary ps = providerReportJdbcService.getPatientAgesByProvider(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd);
     fsr.setPatients(ps);
 
     return  providerReport;
