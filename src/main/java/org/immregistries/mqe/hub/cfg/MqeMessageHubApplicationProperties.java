@@ -30,6 +30,9 @@ public class MqeMessageHubApplicationProperties {
   private DefaultDetectionSeverityRepository detectionSeverityRepo;
 
   @Autowired
+  private DefaultDetectionGuidanceRepository detectionGuidanceRepo;
+
+  @Autowired
   private MqeSettingsJpaRepository settingsRepo;
   
   @Autowired

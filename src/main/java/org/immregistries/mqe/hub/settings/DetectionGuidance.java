@@ -1,19 +1,30 @@
 package org.immregistries.mqe.hub.settings;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import org.springframework.test.context.jdbc.Sql;
 
 
 @Entity
 @Table(name = "DETECTION_GUIDANCE")
-@Sql({"/detectionGuidance.sql"})
 public class DetectionGuidance {
   @Id
   private String mqeCode;
+  @Column(length = 2500)
   private String howToFix;
+  @Column(length = 2500)
   private String whyToFix;
+  
+  public DetectionGuidance() {}
+  
+  public String getHowToFix() {
+    return howToFix;
+  }
+
+  public void setHowToFix(String howToFix) {
+    this.howToFix = howToFix;
+  }
 
   public String getWhyToFix() {
     return whyToFix;
@@ -22,8 +33,6 @@ public class DetectionGuidance {
   public void setWhyToFix(String whyToFix) {
     this.whyToFix = whyToFix;
   }
-
-  public DetectionGuidance() {}
 
   public String getMqeCode() {
     return mqeCode;
