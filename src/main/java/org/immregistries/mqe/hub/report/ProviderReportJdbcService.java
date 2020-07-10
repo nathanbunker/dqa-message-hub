@@ -74,7 +74,7 @@ public class ProviderReportJdbcService {
                 "JOIN ( " +
                         "SELECT DETECTION_ID, FACILITY_MESSAGE_COUNTS_ID, MAX(MESSAGE) as MESSAGE FROM MESSAGE_METADATA mm " +
                         "LEFT JOIN MESSAGE_DETECTION md on md.MESSAGE_METADATA_ID  = mm.MESSAGE_METADATA_ID " +
-                        "GROUP BY DETECTION_ID " +
+                        "GROUP BY DETECTION_ID, FACILITY_MESSAGE_COUNTS_ID " +
                 " ) em on em.DETECTION_ID = MQE_DETECTION_CODE " +
                 "AND em.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID " +
                 "LEFT JOIN DETECTION_GUIDANCE gd on gd.MQE_CODE = MQE_DETECTION_CODE " +
