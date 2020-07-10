@@ -146,7 +146,6 @@ export class CalendarComponent implements OnInit {
       ...this.calendarChart,
     };
 
-    console.log(this.calendarChart);
   }
 
   fillInEmptyDates(start: moment.Moment, end: moment.Moment) {
@@ -159,7 +158,9 @@ export class CalendarComponent implements OnInit {
   pushToCalendar(date: moment.Moment, count?: number) {
     const selected = this.start && this.end && date.isBetween(this.start, this.end, 'day', '[]');
     const tooltip = this.getTooltip(date, count && count > 0, count, selected);
-    const rangeValue = (selected ? -100 + (count >= 1 ? 140 : 0) : (count >= 1 ? 100 : null));
+
+    /* this range calculation changes how the colors work out. the number after the second question mark changes the selected color.  */
+    const rangeValue = (selected ? -100 + (count >= 1 ? 100 : 0) : (count >= 1 ? 100 : null));
 
     this.calendarChart.dataTable.push(
       [

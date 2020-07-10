@@ -14,8 +14,8 @@ export class DatepickerComponent implements OnInit {
   @Input()
   set dateString(value: string) {
     const _parsed = moment(value, 'YYYYMMDD');
-    console.log(value);
-    console.log(_parsed.year(), _parsed.month() + 1, _parsed.date());
+    // console.log(value);
+    // console.log(_parsed.year(), _parsed.month() + 1, _parsed.date());
     this.date = new NgbDate(_parsed.year(), _parsed.month() + 1, _parsed.date());
   }
 

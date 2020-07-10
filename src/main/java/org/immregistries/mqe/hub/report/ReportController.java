@@ -10,6 +10,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hl7util.SeverityLevel;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
+import org.immregistries.mqe.hub.report.FacilitySummaryReport.PatientSummary;
 import org.immregistries.mqe.hub.report.viewer.*;
 import org.immregistries.mqe.hub.rest.model.Hl7MessageSubmission;
 import org.immregistries.mqe.hub.settings.DetectionSeverityOverride;
@@ -45,6 +46,9 @@ public class ReportController {
 
   @Autowired
   MessagesViewJpaRepository mvRepo;
+
+  @Autowired
+  ReportJdbcRepository reportRepo;
 
   @Autowired
   private CodeCollectionService codeCollectionService;
@@ -101,28 +105,11 @@ public class ReportController {
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
     ProviderReport providerReport = providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
 
-    /* new data */
-    FacilitySummaryReport psr = providerReport.getCountSummary();
-    psr.getMessages().setTotal(providerReport.getNumberOfMessage());
+    FacilitySummaryReport fsr = providerReport.getCountSummary();
+    fsr.getMessages().setTotal(providerReport.getNumberOfMessage());
 
-    Integer patientCount = allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT);
-    if (patientCount!=null) {
-      psr.getPatients().setTotal(patientCount);
-
-    }
-    Map<Integer, Integer> patientAgecounts = allDaysMetrics.getPatientAgeCounts();
-    int adultCount = 0;
-    int childCount = 0;
-    for (Integer age : patientAgecounts.values()) {
-      int cnt = patientAgecounts.get(age);
-      if (age != null && age < 18) {
-        childCount = childCount + cnt;
-      } else {
-        adultCount = adultCount + cnt;
-      }
-    }
-    psr.getPatients().setAdults(adultCount);
-    psr.getPatients().setChildren(childCount);
+    PatientSummary ps = reportRepo.getPatientAgesByProvider(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd);
+    fsr.setPatients(ps);
 
     return  providerReport;
   }
