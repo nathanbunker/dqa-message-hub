@@ -77,6 +77,7 @@ export interface CodeCount {
   count: number;
   status?: any;
   label?: any;
+  showMessage?: boolean;
 }
 
 export interface DetectionCount {
@@ -91,6 +92,7 @@ export interface DetectionCount {
   count: number;
   source: string;
   diagnosticMessage: string;
+  showMessage?: boolean;
 }
 
 export interface Hl7ErrorCode {

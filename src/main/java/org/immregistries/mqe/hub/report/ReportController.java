@@ -97,24 +97,13 @@ public class ReportController {
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
   public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     final String username = token.getPrincipal().getUsername();
-    providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
-    VxuScoredReport vxuScoredReport = this.getScoredReportAndOverrideDefaults(providerKey, dateStart, dateEnd, username);
-    int numberOfMessages = repo.getFacilityMessageCountByUsername(providerKey, dateStart, dateStart, username);
-    CodeCollectionMap codeCollectionMap = codeCollectionService.getEvaluatedCodeFromMetrics(allDaysMetrics);
-    ProviderReport providerReport = new ProviderReport();
-    providerReport.setProvider(providerKey);
-    providerReport.setStartDate(dateStart);
-    providerReport.setEndDate(dateStart);
-    providerReport.setNumberOfMessage(numberOfMessages);
-    providerReport.setErrors(this.getErrors(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, vxuScoredReport));
-    providerReport.setCodeIssues(this.getCodeIssues(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd, codeCollectionMap.getCodes()));
-    providerReport.setNumberOfErrors(providerReport.getErrors().size());
+    ProviderReport providerReport = providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
 
     /* new data */
     FacilitySummaryReport psr = providerReport.getCountSummary();
-    psr.getMessages().setTotal(numberOfMessages);
+    psr.getMessages().setTotal(providerReport.getNumberOfMessage());
 
     Integer patientCount = allDaysMetrics.getObjectCounts().get(VxuObject.PATIENT);
     if (patientCount!=null) {
@@ -132,7 +121,7 @@ public class ReportController {
         adultCount = adultCount + cnt;
       }
     }
-  psr.getPatients().setAdults(adultCount);
+    psr.getPatients().setAdults(adultCount);
     psr.getPatients().setChildren(childCount);
 
     return  providerReport;

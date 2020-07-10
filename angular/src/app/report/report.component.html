@@ -32,7 +32,7 @@
         <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : report.errors && report.errors.length > 0 }"></ng-container>
       </div>
       <div class="col-11">
-        <h3 style="font-weight: bold; margin-bottom: 20px;" >Quality Errors</h3>
+        <h3 style="font-weight: bold; margin-bottom: 20px;" >Quality Errors (Top 10)</h3>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -60,7 +60,7 @@
         <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : report.codeIssues && report.codeIssues.length > 0 }"></ng-container>
       </div>
       <div class="col-11">
-        <h3 style="font-weight: bold; margin-bottom: 20px;" >Code Issues</h3>
+        <h3 style="font-weight: bold; margin-bottom: 20px;" >Code Issues (Top 10)</h3>
         <table class="table table-striped">
           <thead>
             <tr>
@@ -79,7 +79,7 @@
         </table>
       </div>
     </div>
-    <div class="row" style="padding: 20px;">
+    <!-- <div class="row" style="padding: 20px;">
       <div class="col-1">
         <ng-container *ngTemplateOutlet="thumbs; context : { $implicit : !!report.conformanceIssues && report.conformanceIssues.length > 0 }"></ng-container>
       </div>
@@ -107,7 +107,7 @@
           </tr>
         </table>
       </div>
-    </div>
+    </div> -->
   </div>
   <div class="report-header quality-issue" style="margin-top: 10px;">
     <h2 style="margin: 0;"><fa-icon icon="chevron-right"></fa-icon> MQE - Integration Report - Quality Issue </h2>
@@ -121,9 +121,15 @@
       </h3>
     </div>
     <div style="margin-top: 10px;">
-      <h5>Example</h5>
+      <h5 *ngIf="error.exampleMessage">
+        <button class="btn btn-sm btn-primary" (click)="toggleShowMessage(error)" >
+          <fa-icon *ngIf="!error.showMessage" icon="eye"></fa-icon>
+          <fa-icon *ngIf="error.showMessage" icon="eye-slash"></fa-icon>
+        </button>
+        Example HL7 Message
+      </h5>
     </div>
-    <app-hl7-view *ngIf="error.exampleMessage" [hl7Text]="error.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="error.showMessage" [hl7Text]="error.exampleMessage" ></app-hl7-view>
     <div style="margin-top: 10px;">
       <h5>Corrective Action : </h5>
       {{error.howToFix}}
@@ -150,9 +156,15 @@
       </h3>
     </div>
     <div style="margin-top: 10px;">
-      <h5>Example</h5>
+      <h5 *ngIf="codeIssue.exampleMessage">
+        <button class="btn btn-sm btn-primary" (click)="toggleShowMessage(codeIssue)" >
+          <fa-icon *ngIf="!codeIssue.showMessage" icon="eye"></fa-icon>
+          <fa-icon *ngIf="codeIssue.showMessage" icon="eye-slash"></fa-icon>
+        </button>
+        Example HL7 Message
+      </h5>
     </div>
-    <app-hl7-view *ngIf="codeIssue.exampleMessage" [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="codeIssue.showMessage" [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">
@@ -304,8 +316,8 @@
         </tr>
       </table>
     </div> -->
-    <h3 style="color: gray;" >Common Message</h3>
-    <app-hl7-view  *ngIf="report.commonMessage" [hl7Text]="report.commonMessage" ></app-hl7-view>
+    <!-- <h3 style="color: gray;" >Common Message</h3>
+    <app-hl7-view  *ngIf="report.commonMessage" [hl7Text]="report.commonMessage" ></app-hl7-view> -->
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">
@@ -336,7 +348,43 @@
   </div>
   <div style="width: 100%; padding: 20px;">
     <h3 style="font-weight: bold;" >Administered Vaccines</h3>
-    <h3 style="font-weight: bold;" >Historical Vaccines</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Label</th>
+          <th>Status</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of administered">
+          <td>{{item.value}}</td>
+          <td>{{item.label}}</td>
+          <td>{{item.status}}</td>
+          <td>{{item.count}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <h3 style="font-weight: bold; margin-top: 5px;" >Historical Vaccines</h3>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Label</th>
+          <th>Status</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of historical">
+          <td>{{item.value}}</td>
+          <td>{{item.label}}</td>
+          <td>{{item.status}}</td>
+          <td>{{item.count}}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
 </div>

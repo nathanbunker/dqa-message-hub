@@ -16,7 +16,7 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle
+  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle, faEye, faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -126,6 +126,8 @@ export class AppModule {
       faExclamationTriangle,
       faCog,
       faTimes,
+      faEye,
+      faEyeSlash,
     );
   }
 }

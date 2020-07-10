@@ -1,5 +1,6 @@
 <div class="heading">
-  <h4>VACCINE TYPES EXPECTED</h4>
+  <h4>VACCINE GROUPS ADMINISTERED</h4>
+  <p>excludes historical or otherwise not administered</p>
 </div>
 <div *ngIf="_providedTable">
   <ng-container *ngFor="let table of _providedTable" >
@@ -7,7 +8,7 @@
     <table class="table table-sm table-striped">
         <thead>
           <tr>
-            <th style="width: 33%;">Vaccine Reported</th>
+            <th style="width: 33%;">Vaccine Groups Reported</th>
             <th style="width: 25%;">Count</th>
             <th style="width: 25%;">Status</th>
             <th style="width: 12%;">filter</th>
@@ -32,7 +33,7 @@
       </table>
   </ng-container>
 </div>
-<h3>Expected Vaccines</h3>
+<h3>Expected Vaccine Groups</h3>
 <div *ngIf="_expectedTable">
     <table class="vaccineTypeTable" width="700">
       <thead>
@@ -64,7 +65,7 @@
 </div>
 
 <h4>How To Read</h4>
-<p>The Vaccine Types Expected table shown above is designed for rapid evaluation of which administered vaccinations
+<p>The table shown above is designed for rapid evaluation of which administered vaccinations
 where submitted for this selection of test messages. The counts in the table represent the number of administered vaccinations
 (excluding historical or otherwise not administered) grouped into vaccine type and age of patient when administered. The cells
 are colored based on the expectations for Present / Not Present for each vaccine type and age group. </p>
