@@ -149,7 +149,7 @@ public class ProviderReportJdbcService {
 
 
     List<CollectionBucket> getCodeIssuesReport(String providerKey, Date dateStart, Date dateEnd, String username) {
-        String query = "SELECT ATTRIBUTE, fcc.CODE_TYPE, SUM(CODE_COUNT) as count, fcc.CODE_STATUS, fcc.CODE_VALUE, MESSAGE\n" +
+        String query = "SELECT ATTRIBUTE, fcc.CODE_TYPE, SUM(CODE_COUNT) as count, fcc.CODE_STATUS, fcc.CODE_VALUE, MESSAGE " +
                 "\n" +
                 "FROM FACILITY_MESSAGE_COUNTS fmc\n" +
                 "JOIN FACILITY f on f.facility_id = fmc.facility_id\n" +
@@ -159,7 +159,7 @@ public class ProviderReportJdbcService {
                 "\tSELECT CODE_TYPE, CODE_VALUE, FACILITY_MESSAGE_COUNTS_ID, MAX(MESSAGE) as MESSAGE \n" +
                 "\tFROM MESSAGE_METADATA mm\n" +
                 "\tLEFT JOIN MESSAGE_CODE mc on mc.MESSAGE_METADATA_ID  = mm.MESSAGE_METADATA_ID \n" +
-                "\tGROUP BY CODE_TYPE, CODE_VALUE\n" +
+                "\tGROUP BY CODE_TYPE, CODE_VALUE, FACILITY_MESSAGE_COUNTS_ID \n" +
                 ") em on em.CODE_TYPE = fcc.CODE_TYPE \n" +
                 "AND em.CODE_VALUE = fcc.CODE_VALUE\n" +
                 "AND em.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n" +
@@ -169,7 +169,7 @@ public class ProviderReportJdbcService {
                 "AND trunc(fmc.upload_date) >= :rangeStart " +
                 "AND trunc(fmc.upload_date) <= :rangeEnd " +
                 "AND fcc.CODE_STATUS <> 'Valid'\n" +
-                "GROUP BY fcc.CODE_TYPE, fcc.CODE_VALUE\n" +
+                "GROUP BY ATTRIBUTE, fcc.CODE_TYPE, fcc.CODE_STATUS, fcc.CODE_VALUE, MESSAGE " +
                 "ORDER BY count DESC\n" +
                 "LIMIT 10";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
