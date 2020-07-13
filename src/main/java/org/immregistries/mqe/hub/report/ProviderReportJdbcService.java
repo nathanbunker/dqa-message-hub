@@ -61,31 +61,30 @@ public class ProviderReportJdbcService {
 
     List<ScoreReportable> getDetectionsReport(String providerKey, Date dateStart, Date dateEnd, String username) {
         String query =
-                "SELECT MQE_DETECTION_CODE, SUM(ATTRIBUTE_COUNT) as COUNT, coalesce(o1.SEVERITY , ds.SEVERITY) as SEVERITY, MESSAGE, HOW_TO_FIX, WHY_TO_FIX " +
-                "FROM FACILITY_MESSAGE_COUNTS fmc " +
-                "JOIN FACILITY f on f.facility_id = fmc.facility_id " +
-                "JOIN FACILITY_DETECTION_COUNTS fdc on fdc.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID " +
-
-                "LEFT JOIN DETECTION_SEVERITY_OVERRIDE o1 on o1.MQE_CODE = fdc.MQE_DETECTION_CODE " +
-                "LEFT JOIN DETECTION_SEVERITY_OVERRIDE_GROUP o1g on o1.DETECTION_SEVERITY_OVERRIDE_GROUP_ID = o1g.DETECTION_SEVERITY_OVERRIDE_GROUP_ID " +
-                "AND o1g.NAME = 'Unspecified' " +
-                "JOIN DETECTION_SEVERITY ds on ds.MQE_CODE = fdc.MQE_DETECTION_CODE " +
-
-                "JOIN ( " +
-                        "SELECT DETECTION_ID, FACILITY_MESSAGE_COUNTS_ID, MAX(MESSAGE) as MESSAGE FROM MESSAGE_METADATA mm " +
-                        "LEFT JOIN MESSAGE_DETECTION md on md.MESSAGE_METADATA_ID  = mm.MESSAGE_METADATA_ID " +
-                        "GROUP BY DETECTION_ID, FACILITY_MESSAGE_COUNTS_ID " +
-                " ) em on em.DETECTION_ID = MQE_DETECTION_CODE " +
-                "AND em.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID " +
-                "LEFT JOIN DETECTION_GUIDANCE gd on gd.MQE_CODE = MQE_DETECTION_CODE " +
-                "WHERE f.name = :providerIdentifier " +
-                "AND fmc.username = :username " +
-                "AND trunc(fmc.upload_date) >= :rangeStart " +
-                "AND trunc(fmc.upload_date) <= :rangeEnd " +
-                "AND coalesce(o1.SEVERITY , ds.SEVERITY) = 'ERROR' " +
-                "GROUP BY MQE_DETECTION_CODE, em.MESSAGE, HOW_TO_FIX, WHY_TO_FIX " +
-                "ORDER BY count DESC " +
-                "LIMIT 10 ";
+            "SELECT MQE_DETECTION_CODE,\n"
+                + "       SUM(ATTRIBUTE_COUNT)               as COUNT,\n"
+                + "       max(message) as message,\n"
+                + "       coalesce(o1.SEVERITY, ds.SEVERITY) as SEVERITY,\n"
+                + "       HOW_TO_FIX,\n"
+                + "       WHY_TO_FIX\n"
+                + "FROM FACILITY_MESSAGE_COUNTS fmc\n"
+                + "         JOIN FACILITY f on f.facility_id = fmc.facility_id\n"
+                + "         JOIN FACILITY_DETECTION_COUNTS fdc on fdc.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n"
+                + "         LEFT JOIN DETECTION_SEVERITY_OVERRIDE o1 on o1.MQE_CODE = fdc.MQE_DETECTION_CODE\n"
+                + "         LEFT JOIN DETECTION_SEVERITY_OVERRIDE_GROUP o1g\n"
+                + "                   on o1.DETECTION_SEVERITY_OVERRIDE_GROUP_ID = o1g.DETECTION_SEVERITY_OVERRIDE_GROUP_ID AND\n"
+                + "                      o1g.NAME = 'Unspecified'\n"
+                + "         JOIN DETECTION_SEVERITY ds on ds.MQE_CODE = fdc.MQE_DETECTION_CODE\n"
+                + "         LEFT JOIN DETECTION_GUIDANCE gd on gd.MQE_CODE = MQE_DETECTION_CODE\n"
+                + "         left join MESSAGE_METADATA mm on mm.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n"
+                + "WHERE f.name = :providerIdentifier "
+                + "AND fmc.username = :username "
+                + "AND trunc(fmc.upload_date) >= :rangeStart "
+                + "AND trunc(fmc.upload_date) <= :rangeEnd "
+                + "  AND coalesce(o1.SEVERITY, ds.SEVERITY) = 'ERROR'\n"
+                + "GROUP BY MQE_DETECTION_CODE, HOW_TO_FIX, WHY_TO_FIX\n"
+                + "ORDER BY count DESC\n"
+                + "LIMIT 10";
 
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("rangeEnd", dateEnd)
@@ -149,29 +148,38 @@ public class ProviderReportJdbcService {
 
 
     List<CollectionBucket> getCodeIssuesReport(String providerKey, Date dateStart, Date dateEnd, String username) {
-        String query = "SELECT ATTRIBUTE, fcc.CODE_TYPE, SUM(CODE_COUNT) as count, fcc.CODE_STATUS, fcc.CODE_VALUE, MESSAGE " +
-                "\n" +
-                "FROM FACILITY_MESSAGE_COUNTS fmc\n" +
-                "JOIN FACILITY f on f.facility_id = fmc.facility_id\n" +
-                "JOIN FACILITY_CODE_COUNTS fcc on fcc.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n" +
-                "\n" +
-                "JOIN (\n" +
-                "\tSELECT CODE_TYPE, CODE_VALUE, FACILITY_MESSAGE_COUNTS_ID, MAX(MESSAGE) as MESSAGE \n" +
-                "\tFROM MESSAGE_METADATA mm\n" +
-                "\tLEFT JOIN MESSAGE_CODE mc on mc.MESSAGE_METADATA_ID  = mm.MESSAGE_METADATA_ID \n" +
-                "\tGROUP BY CODE_TYPE, CODE_VALUE, FACILITY_MESSAGE_COUNTS_ID \n" +
-                ") em on em.CODE_TYPE = fcc.CODE_TYPE \n" +
-                "AND em.CODE_VALUE = fcc.CODE_VALUE\n" +
-                "AND em.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n" +
-                "\n" +
-                "WHERE f.name = :providerIdentifier " +
-                "AND fmc.username = :username " +
-                "AND trunc(fmc.upload_date) >= :rangeStart " +
-                "AND trunc(fmc.upload_date) <= :rangeEnd " +
-                "AND fcc.CODE_STATUS <> 'Valid'\n" +
-                "GROUP BY ATTRIBUTE, fcc.CODE_TYPE, fcc.CODE_STATUS, fcc.CODE_VALUE, MESSAGE " +
-                "ORDER BY count DESC\n" +
-                "LIMIT 10";
+        String query =
+                "SELECT fcc.ATTRIBUTE,\n"
+                    + "       fcc.CODE_TYPE,\n"
+                    + "       SUM(fcc.CODE_COUNT) as count,\n"
+                    + "       fcc.CODE_STATUS,\n"
+                    + "       fcc.CODE_VALUE,\n"
+                    + "       max(select max(mm.message)\n"
+                    + "           from MESSAGE_METADATA mm\n"
+                    + "           join message_code mc\n"
+                    + "           on mc.MESSAGE_METADATA_ID = mm.MESSAGE_METADATA_ID\n"
+                    + "           where mm.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n"
+                    + "               and mc.CODE_TYPE = fcc.CODE_TYPE\n"
+                    + "               and mc.CODE_VALUE = fcc.CODE_VALUE\n"
+                    + "               and mc.ATTRIBUTE = fcc.ATTRIBUTE\n"
+                    + "           ) as message\n"
+                    + "\n"
+                    + "FROM FACILITY_MESSAGE_COUNTS fmc\n"
+                    + "         JOIN FACILITY f on f.facility_id = fmc.facility_id\n"
+                    + "         JOIN FACILITY_CODE_COUNTS fcc on fcc.FACILITY_MESSAGE_COUNTS_ID = fmc.FACILITY_MESSAGE_COUNTS_ID\n"
+                    + "WHERE\n"
+                    + "                      f.name = :providerIdentifier\n"
+                    + "                AND fmc.username = :username\n"
+                    + "                AND trunc(fmc.upload_date) >= :rangeStart\n"
+                    + "                AND trunc(fmc.upload_date) <= :rangeEnd\n"
+                    + "                AND\n"
+                    + "fcc.CODE_STATUS <> 'Valid'\n"
+                    + "GROUP BY fcc.ATTRIBUTE, fcc.CODE_TYPE, fcc.CODE_STATUS, fcc.CODE_VALUE\n"
+                    + ", f.name\n"
+                    + ", fmc.username\n"
+                    + ", fmc.UPLOAD_DATE\n"
+                    + "ORDER BY count DESC\n"
+                    + "LIMIT 10;";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("rangeEnd", dateEnd)
                 .addValue("username", username)

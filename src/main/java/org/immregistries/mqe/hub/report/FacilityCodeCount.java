@@ -16,7 +16,7 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "FACILITY_CODE_COUNTS")
 //, uniqueConstraints = @UniqueConstraint(name = "UNIQUE_CODE_COUNT", columnNames = {
 //    "ATTRIBUTE", "FACILITY_MESSAGE_COUNTS_ID", "CODE_TYPE", "CODE_VALUE"}))
-public class CodeCount {
+public class FacilityCodeCount {
 
   @Id
   @SequenceGenerator(name = "CODE_COUNT_GENERATOR", sequenceName = "CODE_COUNT_SEQ", allocationSize = 100)

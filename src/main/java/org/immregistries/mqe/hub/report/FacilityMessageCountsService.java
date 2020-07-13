@@ -3,10 +3,8 @@ package org.immregistries.mqe.hub.report;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.immregistries.mqe.util.validation.MqeDetection;
 import org.immregistries.mqe.validator.detection.Detection;
@@ -92,9 +90,9 @@ public class FacilityMessageCountsService {
         vbList.put(vb, vb.getCount());
       }
 
-      List<CodeCount> codesExisting = fmc.getCodes();
-      logger.info("SM Codes: " + codesExisting);
-      for (CodeCount sam : codesExisting) {
+      List<FacilityCodeCount> codesExisting = fmc.getCodes();
+//      logger.info("SM Codes: " + codesExisting);
+      for (FacilityCodeCount sam : codesExisting) {
         CollectionBucket cc = new CollectionBucket(sam.getCodeType(), sam.getAttribute(), sam.getCodeValue(), sam.getCodeCount());
         Integer ccc = codes.get(cc);
         if (ccc != null) {
@@ -141,7 +139,7 @@ public class FacilityMessageCountsService {
 
     Map<VxuObject, Integer> objectCounts = incomingMetrics.getObjectCounts();
     Map<MqeDetection, Integer> detectionCounts = incomingMetrics.getAttributeCounts();
-    Map<Integer, Integer> patientAgeCounts = incomingMetrics.getPatientAgeCounts();
+//    Map<Integer, Integer> patientAgeCounts = incomingMetrics.getPatientAgeCounts();
 
     for (VxuObject io : objectCounts.keySet()) {
       Integer count = objectCounts.get(io);
@@ -165,6 +163,7 @@ public class FacilityMessageCountsService {
       if (detection == null) {
         continue;
       }
+
       //find the right metrics object...
       List<FacilityDetections> dms = metrics.getDetectionMetrics();
       Integer count = detectionCounts.get(detection);
@@ -192,18 +191,24 @@ public class FacilityMessageCountsService {
       }
     }
 
+    //This is... from the incoming message.
     List<CollectionBucket> codes = incomingMetrics.getCodes().getCodeCountList();
-    //logger.warn("codes: " + codes);
 
+    //This is from the incoming message, added to a list to keep track of.
     List<CollectionBucket> remainingToProcess = new ArrayList<>(codes);
-    List<CodeCount> counts = metrics.getCodes();
 
-    //		for (CodeBucket cb : codes.getCodeCountList()) {
-    //			//look and see if it already is represented in the set.  add to it if it is, add it if its not.
-    for (CodeCount cc : counts) {
-      CollectionBucket cb = new CollectionBucket(cc.getCodeType(), cc.getAttribute(),
-          cc.getCodeValue());
+    //This is the set of already existing codes in the database.
+    List<FacilityCodeCount> counts = metrics.getCodes();
+
+    //		loop over the existing codes that we know about.
+    for (FacilityCodeCount cc : counts) {
+      //Convert it from the DB object to a "collection bucket"
+      CollectionBucket cb = new CollectionBucket(cc.getCodeType(), cc.getAttribute(), cc.getCodeValue());
+      cb.setSource(cc.getOrigin());
+      //Find the collection bucket in the existing code list... b/c this is how we tell if it already exists???
       int idx = codes.indexOf(cb);
+
+      //If it's an entry in the set already, just aggregate it, and remove it from the "to be processed" list.
       if (idx > -1) {
         //add the counts to the list.
         CollectionBucket cbIn = codes.get(idx);
@@ -214,7 +219,7 @@ public class FacilityMessageCountsService {
 
     for (CollectionBucket bucket : remainingToProcess) {
       //none of these are in the db yet.
-      CodeCount cc = new CodeCount();
+      FacilityCodeCount cc = new FacilityCodeCount();
       cc.setAttribute(bucket.getAttribute());
       VxuField f = VxuField.getByName(bucket.getTypeCode());
       cc.setCodeType(f.toString());
@@ -231,7 +236,7 @@ public class FacilityMessageCountsService {
     saveMetrics(metrics);
     logger.info("Metrics: " + metrics);
     facilityMessageCountsRepo.save(metrics);
-    //facilityMessageCountsRepo.flush();
+//    facilityMessageCountsRepo.flush();
 
     return metrics;
   }

@@ -47,7 +47,7 @@ public class FacilityMessageCounts {
   private String username;
 
   @OneToMany(mappedBy = "facilityMessageCounts", cascade = CascadeType.ALL)
-  private List<CodeCount> codes = new ArrayList<>();
+  private List<FacilityCodeCount> codes = new ArrayList<>();
 
   @OneToMany(mappedBy = "facilityMessageCounts", cascade = CascadeType.ALL)
   private List<FacilityDetections> detectionMetrics = new ArrayList<>();
@@ -103,11 +103,11 @@ public class FacilityMessageCounts {
     this.score = score;
   }
 
-  public List<CodeCount> getCodes() {
+  public List<FacilityCodeCount> getCodes() {
     return codes;
   }
 
-  public void setCodes(List<CodeCount> codes) {
+  public void setCodes(List<FacilityCodeCount> codes) {
     this.codes = codes;
   }
 

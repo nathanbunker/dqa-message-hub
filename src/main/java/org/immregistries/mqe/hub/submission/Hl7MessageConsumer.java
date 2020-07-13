@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.immregistries.mqe.core.util.DateUtility;
 import org.immregistries.mqe.hl7util.Reportable;
 import org.immregistries.mqe.hl7util.SeverityLevel;
@@ -187,14 +188,14 @@ public class Hl7MessageConsumer {
     MqeMessageServiceResponse mqeResponse = messageHubResponse.getMqeResponse();
     Date messageDate = mqeResponse.getMessageObjects().getMessageHeader().getMessageDate();
     Date sentDate = new Date();
-    //  stopWatch = new StopWatch();
-    //  stopWatch.start();
+    StopWatch stopWatch = new StopWatch();
+      stopWatch.start();
     FacilityMessageCounts fmc = this.saveMetricsFromValidationResults(facility, mqeResponse, sentDate, username);
-    //  stopWatch.stop();
-    //  logger.warn("saveMetricsFromValidationResults: " + stopWatch.getTotalTimeMillis());
-    //  stopWatch = new StopWatch();
-    //  stopWatch.start();
-    MessageMetadata mm = this.saveMessageForSender(messageSubmission.getMessage(), messageHubResponse.getAck(), messageDate, messageHubResponse, fmc);
+      stopWatch.stop();
+      logger.warn("saveMetricsFromValidationResults: ms elapsed for 'save' function " + stopWatch.getTime());
+      stopWatch = new StopWatch();
+      stopWatch.start();
+    this.saveMessageForSender(messageSubmission.getMessage(), messageHubResponse.getAck(), messageDate, messageHubResponse, fmc);
     //  stopWatch.stop();
     //  logger.warn("saveMessageForSender: " + stopWatch.getTotalTimeMillis());
 
@@ -237,7 +238,6 @@ public class Hl7MessageConsumer {
 //  private MessageMetadata saveMessageForSender(String message, String ack, String facility, Date sentDate, Date messageDate, Hl7MessageHubResponse response) {
   private MessageMetadata saveMessageForSender(String message, String ack, Date messageDate, Hl7MessageHubResponse response, FacilityMessageCounts fmc) {
     MessageMetadata mm = new MessageMetadata();
-
 
     mm.setInputTime(fmc.getUploadDate());
     mm.setMessageTime(messageDate);
@@ -299,13 +299,14 @@ public class Hl7MessageConsumer {
       }
       v.setCount(v.getCount() + 1);
     }
-    metaRepo.save(mm);
-
+    metaRepo.saveAndFlush(mm);
     return mm;
   }
 
   private FacilityMessageCounts saveMetricsFromValidationResults(String facility, MqeMessageServiceResponse validationResults, Date metricsDate, String username) {
+
     MqeMessageMetrics metrics = scorer.getMqeMetricsFor(validationResults);
+
     return metricsSvc.addToFacilityMessageCounts(facility, metricsDate, username, metrics);
   }
 

@@ -3,7 +3,7 @@ package org.immregistries.mqe.hub.report;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CodeCountJpaRepository extends JpaRepository<CodeCount, Long> {
+public interface CodeCountJpaRepository extends JpaRepository<FacilityCodeCount, Long> {
 
-  List<CodeCount> findByFacilityMessageCounts(FacilityMessageCounts sm);
+  List<FacilityCodeCount> findByFacilityMessageCounts(FacilityMessageCounts sm);
 }
