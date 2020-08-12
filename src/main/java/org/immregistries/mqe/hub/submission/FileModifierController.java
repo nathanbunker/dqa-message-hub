@@ -8,25 +8,18 @@ import java.util.Map;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.rest.FileUploadData;
 import org.immregistries.mqe.hub.rest.FileUploadData.MessageAction;
-import org.immregistries.mqe.hub.rest.MessageInputController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@RequestMapping(value = "/api/file")
+@RequestMapping(value = "/api/modify")
 @RestController
-public class FileInputController {
-
-  private static final Logger logger = LoggerFactory.getLogger(FileInputController.class);
-
-  @Autowired
-  private MessageInputController messageController;
-
+public class FileModifierController {
+  private static final Logger logger = LoggerFactory.getLogger(FileModifierController.class);
   private Map<String, FileUploadData> fileQueue = new LinkedHashMap<>();
 
   @RequestMapping(value = "upload-messages", method = RequestMethod.POST)
@@ -68,6 +61,8 @@ public class FileInputController {
       data.setStatus("deleted");
       this.fileQueue.remove(fileId);
     }
+
+
   }
 
   private class FileProcessingQueue {
@@ -114,28 +109,24 @@ public class FileInputController {
   }
 
 
-  private final MessageAction messageSubmitter = new FileUploadData.MessageAction () {
+  private final MessageAction messageModifier = new FileUploadData.MessageAction () {
     @Override
-    public String doStuffWithThisMessage(String message, String sendingFacility,
-        AuthenticationToken token) throws Exception {
-      return messageController.urlEncodedHttpFormPost(message, sendingFacility, token);
+    public String doStuffWithThisMessage(String message, String transformText, AuthenticationToken token) throws Exception {
+      //NATHAN... Put your file modifier stuff here.
+      return "MSH|... {this would be an anonymized message}";
     }
   };
 
   @RequestMapping(value = "process-file", method = RequestMethod.POST)
   public FileUploadData processFile(@RequestParam("fileId") String fileId, AuthenticationToken token) throws Exception {
     FileUploadData fileUpload = this.fileQueue.get(fileId);
-
     if(fileUpload == null || !fileUpload.getUsername().equals(token.getPrincipal().getUsername())) {
       return null;
     }
-
     if ("started".equals(fileUpload.getStatus())) {
       return fileUpload;
     }
-
-    fileUpload.processHL7File(token, messageSubmitter);
+    fileUpload.processHL7File(token, messageModifier);
     return fileUpload;
   }
 }
-
