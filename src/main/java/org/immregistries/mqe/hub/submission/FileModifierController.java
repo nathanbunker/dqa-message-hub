@@ -1,10 +1,13 @@
 package org.immregistries.mqe.hub.submission;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.immregistries.mqe.hl7util.transform.TransformRequest;
+import org.immregistries.mqe.hl7util.transform.Transformer;
 import org.immregistries.mqe.hub.authentication.model.AuthenticationToken;
 import org.immregistries.mqe.hub.rest.FileUploadData;
 import org.immregistries.mqe.hub.rest.FileUploadData.MessageAction;
@@ -112,8 +115,12 @@ public class FileModifierController {
   private final MessageAction messageModifier = new FileUploadData.MessageAction () {
     @Override
     public String doStuffWithThisMessage(String message, String transformText, AuthenticationToken token) throws Exception {
-      //NATHAN... Put your file modifier stuff here.
-      return "MSH|... {this would be an anonymized message}";
+      transformText = " run procedure ANONYMIZE_AND_UPDATE_RECORD";
+      TransformRequest transformRequest = new TransformRequest(message);
+      transformRequest.setTransformText(transformText);
+      Transformer transformer = new Transformer();
+      transformer.transform(transformRequest);
+      return transformRequest.getResultText();
     }
   };
 
