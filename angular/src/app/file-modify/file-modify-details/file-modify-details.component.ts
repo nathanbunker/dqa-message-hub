@@ -37,7 +37,7 @@ export class FileModifyDetailsComponent implements OnInit {
         const element = document.createElement('a');
         const fileData = new Blob([acks], { type: 'text/plain' });
         element.setAttribute('href', URL.createObjectURL(fileData));
-        element.setAttribute('download', filename + '-acks.txt');
+        element.setAttribute('download', filename + '-changed.txt');
         element.style.display = 'none';
         document.body.appendChild(element);
         element.click();
