@@ -1,3 +1,4 @@
+import { HL7PartHighlight } from '../../hl7-view/hl7-part';
 export interface Report {
   firstMessageReceived?: any;
   lastMessageReceived?: any;
@@ -71,7 +72,7 @@ export interface CodeCount {
   typeCode: string;
   typeName?: any;
   source?: any;
-  exampleMessage?: string;
+  exampleMessage?: IExampleMessage;
   attribute: string;
   value: string;
   count: number;
@@ -86,13 +87,20 @@ export interface DetectionCount {
   hl7LocationList: Hl7LocationList[];
   hl7ErrorCode: Hl7ErrorCode;
   applicationErrorCode: Hl7ErrorCode;
-  exampleMessage?: string;
+  exampleMessage?: IExampleMessage;
   howToFix?: string;
   whyToFix?: string;
   count: number;
   source: string;
   diagnosticMessage: string;
   showMessage?: boolean;
+  mqeCode: string;
+}
+
+export interface IExampleMessage {
+  message: string;
+  locations: string[];
+  highlights?: HL7PartHighlight[];
 }
 
 export interface Hl7ErrorCode {

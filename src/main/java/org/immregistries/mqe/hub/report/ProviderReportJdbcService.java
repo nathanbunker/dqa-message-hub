@@ -51,11 +51,37 @@ public class ProviderReportJdbcService {
         report.setStartDate(dateStart);
         report.setEndDate(dateStart);
         report.setNumberOfMessage(messageHistoryJdbcRepository.getFacilityMessageCountByUsername(providerKey, dateStart, dateEnd, username));
-        report.setNumberOfErrors(this.getErrorCount(providerKey, dateStart, dateEnd, username));
+        report.setNumberOfErrors(this.getDetectionCount(providerKey, dateStart, dateEnd, username, "ERROR"));
         report.setErrors(this.getDetectionsReport(providerKey, dateStart, dateEnd, username));
         report.setCodeIssues(this.getCodeIssuesReport(providerKey, dateStart, dateEnd, username));
         report.setVaccinationCodes(this.getVaccineCodesBuckets(providerKey, dateStart, dateEnd, username));
         /* new data */
+        FacilitySummaryReport fsr = report.getCountSummary();
+        fsr.getMessages().setTotal(report.getNumberOfMessage());
+        fsr.getMessages().setErrors(report.getNumberOfErrors());
+        fsr.getMessages().setWarnings(this.getDetectionCount(providerKey, dateStart, dateEnd, username, "WARN"));
+
+        FacilitySummaryReport.PatientSummary ps = this.getPatientAgesByProvider(providerKey, username, dateStart, dateEnd);
+        fsr.setPatients(ps);
+
+        int total = 0;
+        int administered = 0;
+        int historical = 0;
+
+        for(CollectionBucket cb: report.getVaccinationCodes()) {
+            total += cb.getCount();
+            if(cb.getAttribute().equals("Administered")) {
+                administered += cb.getCount();
+            }
+
+            if(cb.getAttribute().equals("Historical")) {
+                historical += cb.getCount();
+            }
+        }
+
+        fsr.getVaccinations().setTotal(total);
+        fsr.getVaccinations().setAdministered(administered);
+        fsr.getVaccinations().setHistorical(historical);
         return report;
     }
 
@@ -98,7 +124,8 @@ public class ProviderReportJdbcService {
                 ScoreReportable scoreReportable = new ScoreReportable(
                         resultSet.getString("SEVERITY"),
                         resultSet.getString("MQE_DETECTION_CODE"),
-                        resultSet.getString("MESSAGE"),
+//                        resultSet.getString("MESSAGE"),
+                        null,
                         resultSet.getString("HOW_TO_FIX"),
                         resultSet.getString("WHY_TO_FIX"),
                         resultSet.getInt("COUNT")
@@ -108,7 +135,7 @@ public class ProviderReportJdbcService {
         });
     }
 
-    int getErrorCount(String providerKey, Date dateStart, Date dateEnd, String username) {
+    int getDetectionCount(String providerKey, Date dateStart, Date dateEnd, String username, String severity) {
         String query = "SELECT SUM(ATTRIBUTE_COUNT) as ERROR_COUNT\n" +
                 "\n" +
                 "FROM FACILITY_MESSAGE_COUNTS fmc\n" +
@@ -122,15 +149,16 @@ public class ProviderReportJdbcService {
                 "JOIN DETECTION_SEVERITY ds on ds.MQE_CODE = fdc.MQE_DETECTION_CODE\n" +
                 "\n" +
                 "\n" +
-                "WHERE f.name = 'Unspecified'\n" +
-                "AND fmc.username = 'hossamt'\n" +
-                "AND trunc(fmc.upload_date) >= '20200708'\n" +
-                "AND trunc(fmc.upload_date) <= '20200708'\n" +
-                "AND ds.SEVERITY = 'ERROR'\n";
+                "WHERE f.name = :providerIdentifier\n" +
+                "AND fmc.username = :username\n" +
+                "AND trunc(fmc.upload_date) >= :rangeStart\n" +
+                "AND trunc(fmc.upload_date) <= :rangeEnd\n" +
+                "AND ds.SEVERITY = :severity\n";
         SqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("rangeEnd", dateEnd)
                 .addValue("username", username)
                 .addValue("rangeStart", dateStart)
+                .addValue("severity", severity)
                 .addValue("providerIdentifier", providerKey);
 
         try {
@@ -195,7 +223,8 @@ public class ProviderReportJdbcService {
                         resultSet.getString("CODE_VALUE"),
                         resultSet.getInt("COUNT"),
                         resultSet.getString("CODE_STATUS"),
-                        resultSet.getString("MESSAGE")
+//                        resultSet.getString("MESSAGE")
+                        null
                 );
                 return scoreReportable;
             }

@@ -18,7 +18,7 @@
       </div>
       <div class="col-2 text-center">
         <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
-        <span class="number-indicator">#</span><br>
+        <span class="number-indicator">{{ report.countSummary?.vaccinations?.administered }}</span><br>
         <span class="subtext">Administered</span>
       </div>
       <div class="col-2 text-center">
@@ -121,15 +121,15 @@
       </h3>
     </div>
     <div style="margin-top: 10px;">
-      <h5 *ngIf="error.exampleMessage">
-        <button class="btn btn-sm btn-primary" (click)="toggleShowMessage(error)" >
+      <h5>
+        <button class="btn btn-sm btn-primary" (click)="toggleExampleMessageForDetection(error)" >
           <fa-icon *ngIf="!error.showMessage" icon="eye"></fa-icon>
           <fa-icon *ngIf="error.showMessage" icon="eye-slash"></fa-icon>
         </button>
         Example HL7 Message
       </h5>
     </div>
-    <app-hl7-view *ngIf="error.showMessage" [hl7Text]="error.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="error.showMessage" [hl7Text]="error.exampleMessage.message" [highlightList]="error.exampleMessage.highlights" ></app-hl7-view>
     <div style="margin-top: 10px;">
       <h5>Corrective Action : </h5>
       {{error.howToFix}}
@@ -156,15 +156,15 @@
       </h3>
     </div>
     <div style="margin-top: 10px;">
-      <h5 *ngIf="codeIssue.exampleMessage">
-        <button class="btn btn-sm btn-primary" (click)="toggleShowMessage(codeIssue)" >
+      <h5>
+        <button class="btn btn-sm btn-primary" (click)="toggleExampleMessageForCode(codeIssue)" >
           <fa-icon *ngIf="!codeIssue.showMessage" icon="eye"></fa-icon>
           <fa-icon *ngIf="codeIssue.showMessage" icon="eye-slash"></fa-icon>
         </button>
         Example HL7 Message
       </h5>
     </div>
-    <app-hl7-view *ngIf="codeIssue.showMessage" [hl7Text]="codeIssue.exampleMessage" ></app-hl7-view>
+    <app-hl7-view *ngIf="codeIssue.showMessage" [hl7Text]="codeIssue.exampleMessage.message" [highlightList]="codeIssue.exampleMessage.highlights" ></app-hl7-view>
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">
@@ -184,7 +184,7 @@
     </div>
     <div class="col-2 text-center">
       <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
-      <span class="number-indicator">#</span><br>
+      <span class="number-indicator">{{ report.countSummary?.vaccinations?.administered }}</span><br>
       <span class="subtext">Administered</span>
     </div>
     <div class="col-2 text-center">
@@ -337,7 +337,7 @@
     </div>
     <div class="col-2 text-center">
       <fa-icon class="big-icon" icon="syringe"></fa-icon><br>
-      <span class="number-indicator">#</span><br>
+      <span class="number-indicator">{{ report.countSummary?.vaccinations?.administered }}</span><br>
       <span class="subtext">Administered</span>
     </div>
     <div class="col-2 text-center">

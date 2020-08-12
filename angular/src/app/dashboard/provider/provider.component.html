@@ -128,7 +128,7 @@
     </ngb-tab>
     <ngb-tab [id]="tabsType.REPORT" title="Report">
       <ng-template ngbTabContent>
-        <app-report [data]="providerReport$ | async"></app-report>
+        <app-report [provider]="params.provider" [dateStart]="params.dateStart" [dateEnd]="params.dateEnd" ></app-report>
       </ng-template>
     </ngb-tab>
   </ngb-tabset>

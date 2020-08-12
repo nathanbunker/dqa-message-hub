@@ -2,8 +2,20 @@ span.hl7Part:hover {
     background-color: #337ab7;
     color: #fff;
     border-radius: .25em;
-
 }
+
+span.hl7Part.hl-error {
+  background-color: red;
+  color: #fff;
+  border-radius: .25em;
+}
+
+span.hl7Part.hl-warning {
+  background-color: orange;
+  color: #fff;
+  border-radius: .25em;
+}
+
 span.hl7Part {
     font-family: Fira Code,Menlo,Monaco,Consolas,'Courier New',monospace;
     padding-left: 5px;

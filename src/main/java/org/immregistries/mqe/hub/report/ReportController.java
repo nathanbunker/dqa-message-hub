@@ -99,13 +99,6 @@ public class ReportController {
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
     MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
     ProviderReport providerReport = providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
-
-    FacilitySummaryReport fsr = providerReport.getCountSummary();
-    fsr.getMessages().setTotal(providerReport.getNumberOfMessage());
-
-    PatientSummary ps = providerReportJdbcService.getPatientAgesByProvider(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd);
-    fsr.setPatients(ps);
-
     return  providerReport;
   }
 
