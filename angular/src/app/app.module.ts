@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { FileModifyComponent } from './file-modify/file-modify.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -19,6 +20,7 @@ import {
   faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle, faEye, faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
+import { FileModifyDetailsComponent } from './file-modify/file-modify-details/file-modify-details.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { CalendarComponent } from './dashboard/calendar/calendar.component';
 import { MessageDetailComponent } from './message-detail/message-detail.component';
@@ -54,8 +56,10 @@ import { AuthInterceptor } from './services/auth-interceptor.service';
   declarations: [
     AppComponent,
     FileUploadComponent,
+    FileModifyComponent,
     HeaderComponent,
     FileUploadDetailsComponent,
+    FileModifyDetailsComponent,
     FooterComponent,
     DashboardComponent,
     CalendarComponent,

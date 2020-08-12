@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { FileModifyComponent } from './file-modify/file-modify.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SettingsComponent } from './settings/settings.component';
 import { ProviderComponent } from './dashboard/provider/provider.component';
@@ -26,6 +27,11 @@ const routes: Routes = [
   {
     path: 'file',
     component: FileUploadComponent,
+    canActivate: [AuthenticatedGuard],
+  },
+  {
+    path: 'modify',
+    component: FileModifyComponent,
     canActivate: [AuthenticatedGuard],
   },
   {
