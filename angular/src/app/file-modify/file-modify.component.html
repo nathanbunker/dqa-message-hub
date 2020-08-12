@@ -1,0 +1,22 @@
+<div class="container" style="padding-top: 20px;">
+    <div>
+        <div class="row">
+            <div class="col-md-12">
+                <h2>File Anonymizer Page</h2>
+            </div>
+        </div>
+    </div>
+    <app-file-modify-details *ngFor="let key of keysOf(fileUploads)" [fileUploadInfo]="fileUploads[key] | async" (delete)="delete($event)" (resume)="resume($event)"></app-file-modify-details>
+
+    <div style="border:2px dotted grey; padding:10px;margin:10px;">
+      <div class="row">
+        <div class="col-sm-10">
+          <input type="file" (change)="setFile($event)"/>
+        </div>
+        <div class="col-sm-2">
+          <button (click)="submit()" class="btn btn-primary btn-sm" [disabled]="!file">Submit</button>
+        </div>
+      </div>
+    </div>
+</div>
+
