@@ -1,5 +1,11 @@
+import { IHL7Query } from '../services/hl7-parser.service';
 export interface HL7PartHighlight {
   hl7Path: string;
+  type: HighlightType;
+}
+
+export interface HL7PartHighlightQuery {
+  query: IHL7Query;
   type: HighlightType;
 }
 

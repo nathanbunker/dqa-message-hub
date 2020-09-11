@@ -129,7 +129,7 @@
         Example HL7 Message
       </h5>
     </div>
-    <app-hl7-view *ngIf="error.showMessage" [hl7Text]="error.exampleMessage.message" [highlightList]="error.exampleMessage.highlights" ></app-hl7-view>
+    <app-hl7-view *ngIf="error.showMessage" [hl7Text]="error.exampleMessage.message" [highlight]="error.exampleMessage.highlights" ></app-hl7-view>
     <div style="margin-top: 10px;">
       <h5>Corrective Action : </h5>
       {{error.howToFix}}
@@ -164,7 +164,7 @@
         Example HL7 Message
       </h5>
     </div>
-    <app-hl7-view *ngIf="codeIssue.showMessage" [hl7Text]="codeIssue.exampleMessage.message" [highlightList]="codeIssue.exampleMessage.highlights" ></app-hl7-view>
+    <app-hl7-view *ngIf="codeIssue.showMessage" [hl7Text]="codeIssue.exampleMessage.message" [highlight]="codeIssue.exampleMessage.highlights" ></app-hl7-view>
   </div>
 
   <div class="report-header summary-counts" style="margin-top: 10px;">
@@ -221,30 +221,6 @@
           </td>
           <td class="table-green-cell table-number">
             {{report.countSummary?.vaccinations?.historical}}
-          </td>
-        </tr>
-        <tr>
-          <td class="table-number-label">
-            <strong style="color: gray;" > Refusals </strong>
-          </td>
-          <td class="table-green-cell table-number">
-            {{report.countSummary?.vaccinations?.refusals}}
-          </td>
-        </tr>
-        <tr>
-          <td class="table-number-label">
-            <strong style="color: gray;" > Deletes </strong>
-          </td>
-          <td class="table-green-cell table-number">
-            {{report.countSummary?.vaccinations?.deletes}}
-          </td>
-        </tr>
-        <tr>
-          <td class="table-number-label">
-            <strong style="color: gray;" > Other </strong>
-          </td>
-          <td class="table-green-cell table-number">
-            {{report.countSummary?.vaccinations?.other}}
           </td>
         </tr>
       </table>

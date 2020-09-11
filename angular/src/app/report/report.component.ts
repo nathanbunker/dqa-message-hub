@@ -39,7 +39,10 @@ export class ReportComponent implements OnInit {
             code.exampleMessage = example;
             code.exampleMessage.highlights = example.locations.map((location) => {
               return {
-                hl7Path: location,
+                query: {
+                  genericPath: code.source,
+                  value: code.value,
+                },
                 type: HighlightType.ERROR,
               };
             });
@@ -61,7 +64,9 @@ export class ReportComponent implements OnInit {
             detection.exampleMessage = example;
             detection.exampleMessage.highlights = example.locations.map((location) => {
               return {
-                hl7Path: location,
+                query: {
+                  instancePath: location
+                },
                 type: HighlightType.ERROR,
               };
             });

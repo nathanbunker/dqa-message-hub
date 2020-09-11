@@ -4773,7 +4773,7 @@ initializeMap() {
         this.map.set('NTE-4-5', 'Comment Type - Alternate Text (ST)');
         this.map.set('NTE-4-6', 'Comment Type - Name of Alternate Coding System (ID)');
 
-        //Segment - QPD
+        // Segment - QPD
         this.map.set('QPD-4',   'Patient Name (XPN_IZ)');
         this.map.set('QPD-4-1', 'Patient Name - Family Name (FN_IZ)');
         this.map.set('QPD-4-1', 'Patient Name - Family Name (FN_IZ)');
@@ -4796,7 +4796,7 @@ initializeMap() {
         this.map.set('QPD-5-7', 'Patient Mother Maiden Name - Name Type Code (ID)');
         this.map.set('QPD-5-8', 'Patient Mother Maiden Name - Name Representation Code (ID)');
         this.map.set('QPD-5-9', 'Patient Mother Maiden Name - Name Context (CE)');
-        
+
   }
 
 

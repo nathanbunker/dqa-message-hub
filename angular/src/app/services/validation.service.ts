@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,49 +28,49 @@ export interface MqeMessage {
 }
 
 export interface MqeMessageEvaluation {
-  vxu: string,
-  ack: string,
+  vxu: string;
+  ack: string;
   mqeResponse: {
-    "messageObjects": any,
-    "validationResults": {
-      "issues": any,
-      "rulePassed": true,
-      "possible": string[],
-      "ruleClass": string,
-      "targetId": string,
-      "targetType": string,
-      "validationDetections": MqeDetection[]
+    'messageObjects': any,
+    'validationResults': {
+      'issues': any,
+      'rulePassed': true,
+      'possible': string[],
+      'ruleClass': string,
+      'targetId': string,
+      'targetType': string,
+      'validationDetections': MqeDetection[]
     } []
-  }
+  };
 }
 
 export interface MqeDetection {
-    "detection": string,
-    "positionId": string,
-    "valueReceived": string,
-    "hl7LocationList": any[],
-    "message": string,
-    "error": boolean,
-    "source": string,
-    "severity": string,
-    "reportedMessage": string,
-    "diagnosticMessage": string,
-    "applicationErrorCode": {
-        "identifier": string,
-        "text": string,
-        "nameOfCodingSystem": string,
-        "alternateIdentifier": string,
-        "alternateText": string,
-        "nameOfAlternateCodingSystem": string
-    },
-    "hl7ErrorCode": {
-        "identifier": string,
-        "text": string,
-        "nameOfCodingSystem": string,
-        "alternateIdentifier": string,
-        "alternateText": string,
-        "nameOfAlternateCodingSystem": string
-    }
+    'detection': string;
+    'positionId': string;
+    'valueReceived': string;
+    'hl7LocationList': any[];
+    'message': string;
+    'error': boolean;
+    'source': string;
+    'severity': string;
+    'reportedMessage': string;
+    'diagnosticMessage': string;
+    'applicationErrorCode': {
+        'identifier': string,
+        'text': string,
+        'nameOfCodingSystem': string,
+        'alternateIdentifier': string,
+        'alternateText': string,
+        'nameOfAlternateCodingSystem': string
+    };
+    'hl7ErrorCode': {
+        'identifier': string,
+        'text': string,
+        'nameOfCodingSystem': string,
+        'alternateIdentifier': string,
+        'alternateText': string,
+        'nameOfAlternateCodingSystem': string
+    };
 }
 
 interface RootObject {

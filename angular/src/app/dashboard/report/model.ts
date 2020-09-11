@@ -1,4 +1,4 @@
-import { HL7PartHighlight } from '../../hl7-view/hl7-part';
+import { HL7PartHighlight, HL7PartHighlightQuery } from '../../hl7-view/hl7-part';
 export interface Report {
   firstMessageReceived?: any;
   lastMessageReceived?: any;
@@ -19,6 +19,10 @@ export interface MessageDetail {
   messageResponse: string;
   detections: any[];
   codes: any[];
+  showMessageReceived?: boolean;
+  showResponse?: boolean;
+  received?: IHL7MessageView;
+  response?: IHL7MessageView;
 }
 
 export interface ScoreGroup {
@@ -72,7 +76,7 @@ export interface CodeCount {
   typeCode: string;
   typeName?: any;
   source?: any;
-  exampleMessage?: IExampleMessage;
+  exampleMessage?: IHL7MessageView;
   attribute: string;
   value: string;
   count: number;
@@ -87,7 +91,7 @@ export interface DetectionCount {
   hl7LocationList: Hl7LocationList[];
   hl7ErrorCode: Hl7ErrorCode;
   applicationErrorCode: Hl7ErrorCode;
-  exampleMessage?: IExampleMessage;
+  exampleMessage?: IHL7MessageView;
   howToFix?: string;
   whyToFix?: string;
   count: number;
@@ -97,10 +101,12 @@ export interface DetectionCount {
   mqeCode: string;
 }
 
-export interface IExampleMessage {
+export interface IHL7MessageView {
   message: string;
-  locations: string[];
-  highlights?: HL7PartHighlight[];
+  locations?: string[];
+
+  // UI Generated
+  highlights?: HL7PartHighlightQuery[];
 }
 
 export interface Hl7ErrorCode {
@@ -157,6 +163,8 @@ export interface MessageList {
   patientName: string;
   errorsCount: number;
   warningsCount: number;
+  details?: MessageDetail;
+  showDetails?: boolean;
 }
 
 export interface VaccinationExpectedMap {

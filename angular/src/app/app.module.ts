@@ -17,7 +17,22 @@ import {
   faStethoscope,
   faCaretDown,
   faTrashAlt,
-  faPause, faDownload, faChevronRight, faChevronDown, faSearch, faChevronLeft, faFilter, faSpinner, faCog, faTimes, faThumbsDown, faThumbsUp, faEnvelope, faSyringe, faExclamationTriangle, faEye, faEyeSlash
+  faDownload,
+  faChevronRight,
+  faChevronDown,
+  faSearch,
+  faChevronLeft,
+  faFilter,
+  faSpinner,
+  faCog,
+  faTimes,
+  faThumbsDown,
+  faThumbsUp,
+  faEnvelope,
+  faSyringe,
+  faExclamationTriangle,
+  faEye,
+  faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import { FileUploadDetailsComponent } from './file-upload/file-upload-details/file-upload-details.component';
 import { FileModifyDetailsComponent } from './file-modify/file-modify-details/file-modify-details.component';
