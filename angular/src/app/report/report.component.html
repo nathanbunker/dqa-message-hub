@@ -38,7 +38,8 @@
             <tr>
               <th>Description</th>
               <th>Location</th>
-              <th>Count</th>
+              <th>Messages</th>
+              <th>Detections</th>
             </tr>
           </thead>
           <tr *ngFor="let item of report.errors">
@@ -49,7 +50,10 @@
               </span>
             </td>
             <td>
-              {{item.count}}
+              {{item.messageCount}} 
+            </td>
+            <td>
+              {{item.count}} 
             </td>
           </tr>
         </table>

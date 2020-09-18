@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.immregistries.mqe.hl7util.SeverityLevel;
@@ -93,12 +94,37 @@ public class ReportController {
     return this.getScoredReportAndOverrideDefaults(providerKey, date, dateEnd, token.getPrincipal().getUsername());
   }
 
+
+  @RequestMapping(method = RequestMethod.GET, value = "/example/detection/{mqeCode}/{providerKey}/start/{dateStart}/end/{dateEnd}")
+  public MqeExampleMessage getExampleMessageForDetection(@PathVariable("mqeCode") String mqeCode, @PathVariable("providerKey") String providerKey,
+      @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date date,  @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
+    logger.info("ReportController get report! sender:" + providerKey + " date: " + date);
+    return this.providerReportJdbcService.getExampleMessageForDetection(mqeCode, providerKey, date, dateEnd, token.getPrincipal().getUsername());
+  }
+
+
+  @RequestMapping(method = RequestMethod.GET, value = "/example/code/{codeType}/{codeValue}/{providerKey}/start/{dateStart}/end/{dateEnd}")
+  public MqeExampleMessage getMessageExampleForCode(@PathVariable("codeType") String codeType, @PathVariable("codeValue") String codeValue, @PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
+    final String username = token.getPrincipal().getUsername();
+    return providerReportJdbcService.getExampleMessageForCodeTypeAndValue(codeType, codeValue, providerKey, dateStart, dateEnd, username);
+  }
+
   @RequestMapping(method = RequestMethod.GET, value = "/complete/{providerKey}/start/{dateStart}/end/{dateEnd}")
   public ProviderReport getCompleteReportFor(@PathVariable("providerKey") String providerKey, @PathVariable("dateStart") @DateTimeFormat(pattern = "yyyyMMdd") Date dateStart, @PathVariable("dateEnd") @DateTimeFormat(pattern = "yyyyMMdd") Date dateEnd, AuthenticationToken token) {
     final String username = token.getPrincipal().getUsername();
     logger.info("ReportController get complete report! sender:" + providerKey + " date: " + dateStart + " user: " + username);
-    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
-    ProviderReport providerReport = providerReportJdbcService.getProvideReport(providerKey, dateStart, dateEnd, username);
+//    MqeMessageMetrics allDaysMetrics = metricsSvc.getMetricsFor(providerKey, dateStart, username);
+    StopWatch sw = new StopWatch();
+    sw.start();
+    ProviderReport providerReport = providerReportJdbcService.getProviderReport(providerKey, dateStart, dateEnd, username);
+    sw.stop();
+    logger.warn("providerReportJdbcService.getProviderReport took ["+sw.getTime() + "]ms");
+    FacilitySummaryReport fsr = providerReport.getCountSummary();
+    fsr.getMessages().setTotal(providerReport.getNumberOfMessage());
+
+    PatientSummary ps = providerReportJdbcService.getPatientAgesByProvider(providerKey, token.getPrincipal().getUsername(), dateStart, dateEnd);
+    fsr.setPatients(ps);
+
     return  providerReport;
   }
 

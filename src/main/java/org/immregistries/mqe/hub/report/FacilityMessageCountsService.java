@@ -234,7 +234,7 @@ public class FacilityMessageCountsService {
     this.aggregateVaccineCounts(metrics, incomingMetrics.getVaccinations().getCodeCountList());
 
     saveMetrics(metrics);
-    logger.info("Metrics: " + metrics);
+//    logger.info("Metrics: " + metrics);
     facilityMessageCountsRepo.save(metrics);
 //    facilityMessageCountsRepo.flush();
 
