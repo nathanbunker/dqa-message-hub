@@ -37,15 +37,13 @@ export class ReportComponent implements OnInit {
         this.reportingService
           .getExampeMessageByCode(code.typeCode, code.value, this.provider, this.dateStart, this.dateEnd).subscribe((example) => {
             code.exampleMessage = example;
-            code.exampleMessage.highlights = example.locations.map((location) => {
-              return {
-                query: {
-                  genericPath: code.source,
-                  value: code.value,
-                },
-                type: HighlightType.ERROR,
-              };
-            });
+            code.exampleMessage.highlights = [{
+              query: {
+                genericPath: code.source,
+                value: code.value,
+              },
+              type: HighlightType.ERROR,
+            }];
             code.showMessage = true;
           });
       } else {
