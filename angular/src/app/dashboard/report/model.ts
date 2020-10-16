@@ -94,6 +94,7 @@ export interface DetectionCount {
   exampleMessage?: IHL7MessageView;
   howToFix?: string;
   whyToFix?: string;
+  messageCount?: number;
   count: number;
   source: string;
   diagnosticMessage: string;
