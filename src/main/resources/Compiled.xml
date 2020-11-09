@@ -79,6 +79,35 @@
             </use-date>
         </code>
         <code>
+            <value>Moderna COVID-19 Vaccine</value>
+            <label>Moderna COVID-19 Vaccine</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">MOD</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
+            <value>Pfizer COVID-19 Vaccine</value>
+            <label>Pfizer COVID-19 Vaccine</label>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
+                <link-to codeset="VACCINATION_MANUFACTURER_CODE">PFR</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
+        <code>
             <value>BIOTHRAX</value>
             <label>anthrax</label>
             <code-status>
@@ -10865,6 +10894,22 @@
             </use-date>
         </code>
         <code>
+            <value>MOD</value>
+            <label>Moderna US, Inc.</label>
+            <description>Moderna US, Inc.</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+            </use-date>
+        </code>
+        <code>
             <value>NAB</value>
             <label>NABI</label>
             <description>formerly North American Biologicals, Inc.</description>
@@ -11073,14 +11118,17 @@
             <reference>
                 <link-to codeset="VACCINATION_TRADE_NAME">Trumenba</link-to>
                 <link-to codeset="VACCINATION_TRADE_NAME">PREVNAR 13</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer COVID-19 Vaccine</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00005-1971-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">00005-0100-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1000-01</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-1971-04</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-1971-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-1971-02</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-0100-10</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-0100-05</link-to>
                 <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">00005-0100-02</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1000-02</link-to>
             </reference>
             <use-date>
                 <not-before>20100528</not-before>
@@ -14773,6 +14821,21 @@
             </reference>
         </code>
         <code>
+            <value>COVID-19</value>
+            <label>COVID-19</label>
+            <description></description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINATION_CVX_CODE">900</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">901</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">902</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">207</link-to>
+                <link-to codeset="VACCINATION_CVX_CODE">208</link-to>
+            </reference>
+        </code>
+        <code>
             <value>DENGUE</value>
             <label>dengue fever</label>
             <reference>
@@ -16342,6 +16405,117 @@
     <codeset>
         <label>Vaccination CVX Code</label>
         <type>VACCINATION_CVX_CODE</type>
+        <code>
+            <value>900</value>
+            <label>mRNA-1273</label>
+            <description>Moderna COVID-19 Vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+                <not-expected-before>20201001</not-expected-before>
+            </use-date>
+            <use-age>
+                <not-before-month>1</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>vaccine</concept-type>
+            <test-age>12 years</test-age>
+        </code>
+        <code>
+            <value>901</value>
+            <label>BNT162b2</label>
+            <description>Pfizer/BioNTech COVID-19 Vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+                <not-expected-before>20201001</not-expected-before>
+            </use-date>
+            <use-age>
+                <not-before-month>1</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>vaccine</concept-type>
+            <test-age>12 years</test-age>
+        </code>
+        <code>
+            <value>902</value>
+            <label>COVID Unspecified</label>
+            <description>COVID-19 Vaccine</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+                <not-expected-before>20201001</not-expected-before>
+            </use-date>
+            <use-age>
+                <not-before-month>1</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>vaccine</concept-type>
+            <test-age>12 years</test-age>
+        </code>
+        <code>
+            <value>207</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 100 mcg 0.5 mL dose</label>
+            <description>SARS-COV-2 COVID-19 vaccine, mRNA, spike protein, LNP, preservative free, 100 mcg 0.5mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Moderna COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">80777-0273-10</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">80777-0273-99</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+                <not-expected-before>20201001</not-expected-before>
+            </use-date>
+            <use-age>
+                <not-before-month>1</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>vaccine</concept-type>
+            <test-age>12 years</test-age>
+        </code>
+        <code>
+            <value>208</value>
+            <label>COVID-19, mRNA, LNP-S, PF, 30 mcg 0.3 mL dose</label>
+            <description>SARS-COV-2 COVID-19 vaccine, mRNA, spike protein, LNP, preservative free, 30 mcg 0.3mL dose</description>
+            <code-status>
+                <status>Valid</status>
+            </code-status>
+            <reference>
+                <link-to codeset="VACCINE_GROUP">COVID-19</link-to>
+                <link-to codeset="VACCINATION_TRADE_NAME">Pfizer COVID-19 Vaccine</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_USE">59267-1000-01</link-to>
+                <link-to codeset="VACCINATION_NDC_CODE_UNIT_OF_SALE">59267-1000-02</link-to>
+            </reference>
+            <use-date>
+                <not-before>20201001</not-before>
+                <not-expected-before>20201001</not-expected-before>
+            </use-date>
+            <use-age>
+                <not-before-month>1</not-before-month>
+                <not-after-month>1440</not-after-month>
+            </use-age>
+            <concept-type>vaccine</concept-type>
+            <test-age>12 years</test-age>
+        </code>
         <code>
             <value>143</value>
             <label>Adenovirus types 4 and 7</label>
